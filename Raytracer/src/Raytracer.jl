@@ -1,9 +1,9 @@
 module Raytracer
 
-import ColorTypes
+import ColorTypes.RGB
 import Base.:+, Base.:*, Base.:≈
 
-# To make this work, first define the product "scalar * color"
-Base.:*(c::ColorTypes.RGB{T}, scalar) where {T} = scalar * c
+Base.:+(c1::RGB{T}, c2::RGB{T}) where {T} = RGB(c1.r+c2.r,c1.g+c2.g,c1.b+c2.b)
+Base.:-(c1::RGB{T}, c2::RGB{T}) where {T} = RGB(c1.r-c2.r,c1.g-c2.g,c1.b-c2.b)
 
 end # module
