@@ -17,4 +17,8 @@ Base.:≈(c1::RGB{T}, c2::RGB{T}) where {T} = c1.r ≈ c2.r &&
                                             c1.g ≈ c2.g &&
                                             c1.b ≈ c2.b
 
+Base.:+(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r+c2.r,c1.g+c2.g,c1.b+c2.b)
+
+Base.:-(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r-c2.r,c1.g-c2.g,c1.b-c2.b)
+
 end # module

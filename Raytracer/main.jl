@@ -6,7 +6,7 @@ Pkg.activate(normpath(@__DIR__))
 using Raytracer
 
 function main()
-    hello_world.greet()
+    println("Hello, world!")
 end
 
 main()
