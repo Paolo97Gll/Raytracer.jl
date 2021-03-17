@@ -114,7 +114,7 @@ end
 
 # show in compact mode (i.e. inside a container)
 function Base.show(io::IO, c::RGB{T}) where {T}
-    print(io, "RGB($(c.r) $(c.g) $(c.b))")
+    print(io, "($(c.r) $(c.g) $(c.b))")
 end
 
 # default show

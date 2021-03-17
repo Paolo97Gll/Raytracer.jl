@@ -6,10 +6,6 @@ function HdrImage{T}(N::Integer,M::Integer) where {T}
     HdrImage{T}(zeros(RGB{T}, N, M))
 end
 
-function size(image::HdrImage)
-    return size(image.pixel_matrix)
-end
-
 # TODO write(io::IO, image::HdrImage)
 
 ############
@@ -44,4 +40,17 @@ BroadcastStyle(::Style{HdrImage{T}}, ::BroadcastStyle) where {T} = Style{HdrImag
 
 function similar(bc::Broadcasted{Style{HdrImage{T}}}, ::Type{T}) where {T}
     HdrImage{T}(similar(Matrix{T}, axes(bc)))
+end
+
+#########
+# OTHER #
+#########
+
+function size(image::HdrImage)
+    return size(image.pixel_matrix)
+end
+
+function Base.show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
+    println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
+    Base.print_matrix(io, image.pixel_matrix)
 end
