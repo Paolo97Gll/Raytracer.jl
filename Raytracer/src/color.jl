@@ -89,12 +89,12 @@ Broadcast.BroadcastStyle(::Type{<:RGB}) = RGBBroadcastStyle()
 # and the constructor that combines the `RGBBroadcastStyle` with any other `BroadcastStyle`
 # we want our style to have precedence over any other so that if an `RGB` type is present among
 # the arguments of broadcasting the result will be of type `RGB`
-Broadcast.BroadcastStyle(::Raytracer.RGBBroadcastStyle, ::Broadcast.BroadcastStyle) = Raytracer.RGBBroadcastStyle()
+Broadcast.BroadcastStyle(::RGBBroadcastStyle, ::Broadcast.BroadcastStyle) = RGBBroadcastStyle()
 
 # the call to `materialize` returns a call to `copy`, which by default is specialized for array-like types
 # we then have to implement a method that treats any `Broadcasted` type with our custom `RGBBroadcastStyle`
 # in an appropriate way. 
-@inline function Broadcast.copy(bc::Broadcast.Broadcasted{Raytracer.RGBBroadcastStyle})
+@inline function Broadcast.copy(bc::Broadcast.Broadcasted{RGBBroadcastStyle})
     # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
     # the result of the broadcasting and stores it into an array. splatting this
     # array into an `RGB` constructor gives us the desired result
