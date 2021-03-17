@@ -12,7 +12,10 @@ end
 
 # TODO write(io::IO, image::HdrImage)
 
-# implementing an iterator over RGB
+############
+# ITERATOR #
+############
+
 eltype(::HdrImage{T}) where {T} = T
 
 length(image::HdrImage) = length(image.pixel_matrix)
@@ -30,7 +33,9 @@ function iterate(image::HdrImage{T}, state = 1) where {T}
     state > lastindex(image) ? nothing : (image[state], state + 1)
 end
 
-# TODO implement broadcasting
+################
+# BROADCASTING #
+################
 
 axes(image::HdrImage) = axes(image.pixel_matrix)
 
