@@ -1,5 +1,5 @@
 struct HdrImage{T}
-    array_matrix::Matrix{T}
+    pixel_matrix::Matrix{T}
 end
 
 function HdrImage{T}(N::Integer,M::Integer) where {T}
@@ -7,7 +7,7 @@ function HdrImage{T}(N::Integer,M::Integer) where {T}
 end
 
 function size(image::HdrImage)
-    return size(image.array_matrix)
+    return size(image.pixel_matrix)
 end
 
 # TODO write(io::IO, image::HdrImage)
