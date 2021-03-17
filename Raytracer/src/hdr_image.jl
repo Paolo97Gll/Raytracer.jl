@@ -1,11 +1,6 @@
-function Base.zero(x::Type{RGB})
-    T = eltype(x)
-    RGB(zero(T), zero(T), zero(T))
-end
-
-struct HdrImage
-    function HdrImage(N::Integer,M::Integer)
-        new(zeros(RGB, N, M))
+struct HdrImage{T}
+    function HdrImage{T}(N::Integer,M::Integer) where {T}
+        new{T}(zeros(RGB{T}, N, M))
     end
-    array_matrix::Matrix
+    array_matrix::Matrix{T}
 end

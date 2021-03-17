@@ -100,3 +100,8 @@ Base.BroadcastStyle(::Raytracer.RGBBroadcastStyle, ::Broadcast.BroadcastStyle) =
     # array into an `RGB` constructor gives us the desired result
     return RGB(convert(Broadcast.Broadcasted{Nothing}, bc)...)
 end
+
+function Base.zero(x::Type{RGB})
+    T = eltype(x)
+    RGB(zero(T), zero(T), zero(T))
+end
