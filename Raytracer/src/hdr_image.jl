@@ -1,8 +1,9 @@
 struct HdrImage{T}
-    function HdrImage{T}(N::Integer,M::Integer) where {T}
-        new{T}(zeros(RGB{T}, N, M))
-    end
     array_matrix::Matrix{T}
+end
+
+function HdrImage{T}(N::Integer,M::Integer) where {T}
+    HdrImage{T}(zeros(RGB{T}, N, M))
 end
 
 function size(image::HdrImage)
