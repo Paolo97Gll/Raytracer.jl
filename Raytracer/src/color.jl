@@ -107,7 +107,17 @@ end
 #########
 
 
-function zero(x::Type{RGB})
-    z = zero(eltype(x))
+function Base.zero(T::Type{RGB})
+    z = zero(eltype(T))
     RGB(z, z, z)
+end
+
+# show in compact mode (i.e. inside a container)
+function Base.show(io::IO, c::RGB{T}) where {T}
+    print(io, "RGB($(c.r) $(c.g) $(c.b))")
+end
+
+# default show
+function Base.show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
+    print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
