@@ -1,6 +1,3 @@
-import ColorTypes.RGB
-
-
 ##############
 # OPERATIONS #
 ##############
