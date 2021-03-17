@@ -1,6 +1,9 @@
 module Raytracer
 
-include("Color.jl")
-include("HdrImage.jl")
+import ColorTypes: RGB
+import Base: Matrix
 
-end # module
+include("color.jl")
+include("hdr_image.jl")
+
+end
