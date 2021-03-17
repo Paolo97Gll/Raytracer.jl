@@ -4,3 +4,12 @@ struct HdrImage{T}
     end
     array_matrix::Matrix{T}
 end
+
+function size(image::HdrImage)
+    return size(image.array_matrix)
+end
+
+# TODO write(io::IO, image::HdrImage)
+
+# TODO implement iterate
+# TODO implement broadcasting

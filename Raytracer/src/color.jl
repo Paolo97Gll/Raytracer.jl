@@ -101,7 +101,7 @@ Base.BroadcastStyle(::Raytracer.RGBBroadcastStyle, ::Broadcast.BroadcastStyle) =
     return RGB(convert(Broadcast.Broadcasted{Nothing}, bc)...)
 end
 
-function Base.zero(x::Type{RGB})
+function zero(x::Type{RGB})
     T = eltype(x)
     RGB(zero(T), zero(T), zero(T))
 end
