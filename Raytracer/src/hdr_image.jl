@@ -39,11 +39,9 @@ end
 
 axes(image::HdrImage) = axes(image.pixel_matrix)
 
-Broadcast.BroadcastStyle(::Type{<:HdrImage{T}}) where {T} = Broadcast.Style{HdrImage{T}}
-Broadcast.BroadcastStyle(::Broadcast.Style{HdrImage{T}}, ::Broadcast.BroadcastStyle) where {T} = Broadcast.Style{HdrImage{T}}()
+BroadcastStyle(::Type{<:HdrImage{T}}) where {T} = Style{HdrImage{T}}
+BroadcastStyle(::Style{HdrImage{T}}, ::BroadcastStyle) where {T} = Style{HdrImage{T}}()
 
-function similar(bc::Broadcast.Broadcasted{Broadcast.Style{HdrImage{T}}}, ::Type{T}) where {T}
+function similar(bc::Broadcasted{Style{HdrImage{T}}}, ::Type{T}) where {T}
     HdrImage{T}(similar(Matrix{T}, axes(bc)))
 end
-
-# TODO implement tests
