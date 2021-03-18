@@ -17,6 +17,7 @@ eltype(::HdrImage{T}) where {T} = T
 length(image::HdrImage) = length(image.pixel_matrix)
 
 firstindex(image::HdrImage) = firstindex(image.pixel_matrix)
+firstindex(image::HdrImage, d) = firstindex(image.pixel_matrix, d)
 
 lastindex(image::HdrImage) = lastindex(image.pixel_matrix)
 lastindex(image::HdrImage, d) = lastindex(image.pixel_matrix, d)
@@ -35,6 +36,7 @@ end
 ################
 
 axes(image::HdrImage) = axes(image.pixel_matrix)
+axes(image::HdrImage, d) = axes(image.pixel_matrix, d)
 
 BroadcastStyle(::Type{<:HdrImage{T}}) where {T} = Style{HdrImage{T}}
 BroadcastStyle(::Style{HdrImage{T}}, ::BroadcastStyle) where {T} = Style{HdrImage{T}}()
