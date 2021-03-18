@@ -101,16 +101,9 @@ Broadcast.BroadcastStyle(::RGBBroadcastStyle, ::Broadcast.BroadcastStyle) = RGBB
     return RGB(convert(Broadcast.Broadcasted{Nothing}, bc)...)
 end
 
-
-#########
-# OTHER #
-#########
-
-
-function Base.zero(T::Type{RGB})
-    z = zero(eltype(T))
-    RGB(z, z, z)
-end
+######
+# IO #
+######
 
 # show in compact mode (i.e. inside a container)
 function Base.show(io::IO, c::RGB)
@@ -128,4 +121,13 @@ end
 
 function Base.write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
+end
+
+#########
+# OTHER #
+#########
+
+function Base.zero(T::Type{RGB})
+    z = zero(eltype(T))
+    RGB(z, z, z)
 end
