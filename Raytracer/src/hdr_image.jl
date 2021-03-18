@@ -19,6 +19,7 @@ length(image::HdrImage) = length(image.pixel_matrix)
 firstindex(image::HdrImage) = firstindex(image.pixel_matrix)
 
 lastindex(image::HdrImage) = lastindex(image.pixel_matrix)
+lastindex(image::HdrImage, d) = lastindex(image.pixel_matrix, d)
 
 getindex(image::HdrImage, inds...) = getindex(image.pixel_matrix, inds...)
 
