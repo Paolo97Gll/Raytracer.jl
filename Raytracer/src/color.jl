@@ -121,3 +121,11 @@ end
 function Base.show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
+
+function Base.write(io::IO, c::RGB{Float32})
+    write(io, c...)
+end
+
+function Base.write(io::IO, c::RGB{T}) where {T<:Real}
+    write(io, convert.(Float32, c))
+end

@@ -64,3 +64,6 @@ end
     # it works for any operator valid for the types of the elements
     @test all(true == el for el in (c2 ./ c1 .≈ RGB(4., 5 // 2, 2.)))
 end
+
+# TODO Paolo: test color pretty printing
+# TODO Paolo: test color write to IO
