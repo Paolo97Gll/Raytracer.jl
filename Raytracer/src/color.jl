@@ -113,7 +113,7 @@ function Base.zero(T::Type{RGB})
 end
 
 # show in compact mode (i.e. inside a container)
-function Base.show(io::IO, c::RGB{T}) where {T}
+function Base.show(io::IO, c::RGB)
     print(io, "($(c.r) $(c.g) $(c.b))")
 end
 
@@ -126,6 +126,6 @@ function Base.write(io::IO, c::RGB{Float32})
     write(io, c...)
 end
 
-function Base.write(io::IO, c::RGB{T}) where {T<:Real}
+function Base.write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
 end
