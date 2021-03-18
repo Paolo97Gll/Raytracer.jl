@@ -13,15 +13,15 @@
 (*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}(scalar * c.r, scalar * c.g, scalar * c.b)
 
 """Mirrored version of scalar multiplication for a RGB type instance"""
-(*)(c::RGB{T}, scalar::Number) where {T} = scalar * c
+(*)(c::RGB, scalar::Number) = scalar * c
 
 """Dispatch of elementwise multiplication between two RGB type instances"""
 (*)(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
 
 """Dispatch of elementwise ≈ operator between two RGB type instances"""
-(≈)(c1::RGB{T}, c2::RGB{T}) where {T} = c1.r ≈ c2.r && 
-                                        c1.g ≈ c2.g &&
-                                        c1.b ≈ c2.b
+(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r && 
+                        c1.g ≈ c2.g &&
+                        c1.b ≈ c2.b
 
 
 ############
@@ -32,15 +32,15 @@
 # implementing an iterator over RGB
 eltype(::RGB{T}) where {T} = T
 
-length(c::RGB{T}) where {T} = 3
+Base.length(::RGB) = 3
 
-firstindex(c::RGB{T}) where {T} = 1
+Base.firstindex(::RGB) = 1
 
-function lastindex(c::RGB{T}) where {T}
+function lastindex(c::RGB)
     length(c)
 end
 
-function getindex(c::RGB{T}, i::Integer) where {T}
+function Base.getindex(c::RGB, i::Integer)
     if i == 1
         return c.r
     elseif i == 2
@@ -51,11 +51,11 @@ function getindex(c::RGB{T}, i::Integer) where {T}
         throw(BoundsError(c, i))
     end
 end
-function getindex(c::RGB{T}, i::CartesianIndex{1}) where {T}
+function Base.getindex(c::RGB, i::CartesianIndex{1})
     getindex(c, Tuple(i)[1])
 end
 
-function iterate(c::RGB{T}, state = 1) where {T}
+function Base.iterate(c::RGB, state = 1)
     state > 3 ? nothing : (c[state], state +1)
 end
 
@@ -75,9 +75,9 @@ end
 # array-like type. We'll trick the broadcasting process into thinking this is the case for `RGB` so that
 # `broadcastable` will return its argument when it is applied to an `RGB`
 
-axes(::RGB{T}) where {T} = (OneTo(3),) 
+Base.axes(::RGB) = (OneTo(3),) 
 
-Broadcast.broadcastable(c::RGB{T}) where {T} = c 
+Broadcast.broadcastable(c::RGB) = c 
 Broadcast.broadcastable(::Type{RGB}) = RGB # broadcastable is also applied to types
 
 # then the result of the previous mapping is passed onto the function `combine_styles`, which
