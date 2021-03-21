@@ -3,7 +3,7 @@ module Raytracer
 import ColorTypes: RGB
 import Base: Matrix, OneTo
 import Base: (+), (-), (*), (≈) 
-import Base: size, zero, eltype, length, firstindex, lastindex, getindex, getindex, iterate, axes, show, write
+import Base: size, zero, one, eltype, length, firstindex, lastindex, getindex, getindex, iterate, axes, show, write
 import Base.Broadcast: BroadcastStyle, Style, Broadcasted
 import Base.Broadcast: broadcastable, copy, similar
 
