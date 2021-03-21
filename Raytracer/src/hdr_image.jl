@@ -72,3 +72,7 @@ end
 function size(image::HdrImage)
     return size(image.pixel_matrix)
 end
+
+function fill!(image::HdrImage, x)
+    fill!(image.pixel_matrix, x)
+end
