@@ -38,9 +38,9 @@
                         c1.b ≈ c2.b
 
 
-############
-# ITERATOR #
-############
+##############
+# ITERATIONS #
+##############
 
 
 eltype(::RGB{T}) where {T} = T
@@ -150,6 +150,7 @@ end
 # Since we will work with PFM images, which uses 32-bit floating point
 # values, we need to convert to Float32 before writing to stream.
 function Base.write(io::IO, c::RGB)
+    @warn "Implicit conversion from $(eltype(c)) to Float32, since PFM images works with 32bit floating point values"
     write(io, convert.(Float32, c))
 end
 
