@@ -36,7 +36,7 @@ Base.length(::RGB) = 3
 
 Base.firstindex(::RGB) = 1
 
-function lastindex(c::RGB)
+function Base.lastindex(c::RGB)
     length(c)
 end
 
