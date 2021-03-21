@@ -134,17 +134,21 @@ function Base.show(io::IO, c::RGB)
     print(io, "($(c.r) $(c.g) $(c.b))")
 end
 
-# Default show (more extended)
+# Human-readable show (more extended)
 function Base.show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
 
-# Write into a file (for eltype = Float32)
+# Write into a file (for eltype(c) == Float32)
+# Since we will work with PFM images, which uses 32-bit floating point
+# values, we can directly write Float32 values.
 function Base.write(io::IO, c::RGB{Float32})
     write(io, c...)
 end
 
 # Write into a file (generic version): convert to float before writing
+# Since we will work with PFM images, which uses 32-bit floating point
+# values, we need to convert to Float32 before writing to stream.
 function Base.write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
 end
