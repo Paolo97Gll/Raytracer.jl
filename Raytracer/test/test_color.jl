@@ -103,6 +103,13 @@
         @test zero(RGB{Float64}) == RGB{Float64}(0., 0., 0.)
         # test zero from variable
         c = RGB(1., 2., 3.)
-        @test zero(c) == RGB(0., 0., 0.) 
+        @test zero(c) == RGB(0., 0., 0.)
+
+        # test one from type
+        @test one(RGB{Float32}) == RGB{Float32}(1., 1., 1.)
+        @test one(RGB{Float64}) == RGB{Float64}(1., 1., 1.)
+        # test one from variable
+        c = RGB(1., 2., 3.)
+        @test one(c) == RGB(1., 1., 1.)
     end
 end

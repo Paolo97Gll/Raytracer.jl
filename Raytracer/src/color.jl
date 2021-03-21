@@ -163,7 +163,6 @@ function Base.zero(T::Type{<:RGB})
     z = zero(eltype(T))
     RGB(z, z, z)
 end
-
 function Base.zero(c::RGB)
     zero(typeof(c))
 end
@@ -172,7 +171,6 @@ function Base.one(T::Type{<:RGB})
     z = one(eltype(T))
     RGB(z, z, z)
 end
-
 function Base.one(c::RGB)
     one(typeof(c))
 end
