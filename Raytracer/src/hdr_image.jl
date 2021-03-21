@@ -6,8 +6,6 @@ function HdrImage{T}(N::Integer,M::Integer) where {T}
     HdrImage{T}(zeros(RGB{T}, N, M))
 end
 
-# TODO Samuele: write(io::IO, image::HdrImage)
-
 ############
 # ITERATOR #
 ############
