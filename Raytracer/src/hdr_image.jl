@@ -1,14 +1,39 @@
+# This file implement the structure HdrImage, which is used to represent an
+# HDR image
+#
+# The current implemented extensions are:
+# - OPERATIONS. Implement sum, difference and other operations between RGB types.
+# - ITERATIONS. Since an RGB type can be seen as a three-element array, it is 
+#   possible to implement the iterations through its elements (r, g and b).
+# - BROADCASTING. Same consideration made for the iterations.
+# - IO. Utilities for various IO operations, such as printing or writing into
+#   a stream.
+# - OTHER. Other usefull utilities.
+#
+# More informations are reported above the single implementation.
+
+
+##################
+# MAIN STRUCTURE #
+##################
+
+
 struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
-function HdrImage{T}(N::Integer,M::Integer) where {T}
-    HdrImage{T}(zeros(RGB{T}, N, M))
+function HdrImage{T}(N::Integer, M::Integer) where {T}
+    HdrImage(zeros(RGB{T}, N, M))
+end
+function HdrImage(N::Integer, M::Integer)
+    HdrImage{Float32}(N, M)
 end
 
-############
-# ITERATOR #
-############
+
+##############
+# ITERATIONS #
+##############
+
 
 eltype(::HdrImage{T}) where {T} = T
 
@@ -29,9 +54,11 @@ function iterate(image::HdrImage{T}, state = 1) where {T}
     state > lastindex(image) ? nothing : (image[state], state + 1)
 end
 
+
 ################
 # BROADCASTING #
 ################
+
 
 axes(image::HdrImage) = axes(image.pixel_matrix)
 axes(image::HdrImage, d) = axes(image.pixel_matrix, d)
@@ -43,9 +70,11 @@ function similar(bc::Broadcasted{Style{HdrImage{T}}}, ::Type{T}) where {T}
     HdrImage{T}(similar(Matrix{T}, axes(bc)))
 end
 
+
 ######
 # IO #
 ######
+
 
 function Base.show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
     println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
@@ -57,9 +86,11 @@ function Base.write(io::IO, image::HdrImage)
      (c for c ∈ image[end:-1:begin, :])...)
 end
 
+
 #########
 # OTHER #
 #########
+
 
 function size(image::HdrImage)
     return size(image.pixel_matrix)
