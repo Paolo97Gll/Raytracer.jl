@@ -29,6 +29,11 @@
 
 
     @testset "Other" begin
+        width, height = 3, 2
+        a = HdrImage(fill(RGB(NaN32,NaN32,NaN32), height, width))
+        @test all(HdrImage(width, height) .== fill!(a, zero(RGB{Float32})))
+        a = HdrImage(ones(RGB{Float32}, height, width))
+        @test all(fill!(HdrImage(width, height), one(RGB{Float32})) .== a)
         # TODO Paolo: Other tests
     end
 end
