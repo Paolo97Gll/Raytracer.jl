@@ -53,7 +53,7 @@ function Base.show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
 end
 
 function Base.write(io::IO, image::HdrImage)
-    write(io, "PF\n$(join(size(image)," "))\n$(is_little_endian() ? -1 : 1)\n", (c for c ∈ image[end:-1:begin, :])...)
+    write(io, "PF\n$(join(size(image)," "))\n$(little_endian ? -1 : 1)\n", (c for c ∈ image[end:-1:begin, :])...)
 end
 
 #########
