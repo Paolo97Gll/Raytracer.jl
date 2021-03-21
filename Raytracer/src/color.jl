@@ -159,7 +159,12 @@ end
 #########
 
 
-function Base.zero(T::Type{RGB})
+function Base.zero(T::Type{RGB{T1}}) where T1
     z = zero(eltype(T))
+    RGB(z, z, z)
+end
+
+function Base.zero(c::RGB{T}) where T
+    z = zero(eltype(c))
     RGB(z, z, z)
 end
