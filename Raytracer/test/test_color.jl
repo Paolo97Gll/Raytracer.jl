@@ -90,3 +90,7 @@ end
     write(io, c)
     @test reinterpret(Float32, take!(io)) == [1., 2., 3.]
 end
+
+@testset "Color: other" begin
+    # TODO Paolo: test zero and zeros methods
+end
