@@ -2,8 +2,12 @@ struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
-function HdrImage{T}(N::Integer,M::Integer) where {T}
-    HdrImage{T}(zeros(RGB{T}, N, M))
+@inline function HdrImage{T}(N::Integer,M::Integer) where {T}
+    HdrImage{T}(zeros(T, N, M))
+end
+
+@inline function HdrImage(::type{T},N::Integer,M::Integer) where {T}
+    HdrImage{T}(N, M)
 end
 
 ############
