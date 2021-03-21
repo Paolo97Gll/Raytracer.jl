@@ -22,11 +22,16 @@ struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
-function HdrImage{T}(N::Integer, M::Integer) where {T}
-    HdrImage(zeros(RGB{T}, N, M))
+@inline function HdrImage{T}(N::Integer,M::Integer) where {T}
+    HdrImage{T}(zeros(T, N, M))
 end
-function HdrImage(N::Integer, M::Integer)
-    HdrImage{Float32}(N, M)
+
+@inline function HdrImage(::Type{T},N::Integer,M::Integer) where {T}
+    HdrImage{T}(N, M)
+end
+
+@inline function HdrImage(N::Integer,M::Integer)
+    HdrImage{RGB{Float32}}(N, M)
 end
 
 
@@ -94,4 +99,8 @@ end
 
 function size(image::HdrImage)
     return size(image.pixel_matrix)
+end
+
+function fill!(image::HdrImage, x)
+    fill!(image.pixel_matrix, x)
 end
