@@ -127,7 +127,11 @@ end
 # OTHER #
 #########
 
-function Base.zero(T::Type{RGB})
+function Base.zero(T::Type{<:RGB})
     z = zero(eltype(T))
     RGB(z, z, z)
+end
+
+function Base.zero(c::RGB)
+    zero(typeof(c))
 end
