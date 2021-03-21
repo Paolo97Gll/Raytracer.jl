@@ -1,16 +1,15 @@
-# This file implement the structure HdrImage, which is used to represent an
-# HDR image
+# This file implement the structure HdrImage, which is used to represent an HDR image
 #
-# The current implemented extensions are:
-# - OPERATIONS. Implement sum, difference and other operations between RGB types.
-# - ITERATIONS. Since an RGB type can be seen as a three-element array, it is 
-#   possible to implement the iterations through its elements (r, g and b).
-# - BROADCASTING. Same consideration made for the iterations.
-# - IO. Utilities for various IO operations, such as printing or writing into
-#   a stream.
-# - OTHER. Other usefull utilities.
+# Current implementation info:
+# - ITERATIONS.
+# - BROADCASTING.
+# - IO.
+# - OTHER.
 #
 # More informations are reported above the single implementation.
+
+
+# TODO improve comments and descriptions
 
 
 ##################
@@ -18,18 +17,30 @@
 ##################
 
 
+"""
+TODO add docstring
+"""
 struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
+"""
+TODO add docstring
+"""
 @inline function HdrImage{T}(width::Integer, height::Integer) where {T}
     HdrImage{T}(zeros(T, height, width))
 end
 
+"""
+TODO add docstring
+"""
 @inline function HdrImage(::Type{T}, width::Integer, height::Integer) where {T}
     HdrImage{T}(width, height)
 end
 
+"""
+TODO add docstring
+"""
 @inline function HdrImage(width::Integer, height::Integer)
     HdrImage{RGB{Float32}}(width, height)
 end

@@ -14,17 +14,21 @@
     end
 
     @testset "Iterations" begin
+        # TODO Paolo: Iterations tests
     end
 
 
     @testset "Broadcasting" begin
+        # TODO Paolo: Broadcasting tests
     end
 
 
     @testset "IO" begin
+        # TODO Paolo: IO tests
     end
 
 
     @testset "Other" begin
+        # TODO Paolo: Other tests
     end
 end
