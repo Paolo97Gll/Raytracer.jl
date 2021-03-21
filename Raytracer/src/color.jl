@@ -55,7 +55,7 @@ end
 
 # Since there is no standard that specifies the order in which the colors
 # should be reported, here we use the convention whereby the colors should
-# be reported in the RGB order (first R, then G and finally B). 
+# be reported in the RGB order (first R, then G and finally B).
 function Base.getindex(c::RGB, i::Integer)
     if i == 1
         return c.r
@@ -162,7 +162,6 @@ function Base.zero(T::Type{<:RGB})
     z = zero(eltype(T))
     RGB(z, z, z)
 end
-
 function Base.zero(c::RGB)
     zero(typeof(c))
 end
