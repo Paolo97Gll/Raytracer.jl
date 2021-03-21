@@ -1,10 +1,12 @@
 # This file implement the structure HdrImage, which is used to represent an HDR image
 #
 # Current implementation info:
-# - ITERATIONS.
-# - BROADCASTING.
-# - IO.
-# - OTHER.
+# - ITERATIONS. Since an HdrImage type is a wrapper struct around a Matrix, iterating
+#   on an image means iterating on the underlying Matrix, and in this way we'll implement.
+# - BROADCASTING. Same consideration made for the iterations.
+# - IO. Utilities for various IO operations, such as printing or writing into
+#   a stream.
+# - OTHER. Other usefull utilities.
 #
 # More informations are reported above the single implementation.
 
@@ -18,28 +20,28 @@
 
 
 """
-TODO add docstring
+`HdrImage`
+Class representing an HDR image in a `Matrix` of eltype `T`.
 """
 struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
 """
-TODO add docstring
+`HdrImage{T}(width, height)`
+`HdrImage(::Type{T}, width, height)`
+Construct an `HdrImage` wrapping a matrix of size `(height, width)` filled with `zero(T)`s.
 """
 @inline function HdrImage{T}(width::Integer, height::Integer) where {T}
     HdrImage{T}(zeros(T, height, width))
 end
-
-"""
-TODO add docstring
-"""
 @inline function HdrImage(::Type{T}, width::Integer, height::Integer) where {T}
     HdrImage{T}(width, height)
 end
 
 """
-TODO add docstring
+`HdrImage(width, height)`
+Construct an `HdrImage{RGB{Float32}}` wrapping a matrix of size `(height, width)`.
 """
 @inline function HdrImage(width::Integer, height::Integer)
     HdrImage{RGB{Float32}}(width, height)
