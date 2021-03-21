@@ -20,7 +20,8 @@
 
 
 """
-`HdrImage`
+    HdrImage{T}
+
 Class representing an HDR image in a `Matrix` of eltype `T`.
 """
 struct HdrImage{T}
@@ -28,9 +29,18 @@ struct HdrImage{T}
 end
 
 """
-`HdrImage{T}(width, height)`
-`HdrImage(::Type{T}, width, height)`
+    HdrImage{T}(width, height)
+    HdrImage(::Type{T}, width, height)
+
 Construct an `HdrImage` wrapping a matrix of size `(height, width)` filled with `zero(T)`s.
+
+# Examples
+```jldoctest
+julia> a = HdrImage(RGB{Float64}, 3, 2)
+2x3 HdrImage{RGB{Float64}}
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+```
 """
 @inline function HdrImage{T}(width::Integer, height::Integer) where {T}
     HdrImage{T}(zeros(T, height, width))
@@ -40,8 +50,17 @@ end
 end
 
 """
-`HdrImage(width, height)`
+    HdrImage(width, height)
+
 Construct an `HdrImage{RGB{Float32}}` wrapping a matrix of size `(height, width)`.
+
+# Examples
+```jldoctest
+julia> a = HdrImage(3, 2)
+2x3 HdrImage{RGB{Float32}}
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+```
 """
 @inline function HdrImage(width::Integer, height::Integer)
     HdrImage{RGB{Float32}}(width, height)
