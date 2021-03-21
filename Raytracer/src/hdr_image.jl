@@ -6,8 +6,12 @@ end
     HdrImage{T}(zeros(T, N, M))
 end
 
-@inline function HdrImage(::type{T},N::Integer,M::Integer) where {T}
+@inline function HdrImage(::Type{T},N::Integer,M::Integer) where {T}
     HdrImage{T}(N, M)
+end
+
+@inline function HdrImage(N::Integer,M::Integer)
+    HdrImage{RGB{Float32}}(N, M)
 end
 
 ############
