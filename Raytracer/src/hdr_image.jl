@@ -113,5 +113,5 @@ function size(image::HdrImage)
 end
 
 function fill!(image::HdrImage, x)
-    fill!(image.pixel_matrix, x)
+    HdrImage(fill!(image.pixel_matrix, x))
 end
