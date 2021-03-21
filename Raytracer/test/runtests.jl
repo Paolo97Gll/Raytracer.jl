@@ -3,5 +3,5 @@ using Test
 
 import ColorTypes.RGB
 
-include("color_test.jl")
+include("test_color.jl")
 include("hdr_image_test.jl")

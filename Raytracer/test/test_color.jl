@@ -1,4 +1,4 @@
-@testset "Color Operations" begin
+@testset "Color: operations" begin
     c1 = RGB(1., 2., 3.)
     c2 = RGB(.4, .5, .6)
     
@@ -26,11 +26,11 @@
 end
 
 
-@testset "Color Itarable" begin
+@testset "Color: itarable" begin
     r = 1.
     g = 2.
     b = 3.
-    c = RGB(r,g,b)
+    c = RGB(r, g, b)
 
     # test indexing
     @test r == c[begin] == c[1]
@@ -39,7 +39,7 @@ end
     @test_throws BoundsError c[4]
 
     # test iterability
-    @test all(i == j for (i, j) in zip((r,g,b), c))
+    @test all(i == j for (i, j) in zip((r, g, b), c))
     
     # test splat operator 
     cc = RGB(c...)
@@ -47,10 +47,11 @@ end
 end
 
 
-@testset "Color Broadcasting" begin
-    c1 = RGB(1.,2.,3.)
-    c2 = RGB(4.,5.,6.)
+@testset "Color: broadcasting" begin
+    c1 = RGB(1., 2., 3.)
+    c2 = RGB(4., 5., 6.)
     a = 2
+
     # testing equivalence to custom defined methods
     @test c1 .+ c2 == c1 + c2
     @test c1 .- c2 == c1 - c2
@@ -65,5 +66,27 @@ end
     @test all(true == el for el in (c2 ./ c1 .≈ RGB(4., 5 // 2, 2.)))
 end
 
-# TODO Paolo: test color pretty printing
-# TODO Paolo: test color write to IO
+
+@testset "Color: IO" begin
+    c = RGB(1., 2., 3.)
+
+    # test color pretty printing (compact)
+    io = IOBuffer()
+    show(io, c)
+    @test String(take!(io)) == "(1.0 2.0 3.0)"
+    # test color pretty printing (extended)
+    io = IOBuffer()
+    show(io, "text/plain", c)
+    @test String(take!(io)) == "RGB color with eltype Float64\nR: 1.0, G: 2.0, B: 3.0"
+
+    # test color write to IO (Float32)
+    io = IOBuffer()
+    c_f32 = RGB{Float32}(1., 2., 3.)
+    write(io, c_f32)
+    @test reinterpret(Float32, take!(io)) == [1., 2., 3.]
+
+    # test color write to IO (Float64)
+    io = IOBuffer()
+    write(io, c)
+    @test reinterpret(Float32, take!(io)) == [1., 2., 3.]
+end
