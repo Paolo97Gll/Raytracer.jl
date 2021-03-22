@@ -11,9 +11,6 @@
 # More informations are reported above the single implementation.
 
 
-# TODO improve comments and descriptions
-
-
 ##################
 # MAIN STRUCTURE #
 ##################
@@ -29,10 +26,10 @@ struct HdrImage{T}
 end
 
 """
-    HdrImage{T}(width, height)
-    HdrImage(::Type{T}, width, height)
+    HdrImage{T}(img_width, img_height)
+    HdrImage(::Type{T}, img_width, img_height)
 
-Construct an `HdrImage` wrapping a matrix of size `(height, width)` filled with `zero(T)`s.
+Construct an `HdrImage` wrapping a matrix of size `(img_width, img_height)` filled with `zero(T)`s.
 
 # Examples
 ```jldoctest
@@ -42,17 +39,17 @@ julia> a = HdrImage(RGB{Float64}, 3, 2)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
 ```
 """
-@inline function HdrImage{T}(width::Integer, height::Integer) where {T}
-    HdrImage{T}(zeros(T, height, width))
+@inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T}
+    HdrImage{T}(zeros(T, img_width, img_height))
 end
-@inline function HdrImage(::Type{T}, width::Integer, height::Integer) where {T}
-    HdrImage{T}(width, height)
+@inline function HdrImage(::Type{T}, img_width::Integer, img_height::Integer) where {T}
+    HdrImage{T}(img_width, img_height)
 end
 
 """
-    HdrImage(width, height)
+    HdrImage(img_width, img_height)
 
-Construct an `HdrImage{RGB{Float32}}` wrapping a matrix of size `(height, width)`.
+Construct an `HdrImage{RGB{Float32}}` wrapping a matrix of size `(img_width, img_height)`.
 
 # Examples
 ```jldoctest
@@ -62,8 +59,8 @@ julia> a = HdrImage(3, 2)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
 ```
 """
-@inline function HdrImage(width::Integer, height::Integer)
-    HdrImage{RGB{Float32}}(width, height)
+@inline function HdrImage(img_width::Integer, img_height::Integer)
+    HdrImage{RGB{Float32}}(img_width, img_height)
 end
 
 
@@ -71,8 +68,6 @@ end
 # ITERATIONS #
 ##############
 
-
-eltype(::HdrImage{T}) where {T} = T
 
 length(image::HdrImage) = length(image.pixel_matrix)
 
@@ -128,6 +123,8 @@ end
 # OTHER #
 #########
 
+
+eltype(::HdrImage{T}) where {T} = T
 
 function size(image::HdrImage)
     return size(image.pixel_matrix)
