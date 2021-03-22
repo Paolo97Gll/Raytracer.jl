@@ -43,18 +43,18 @@
 ##############
 
 
-Base.length(::RGB) = 3
+length(::RGB) = 3
 
-Base.firstindex(::RGB) = 1
+firstindex(::RGB) = 1
 
-function Base.lastindex(c::RGB)
+function lastindex(c::RGB)
     length(c)
 end
 
 # Since there is no standard that specifies the order in which the colors
 # should be reported, here we use the convention whereby the colors should
 # be reported in the RGB order (first R, then G and finally B).
-function Base.getindex(c::RGB, i::Integer)
+function getindex(c::RGB, i::Integer)
     if i == 1
         return c.r
     elseif i == 2
@@ -65,11 +65,11 @@ function Base.getindex(c::RGB, i::Integer)
         throw(BoundsError(c, i))
     end
 end
-function Base.getindex(c::RGB, i::CartesianIndex{1})
+function getindex(c::RGB, i::CartesianIndex{1})
     getindex(c, Tuple(i)[1])
 end
 
-function Base.iterate(c::RGB, state = 1)
+function iterate(c::RGB, state = 1)
     state > 3 ? nothing : (c[state], state +1)
 end
 
@@ -88,37 +88,37 @@ end
 # array-like type. We'll trick the broadcasting process into thinking this is the case for `RGB` so that
 # `broadcastable` will return its argument when it is applied to an `RGB`
 
-Base.axes(::RGB) = (OneTo(3),) 
+axes(::RGB) = (OneTo(3),) 
 
-Broadcast.broadcastable(c::RGB) = c 
-Broadcast.broadcastable(::Type{RGB}) = RGB # broadcastable is also applied to types
+broadcastable(c::RGB) = c
+broadcastable(::Type{RGB}) = RGB # broadcastable is also applied to types
 
 # Then the result of the previous mapping is passed onto the function `combine_styles`, which
 # relies on calls to the constructor of `BroadcastStyle`. We need to create a `BroadcastStyle` 
 # exclusive to `RGB` so that we can then specialize other methods that are fed `BroadcastStyle`s
 
-struct RGBBroadcastStyle <: Broadcast.BroadcastStyle
+struct RGBBroadcastStyle <: BroadcastStyle
 end
 
 # Then we specialize the constructor from instances of `RGB`
 
-Broadcast.BroadcastStyle(::Type{<:RGB}) = RGBBroadcastStyle()
+BroadcastStyle(::Type{<:RGB}) = RGBBroadcastStyle()
 
 # And the constructor that combines the `RGBBroadcastStyle` with any other `BroadcastStyle`
 # we want our style to have precedence over any other so that if an `RGB` type is present among
 # the arguments of broadcasting the result will be of type `RGB`
 
-Broadcast.BroadcastStyle(::RGBBroadcastStyle, ::Broadcast.BroadcastStyle) = RGBBroadcastStyle()
+BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
 
 # The call to `materialize` returns a call to `copy`, which by default is specialized for array-like types
 # we then have to implement a method that treats any `Broadcasted` type with our custom `RGBBroadcastStyle`
 # in an appropriate way.
 
-@inline function Broadcast.copy(bc::Broadcast.Broadcasted{RGBBroadcastStyle})
+@inline function copy(bc::Broadcasted{RGBBroadcastStyle})
     # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
     # the result of the broadcasting and stores it into an array. splatting this
     # array into an `RGB` constructor gives us the desired result
-    return RGB(convert(Broadcast.Broadcasted{Nothing}, bc)...)
+    return RGB(convert(Broadcasted{Nothing}, bc)...)
 end
 
 
@@ -128,26 +128,26 @@ end
 
 
 # Show in compact mode (i.e. inside a container)
-function Base.show(io::IO, c::RGB)
+function show(io::IO, c::RGB)
     print(io, "($(c.r) $(c.g) $(c.b))")
 end
 
 # Human-readable show (more extended)
-function Base.show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
+function show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
 
 # Write into a file (for eltype(c) == Float32)
 # Since we will work with PFM images, which uses 32-bit floating point
 # values, we can directly write Float32 values.
-function Base.write(io::IO, c::RGB{Float32})
+function write(io::IO, c::RGB{Float32})
     write(io, c...)
 end
 
 # Write into a file (generic version): convert to float before writing
 # Since we will work with PFM images, which uses 32-bit floating point
 # values, we need to convert to Float32 before writing to stream.
-function Base.write(io::IO, c::RGB)
+function write(io::IO, c::RGB)
     @warn "Implicit conversion from $(eltype(c)) to Float32, since PFM images works with 32bit floating point values"
     write(io, convert.(Float32, c))
 end
@@ -160,18 +160,18 @@ end
 
 eltype(::RGB{T}) where {T} = T
 
-function Base.zero(T::Type{<:RGB})
+function zero(T::Type{<:RGB})
     z = zero(eltype(T))
     RGB(z, z, z)
 end
-function Base.zero(c::RGB)
+function zero(c::RGB)
     zero(typeof(c))
 end
 
-function Base.one(T::Type{<:RGB})
+function one(T::Type{<:RGB})
     z = one(eltype(T))
     RGB(z, z, z)
 end
-function Base.one(c::RGB)
+function one(c::RGB)
     one(typeof(c))
 end
