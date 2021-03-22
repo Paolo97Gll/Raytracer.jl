@@ -31,7 +31,12 @@
         r = 1.
         g = 2.
         b = 3.
-        c = RGB(r, g, b)
+        c = RGB{Float32}(r, g, b)
+
+        # test indexing properties
+        @test length(c) == 3
+        @test firstindex(c) == 1
+        @test lastindex(c) == 3
 
         # test indexing
         @test r == c[begin] == c[1]
@@ -98,6 +103,9 @@
 
 
     @testset "Other" begin
+        # test eltype
+        @test eltype(RGB{Float32}) == Float32
+
         # test zero from type
         @test zero(RGB{Float32}) == RGB{Float32}(0., 0., 0.)
         @test zero(RGB{Float64}) == RGB{Float64}(0., 0., 0.)
