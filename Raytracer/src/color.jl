@@ -43,8 +43,6 @@
 ##############
 
 
-eltype(::RGB{T}) where {T} = T
-
 Base.length(::RGB) = 3
 
 Base.firstindex(::RGB) = 1
@@ -158,6 +156,9 @@ end
 #########
 # OTHER #
 #########
+
+
+eltype(::RGB{T}) where {T} = T
 
 function Base.zero(T::Type{<:RGB})
     z = zero(eltype(T))
