@@ -56,13 +56,14 @@
 
 
     @testset "Other" begin
-        img_width, img_height = 3, 2
+        img_width, img_height = 2, 3
 
-        a = HdrImage(fill(RGB(NaN32,NaN32,NaN32), img_height, img_width))
+        # test fill!
+        a = HdrImage(fill(RGB(NaN32,NaN32,NaN32), img_width, img_height))
         @test all(HdrImage(img_width, img_height) .== fill!(a, zero(RGB{Float32})))
-        
-        a = HdrImage(ones(RGB{Float32}, img_height, img_width))
+        a = HdrImage(ones(RGB{Float32}, img_width, img_height))
         @test all(fill!(HdrImage(img_width, img_height), one(RGB{Float32})) .== a)
+        
         # TODO Paolo: Other tests
     end
 end
