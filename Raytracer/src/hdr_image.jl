@@ -41,7 +41,7 @@ julia> a = HdrImage(RGB{Float64}, 3, 2)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
 ```
 """
-@inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T<:RGB}
+@inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T}
     HdrImage{T}(zeros(T, img_width, img_height))
 end
 
