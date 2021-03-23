@@ -44,7 +44,6 @@ julia> a = HdrImage(RGB{Float64}, 3, 2)
 @inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T}
     HdrImage{T}(zeros(T, img_width, img_height))
 end
-
 @inline function HdrImage(::Type{T}, img_width::Integer, img_height::Integer) where {T}
     HdrImage{T}(img_width, img_height)
 end
@@ -102,17 +101,10 @@ firstindex(image::HdrImage, d) = firstindex(image.pixel_matrix, d)
 lastindex(image::HdrImage) = lastindex(image.pixel_matrix)
 lastindex(image::HdrImage, d) = lastindex(image.pixel_matrix, d)
 
-
 getindex(image::HdrImage, inds...) = getindex(image.pixel_matrix, inds...)
 
-
-function setindex!(image::HdrImage{T}, value::T, key::Integer) where {T}
-    setindex!(image.pixel_matrix, value, key)
-end
-
-# TODO include type filter also here
+setindex!(image::HdrImage, value, key) = setindex!(image.pixel_matrix, value, key)
 setindex!(image::HdrImage, X, inds...) = setindex!(image.pixel_matrix, X, inds...)
-
 
 function iterate(image::HdrImage{T}, state = 1) where {T}
     state > lastindex(image) ? nothing : (image[state], state + 1)
