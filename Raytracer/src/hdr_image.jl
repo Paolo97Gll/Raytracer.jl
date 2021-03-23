@@ -66,6 +66,9 @@ julia> a = HdrImage(3, 2)
     HdrImage{RGB{Float32}}(img_width, img_height)
 end
 
+function HdrImage(arr::AbstractArray{<:Any, 1}, im_width::Integer, im_height::Integer)
+    HdrImage(reshape(arr, im_width, im_height))
+end
 
 ##############
 # ITERATIONS #
