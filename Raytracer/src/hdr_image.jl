@@ -102,17 +102,17 @@ end
 ################
 
 
-# BUG Samuele: broadcasting not working (it returns an array, not a matrix)
-
-
 axes(image::HdrImage) = axes(image.pixel_matrix)
 axes(image::HdrImage, d) = axes(image.pixel_matrix, d)
 
-BroadcastStyle(::Type{<:HdrImage{T}}) where {T} = Style{HdrImage{T}}
-BroadcastStyle(::Style{HdrImage{T}}, ::BroadcastStyle) where {T} = Style{HdrImage{T}}()
+broadcastable(image::HdrImage) = image
+broadcastable(::Type{<:HdrImage}) = HdrImage
 
-function similar(bc::Broadcasted{Style{HdrImage{T}}}, ::Type{T}) where {T}
-    HdrImage{T}(similar(Matrix{T}, axes(bc)))
+BroadcastStyle(::Type{<:HdrImage}) = Style{HdrImage}()
+BroadcastStyle(::Style{HdrImage}, ::BroadcastStyle) = Style{HdrImage}()
+
+@inline function copy(bc::Broadcasted{Style{HdrImage}})
+    return HdrImage(reshape(collect(convert(Broadcasted{Nothing}, bc)), axes(bc)))
 end
 
 
