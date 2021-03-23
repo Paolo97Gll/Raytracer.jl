@@ -30,14 +30,15 @@ end
     HdrImage{T}(img_width, img_height)
     HdrImage(::Type{T}, img_width, img_height)
 
-Construct an `HdrImage` wrapping a matrix of size `(img_width, img_height)` filled with `zero(T)`s.
+Construct an `HdrImage` wrapping a zero-initialized matrix of size `(img_width, img_height)`.
 
 # Examples
 ```jldoctest
 julia> a = HdrImage(RGB{Float64}, 3, 2)
-2x3 HdrImage{RGB{Float64}}
- (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
- (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+3x2 HdrImage{RGB{Float64}}
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
 ```
 """
 @inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T<:RGB}
@@ -52,20 +53,38 @@ end
 """
     HdrImage(img_width, img_height)
 
-Construct an `HdrImage{RGB{Float32}}` wrapping a matrix of size `(img_width, img_height)`.
+Construct an `HdrImage{RGB{Float32}}` wrapping a zero-initialized matrix of size `(img_width, img_height)`.
 
 # Examples
 ```jldoctest
 julia> a = HdrImage(3, 2)
-2x3 HdrImage{RGB{Float32}}
- (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
- (0.0 0.0 0.0)  (0.0 0.0 0.0)  (0.0 0.0 0.0)
+3x2 HdrImage{RGB{Float32}}
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
+ (0.0 0.0 0.0)  (0.0 0.0 0.0)
 ```
 """
 @inline function HdrImage(img_width::Integer, img_height::Integer)
     HdrImage{RGB{Float32}}(img_width, img_height)
 end
 
+"""
+    HdrImage(arr, img_width, img_height)
+
+Construct an `HdrImage{RGB{Float32}}` wrapping a matrix obtained from `reshape(arr, img_width, img_height)`.
+
+# Examples
+```jldoctest
+julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.), 
+              RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
+
+julia> a = HdrImage(arr, 3, 2)
+3x2 HdrImage{RGB{Float64}}
+ (1.0 2.0 3.0)  (10.0 11.0 12.0)
+ (4.0 5.0 6.0)  (13.0 14.0 15.0)
+ (7.0 8.0 9.0)  (16.0 17.0 18.0)
+```
+"""
 function HdrImage(arr::AbstractArray{<:Any, 1}, im_width::Integer, im_height::Integer)
     HdrImage(reshape(arr, im_width, im_height))
 end
