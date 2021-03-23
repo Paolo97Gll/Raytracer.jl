@@ -87,28 +87,27 @@
 
 
     @testset "Broadcasting" begin
-        # TODO uncomment the following lines to enable broadcast testset
-        # HACK maybe use ≈ instead of == ?
+        # BUG Paolo: tests are broken
 
-        # rgb_pixel_matrix = [c1 c4
-        #                     c2 c5
-        #                     c3 c6]
-        # img_1 = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
-        # img_2 = HdrImage{RGB{Float64}}(3, 2)
-        # a = 2
+        rgb_pixel_matrix = [c1 c4
+                            c2 c5
+                            c3 c6]
+        img_1 = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
+        a = 2
+        img_2 = HdrImage{RGB{Float64}}(3, 2)
 
-        # # # testing equivalence to custom defined methods
-        # @test img_1 .+ img_2 == img_1.pixel_matrix + img_2.pixel_matrix
-        # @test img_1 .- img_2 == img_1.pixel_matrix - img_2.pixel_matrix
-        # @test img_1 .* img_2 == img_1.pixel_matrix * img_2.pixel_matrix
-        # @test a .* img_2 == a * img_2.pixel_matrix
+        # testing equivalence to custom defined methods
+        @test all(img_1 .+ img_2 .== img_1.pixel_matrix + img_2.pixel_matrix)
+        @test all(img_1 .- img_2 .== img_1.pixel_matrix - img_2.pixel_matrix)
+        @test all(img_1 .* img_2 .== img_1.pixel_matrix * img_2.pixel_matrix)
+        @test all(a .* img_2 .== a * img_2.pixel_matrix)
 
-        # # # broadcasting operators can be applied between any broadcastable type instances
-        # @test all(true == el for el in ((.1, .2, .3) .+ img_1 .≈ RGB(1.1, 2.2, 3.3)))
-        # @test all(true == el for el in ((1., 2., 3.) .== img_1))
+        # broadcasting operators can be applied between any broadcastable type instances
+        @test all((true == el for el in ((.1, .2, .3) .+ img_1)) .≈ RGB(1.1, 2.2, 3.3))
+        @test all(true == el for el in ((1., 2., 3.) .== img_1))
 
-        # # # it works for any operator valid for the types of the elements
-        # @test all(true == el for el in (img_2 ./ img_1 .≈ RGB(4., 5 // 2, 2.)))
+        # it works for any operator valid for the types of the elements
+        @test all(true == el for el in (img_2 ./ img_1 .≈ RGB(4., 5 // 2, 2.)))
     end
 
 
