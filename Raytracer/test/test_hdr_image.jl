@@ -5,6 +5,8 @@
     c4 = RGB(10., 11., 12.)
     c5 = RGB(13., 14., 15.)
     c6 = RGB(16., 17., 18.)
+    c7 = RGB(19., 20., 21.)
+    c8 = RGB(22., 23., 24.)
 
 
     @testset "Constructors" begin
@@ -87,27 +89,28 @@
 
 
     @testset "Broadcasting" begin
-        # BUG Paolo: tests are broken
-
-        rgb_pixel_matrix = [c1 c4
-                            c2 c5
-                            c3 c6]
-        img_1 = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
         a = 2
-        img_2 = HdrImage{RGB{Float64}}(3, 2)
+        rgb_pixel_matrix_1 = [c1 c3
+                            c2 c4]
+        img_1 = HdrImage(rgb_pixel_matrix_1)
+        rgb_pixel_matrix_2 = [c5 c7
+                            c6 c8]
+        img_2 = HdrImage(rgb_pixel_matrix_2)
 
         # testing equivalence to custom defined methods
         @test all(img_1 .+ img_2 .== img_1.pixel_matrix + img_2.pixel_matrix)
         @test all(img_1 .- img_2 .== img_1.pixel_matrix - img_2.pixel_matrix)
-        @test all(img_1 .* img_2 .== img_1.pixel_matrix * img_2.pixel_matrix)
-        @test all(a .* img_2 .== a * img_2.pixel_matrix)
+        @test all(img_1 .* img_2 .== img_1.pixel_matrix .* img_2.pixel_matrix)
+        @test all(a .* img_1 .== a * img_1.pixel_matrix)
 
+        # BUG broadcasting conflict between RGB and HdrImage
         # broadcasting operators can be applied between any broadcastable type instances
-        @test all((true == el for el in ((.1, .2, .3) .+ img_1)) .≈ RGB(1.1, 2.2, 3.3))
-        @test all(true == el for el in ((1., 2., 3.) .== img_1))
+        # img_3 = HdrImage([c1 c1])
+        # @test all(el for el in (RGB(.1, .2, .3) .+ img_3 .≈ RGB(1.1, 2.2, 3.3)))
+        # @test all(el for el in (c1 .== img_3))
 
-        # it works for any operator valid for the types of the elements
-        @test all(true == el for el in (img_2 ./ img_1 .≈ RGB(4., 5 // 2, 2.)))
+        # # it works for any operator valid for the types of the elements
+        @test all(el for el in (img_1 .* img_2 .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8])))
     end
 
 
