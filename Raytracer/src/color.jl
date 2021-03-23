@@ -47,9 +47,8 @@ length(::RGB) = 3
 
 firstindex(::RGB) = 1
 
-function lastindex(c::RGB)
-    length(c)
-end
+lastindex(c::RGB) = length(c)
+
 
 # Since there is no standard that specifies the order in which the colors
 # should be reported, here we use the convention whereby the colors should
@@ -65,9 +64,12 @@ function getindex(c::RGB, i::Integer)
         throw(BoundsError(c, i))
     end
 end
-function getindex(c::RGB, i::CartesianIndex{1})
-    getindex(c, Tuple(i)[1])
-end
+
+getindex(c::RGB, i::CartesianIndex{1}) = getindex(c, Tuple(i)[1])
+
+
+# setindex! not implemented since RGB si immutable
+
 
 function iterate(c::RGB, state = 1)
     state > 3 ? nothing : (c[state], state +1)
@@ -137,14 +139,13 @@ function show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
 
-# Write into a file (for eltype(c) == Float32)
+
+# Write into a stream (for eltype(c) == Float32)
 # Since we will work with PFM images, which uses 32-bit floating point
 # values, we can directly write Float32 values.
-function write(io::IO, c::RGB{Float32})
-    write(io, c...)
-end
+write(io::IO, c::RGB{Float32}) = write(io, c...)
 
-# Write into a file (generic version): convert to float before writing
+# Write into a stream (generic version): convert to float before writing
 # Since we will work with PFM images, which uses 32-bit floating point
 # values, we need to convert to Float32 before writing to stream.
 function write(io::IO, c::RGB)
@@ -160,18 +161,18 @@ end
 
 eltype(::RGB{T}) where {T} = T
 
+
 function zero(T::Type{<:RGB})
     z = zero(eltype(T))
     RGB(z, z, z)
 end
-function zero(c::RGB)
-    zero(typeof(c))
-end
+
+zero(c::RGB) = zero(typeof(c))
+
 
 function one(T::Type{<:RGB})
     z = one(eltype(T))
     RGB(z, z, z)
 end
-function one(c::RGB)
-    one(typeof(c))
-end
+
+one(c::RGB) = one(typeof(c))
