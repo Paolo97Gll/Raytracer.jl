@@ -73,11 +73,11 @@
         @test c1 .* a == c1 * a
 
         # broadcasting operators can be applied between any broadcastable type instances
-        @test all(true == el for el in ((.1, .2, .3) .+ c1 .≈ RGB(1.1, 2.2, 3.3)))
-        @test all(true == el for el in ((1., 2., 3.) .== c1))
+        @test all(el for el in ((.1, .2, .3) .+ c1 .≈ RGB(1.1, 2.2, 3.3)))
+        @test all(el for el in ((1., 2., 3.) .== c1))
 
         # it works for any operator valid for the types of the elements
-        @test all(true == el for el in (c2 ./ c1 .≈ RGB(4., 5 // 2, 2.)))
+        @test all(el for el in (c2 ./ c1 .≈ RGB(4., 5 // 2, 2.)))
     end
 
 
