@@ -44,8 +44,8 @@
         @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
 
         # test errors
-        @test_throws MethodError HdrImage{Float32}(img_width, img_height)
-        @test_throws MethodError HdrImage(Float32, img_width, img_height)
+        # @test_throws MethodError HdrImage{Float32}(img_width, img_height)
+        # @test_throws MethodError HdrImage(Float32, img_width, img_height)
     end
 
 
