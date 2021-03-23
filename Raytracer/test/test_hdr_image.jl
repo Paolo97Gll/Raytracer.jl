@@ -38,6 +38,11 @@
         @test all(image.pixel_matrix .=== HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix)
         @test all(image.pixel_matrix .!== HdrImage{RGB{Float64}}(img_width, img_height).pixel_matrix)
 
+        arr = Array(collect(RGB(map(Float32, 3(i-1)+1:3i)...) for i ∈ 1:img_width*img_height)) 
+        image = HdrImage(arr, img_width, img_height)
+        @test image.pixel_matrix == reshape(arr, img_width, img_height)
+        @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
+
         # test errors
         @test_throws MethodError HdrImage{Float32}(img_width, img_height)
         @test_throws MethodError HdrImage(Float32, img_width, img_height)
