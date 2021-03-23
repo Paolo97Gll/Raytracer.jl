@@ -120,7 +120,12 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
     # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
     # the result of the broadcasting and stores it into an array. splatting this
     # array into an `RGB` constructor gives us the desired result
-    return RGB(convert(Broadcasted{Nothing}, bc)...)
+    ElType = combine_eltypes(bc.f, bc.args)
+    if ElType <: Bool
+        return copy(convert(Broadcasted{Broadcast.DefaultArrayStyle{ElType}}, bc))
+    else
+        return RGB{ElType}(convert(Broadcasted{Nothing}, bc)...)
+    end
 end
 
 

@@ -112,7 +112,8 @@ BroadcastStyle(::Type{<:HdrImage}) = Style{HdrImage}()
 BroadcastStyle(::Style{HdrImage}, ::BroadcastStyle) = Style{HdrImage}()
 
 @inline function copy(bc::Broadcasted{Style{HdrImage}})
-    return HdrImage(reshape(collect(convert(Broadcasted{Nothing}, bc)), axes(bc)))
+    ElType = combine_eltypes(bc.f, bc.args)
+    return HdrImage{ElType}(reshape(collect(convert(Broadcasted{Nothing}, bc)), axes(bc)))
 end
 
 
