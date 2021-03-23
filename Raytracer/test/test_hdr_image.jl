@@ -103,14 +103,13 @@
         @test all(img_1 .* img_2 .== img_1.pixel_matrix .* img_2.pixel_matrix)
         @test all(a .* img_1 .== a * img_1.pixel_matrix)
 
-        # BUG broadcasting conflict between RGB and HdrImage
         # broadcasting operators can be applied between any broadcastable type instances
-        # img_3 = HdrImage([c1 c1])
-        # @test all(el for el in (RGB(.1, .2, .3) .+ img_3 .≈ RGB(1.1, 2.2, 3.3)))
-        # @test all(el for el in (c1 .== img_3))
+        img_3 = HdrImage([c1 c1])
+        @test all(((Ref(RGB(.1, .2, .3)) .+ img_3) .≈ Ref(RGB(1.1, 2.2, 3.3))))
+        @test all(Ref(c1) .== img_3)
 
         # # it works for any operator valid for the types of the elements
-        @test all(el for el in (img_1 .* img_2 .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8])))
+        @test all((img_1 .* img_2) .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8]))
     end
 
 
