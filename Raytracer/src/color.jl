@@ -18,10 +18,10 @@
 
 
 # Element-wise addition between two RGB type instances
-(+)(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
+(+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
 
 # Element-wise subtraction di between two RGB type instances
-(-)(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
+(-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
 
 # Scalar multiplication for a RGB type instance
 (*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}(scalar * c.r, scalar * c.g, scalar * c.b)
@@ -30,7 +30,7 @@
 (*)(c::RGB, scalar::Number) = scalar * c
 
 # Element-wise multiplication between two RGB type instances
-(*)(c1::RGB{T}, c2::RGB{T}) where {T} = RGB{T}(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
+(*)(c1::RGB, c2::RGB) = RGB(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
 
 # Element-wise ≈ operator between two RGB type instances
 (≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r && 
