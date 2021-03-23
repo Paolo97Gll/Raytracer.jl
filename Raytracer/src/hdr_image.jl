@@ -25,6 +25,7 @@ struct HdrImage{T}
     pixel_matrix::Matrix{T}
 end
 
+
 """
     HdrImage{T}(img_width, img_height)
     HdrImage(::Type{T}, img_width, img_height)
@@ -42,9 +43,11 @@ julia> a = HdrImage(RGB{Float64}, 3, 2)
 @inline function HdrImage{T}(img_width::Integer, img_height::Integer) where {T<:RGB}
     HdrImage{T}(zeros(T, img_width, img_height))
 end
+
 @inline function HdrImage(::Type{T}, img_width::Integer, img_height::Integer) where {T}
     HdrImage{T}(img_width, img_height)
 end
+
 
 """
     HdrImage(img_width, img_height)
@@ -77,10 +80,17 @@ firstindex(image::HdrImage, d) = firstindex(image.pixel_matrix, d)
 lastindex(image::HdrImage) = lastindex(image.pixel_matrix)
 lastindex(image::HdrImage, d) = lastindex(image.pixel_matrix, d)
 
+
 getindex(image::HdrImage, inds...) = getindex(image.pixel_matrix, inds...)
 
-setindex!(image::HdrImage, value, key) = setindex!(image.pixel_matrix, value, key)
+
+function setindex!(image::HdrImage{T}, value::T, key::Integer) where {T}
+    setindex!(image.pixel_matrix, value, key)
+end
+
+# TODO include type filter also here
 setindex!(image::HdrImage, X, inds...) = setindex!(image.pixel_matrix, X, inds...)
+
 
 function iterate(image::HdrImage{T}, state = 1) where {T}
     state > lastindex(image) ? nothing : (image[state], state + 1)
@@ -90,6 +100,9 @@ end
 ################
 # BROADCASTING #
 ################
+
+
+# BUG Samuele: broadcasting not working (it returns an array, not a matrix)
 
 
 axes(image::HdrImage) = axes(image.pixel_matrix)
@@ -108,28 +121,35 @@ end
 ######
 
 
-function Base.show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
+# needed for show
+size(image::HdrImage) = size(image.pixel_matrix)
+
+
+# Show in compact mode (i.e. inside a container)
+function show(io::IO, image::HdrImage{T}) where {T}
+    print_matrix(io, image.pixel_matrix)
+end
+
+# Human-readable show (more extended)
+function show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
     println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
-    Base.print_matrix(io, image.pixel_matrix)
+    print_matrix(io, image.pixel_matrix)
 end
 
-function Base.write(io::IO, image::HdrImage)
+
+# write on stream in PFM format
+# need HdrImage broadcasting
+function write(io::IO, image::HdrImage)
     write(io, transcode(UInt8, "PF\n$(join(size(image)," "))\n$(little_endian ? -1. : 1.)\n"),
-     (c for c ∈ image[end:-1:begin, :])...)
+        (c for c ∈ image[:, end:-1:begin])...)
 end
 
 
-#########
-# OTHER #
-#########
+# #########
+# # OTHER #
+# #########
 
 
 eltype(::HdrImage{T}) where {T} = T
 
-function size(image::HdrImage)
-    return size(image.pixel_matrix)
-end
-
-function fill!(image::HdrImage, x)
-    HdrImage(fill!(image.pixel_matrix, x))
-end
+fill!(image::HdrImage, x) = HdrImage(fill!(image.pixel_matrix, x))
