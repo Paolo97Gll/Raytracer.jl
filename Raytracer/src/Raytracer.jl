@@ -1,6 +1,6 @@
 module Raytracer
 
-import ColorTypes: RGB
+import ColorTypes: RGB, Fractional
 import Base: Matrix, OneTo, print_matrix
 import Base: (+), (-), (*), (≈)
 import Base: size, zero, one, fill!, eltype

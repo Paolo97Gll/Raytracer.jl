@@ -117,15 +117,14 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
 # in an appropriate way.
 
 @inline function copy(bc::Broadcasted{RGBBroadcastStyle})
-    # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
-    # the result of the broadcasting and stores it into an array. splatting this
-    # array into an `RGB` constructor gives us the desired result
-    # BUG Samuele: set case for ElType ≠ Union{AbstractFloat, FixedPointNumbers.FixPoint} and ElType ≠ Bool (e.g. f.(RGB) where f(::AbstractFloat)->Int))
     ElType = combine_eltypes(bc.f, bc.args)
-    if ElType <: Bool
-        return copy(convert(Broadcasted{Broadcast.DefaultArrayStyle{ElType}}, bc))
-    else
+    if ElType <: Fractional # IF ElType instances can be stored in a RGB instance
+        # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
+        # the result of the broadcasting and stores it into an array. splatting this
+        # array into an `RGB` constructor gives us the desired result
         return RGB{ElType}(convert(Broadcasted{Nothing}, bc)...)
+    else #IF ElType instances cannot be stored in a RGB instance
+        return copy(convert(Broadcasted{Broadcast.DefaultArrayStyle{ElType}}, bc))
     end
 end
 
