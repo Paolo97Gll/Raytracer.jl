@@ -120,6 +120,7 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
     # the call to `convert` to a `Broadcasted` type of style `Nothing` computes
     # the result of the broadcasting and stores it into an array. splatting this
     # array into an `RGB` constructor gives us the desired result
+    # BUG Samuele: set case for ElType ≠ Union{AbstractFloat, FixedPointNumbers.FixPoint} and ElType ≠ Bool (e.g. f.(RGB) where f(::AbstractFloat)->Int))
     ElType = combine_eltypes(bc.f, bc.args)
     if ElType <: Bool
         return copy(convert(Broadcasted{Broadcast.DefaultArrayStyle{ElType}}, bc))
