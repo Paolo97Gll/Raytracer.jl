@@ -88,7 +88,8 @@
 
     @testset "Broadcasting" begin
         # TODO uncomment the following lines to enable broadcast testset
-        
+        # HACK maybe use ≈ instead of == ?
+
         # rgb_pixel_matrix = [c1 c4
         #                     c2 c5
         #                     c3 c6]
