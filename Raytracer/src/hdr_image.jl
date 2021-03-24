@@ -167,7 +167,7 @@ end
 function _parse_img_size(line::String)
     elements = split(line, ' ')
     correct_length = 2
-    (length(elements) == correct_length) || throw(InvalidPfmFileFormat("invalid image size specification: got $(length(elements)) instead of $correct_length"))
+    (length(elements) == correct_length) || throw(InvalidPfmFileFormat("invalid head in PFM file: image size: expected $correct_length dimensions got $(length(elements))."))
     img_width, img_height = map(_parse_int ∘ string, elements)
 end
 
@@ -176,7 +176,7 @@ function _parse_int(str::String)
     try
         parse(DestT, str)
     catch e
-        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("image size specification $str is not parsable to type $DestT"))
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid head in PFM file: image size: \"$str\" is not parsable to type $DestT."))
         rethrow(e)
     end
 end
@@ -186,7 +186,7 @@ function _parse_endianness(line::String)
     endian_spec = try
         parse(DestT, line)
     catch e 
-        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("endianness specification $line is not parsable to type $DestT"))
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid head in PFM file: endianness: \"$line\" is not parsable to type $DestT."))
         rethrow(e)
     end
 
@@ -196,15 +196,15 @@ function _parse_endianness(line::String)
     elseif endian_spec == -valid_spec
         return ltoh
     else
-        throw(InvalidPfmFileFormat("invalid endianness specification: got $endian_spec needed ±$valid_spec"))
+        throw(InvalidPfmFileFormat("invalid head in PFM file: endianness: expected ±$valid_spec got $endian_spec."))
     end
 end
 
 function _read_line(io::IO)
     eof(io) && return nothing
     line = readline(io, keep=true)
-    ('\r' ∈ line) && throw(InvalidPfmFileFormat("newline is not LF conform"))
-    isascii(line) || throw(InvalidPfmFileFormat("found non-ascii line"))
+    ('\r' ∈ line) && throw(InvalidPfmFileFormat("invalid head in PFM file: newline is not LF conform."))
+    isascii(line) || throw(InvalidPfmFileFormat("invalid head in PFM file: found non-ascii line."))
     line
 end
 
@@ -214,7 +214,7 @@ function _read_float(io::IO, endianness_f)
     try
         readbytes!(io, data, 4)
     catch e
-        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("corrupted binary data"))
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid bytestream in PFM file: corrupted binary data."))
         rethrow(e)
     end
     endianness_f(reinterpret(Float32, data)[1])
@@ -223,7 +223,7 @@ end
 
 function Base.read(io::IO, ::FE"pfm")
     magic = strip(_read_line(io))
-    magic == "PF" || throw(InvalidPfmFileFormat("invalid magic in PFM file: expected PF got $magic."))
+    magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
     img_size_str = _read_line(io)
     img_width, img_height = _parse_img_size(img_size_str)
     endianness_str = _read_line(io)
@@ -232,7 +232,7 @@ function Base.read(io::IO, ::FE"pfm")
     try 
         HdrImage([RGB{Float32}(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))
     catch e
-        isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head"))
+        isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
         rethrow(e)
     end
 end
