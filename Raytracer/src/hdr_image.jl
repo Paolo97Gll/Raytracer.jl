@@ -159,8 +159,21 @@ function write(io::IO, image::HdrImage)
         (c for c ∈ image[:, end:-1:begin])...)
 end
 
-function _parse_img_size()
-    
+function _parse_img_size(line::String)
+    elements = split(line, ' ')
+    correct_length = 2
+    (length(elements) == correct_length) || throw(InvalidPfmFileFormat("invalid image size specification: got $(length(elements)) instead of $correct_length"))
+    img_width, img_height = map(_parse_int ∘ string, elements)
+end
+
+function _parse_int(str::String)
+    DestT = UInt
+    try
+        parse(DestT, str)
+    catch e
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("image size specification $str is not parsable to type $DestT"))
+        rethrow(e)
+    end
 end
 
 function _parse_endianness(line::String)
@@ -168,9 +181,8 @@ function _parse_endianness(line::String)
     endian_spec = try
         parse(DestT, line)
     catch e 
-        if isa(e, ArgumentError)
-            throw(InvalidPfmFileFormat("endianness specification is not parsable to type $DestT"))
-        end
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("endianness specification $line is not parsable to type $DestT"))
+        rethrow(e)
     end
 
     valid_spec = one(DestT)
