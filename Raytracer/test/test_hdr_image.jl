@@ -187,11 +187,11 @@
         # test _read_line
         # TODO Paolo: improve tests with all the possible cases
         io = IOBuffer(b"hello\nworld")
-        @test _read_line!(io) == "hello\n"
-        @test _read_line!(io) == "world"
-        @test _read_line!(io) === nothing
+        @test _read_line(io) == "hello\n"
+        @test _read_line(io) == "world"
+        @test _read_line(io) === nothing
         io = IOBuffer(b"è")
-        @test_throws InvalidPfmFileFormat _read_line!(io)
+        @test_throws InvalidPfmFileFormat _read_line(io)
 
         # test _read_float
         # TODO Paolo: improve tests with all the possible cases
@@ -199,14 +199,14 @@
         io = IOBuffer()
         write(io, htol(Float32(2)))
         seekstart(io)
-        @test _read_float!(io, ltoh) == Float32(2)
-        @test _read_float!(io, ltoh) === nothing
+        @test _read_float(io, ltoh) == Float32(2)
+        @test _read_float(io, ltoh) === nothing
         # big endian
         io = IOBuffer()
         write(io, hton(Float32(2)))
         seekstart(io)
-        @test _read_float!(io, ntoh) == Float32(2)
-        @test _read_float!(io, ntoh) === nothing
+        @test _read_float(io, ntoh) == Float32(2)
+        @test _read_float(io, ntoh) === nothing
     end
 
 

@@ -196,7 +196,7 @@ function _parse_endianness(line::String)
     end
 end
 
-function _read_line!(io::IO)
+function _read_line(io::IO)
     eof(io) && return nothing
     line = readline(io, keep=true)
     ('\r' ∈ line) && throw(InvalidPfmFileFormat("newline is not LF conform"))
@@ -204,7 +204,7 @@ function _read_line!(io::IO)
     line
 end
 
-function _read_float!(io::IO, endianness_f)
+function _read_float(io::IO, endianness_f)
     eof(io) && return nothing
     data = Array{UInt8, 1}(undef, 4)
     try
