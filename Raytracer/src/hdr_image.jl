@@ -183,9 +183,9 @@ function _parse_endianness(line::String)
     end
 end
 
-# #########
-# # OTHER #
-# #########
+#########
+# OTHER #
+#########
 
 
 eltype(::HdrImage{T}) where {T} = T
