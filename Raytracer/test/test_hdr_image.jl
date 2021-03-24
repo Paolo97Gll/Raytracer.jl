@@ -211,6 +211,10 @@
         seekstart(io)
         @test _read_float(io, ntoh) == Float32(2)
         @test _read_float(io, ntoh) === nothing
+
+        # TODO Samuele: add tests for _FloatStream interface
+
+        # TODO Samuele: add tests for read
     end
 
 
