@@ -230,20 +230,23 @@ function Base.read(io::IO, ::FE"pfm")
     endianness_f = _parse_endianness(endianness_str)
     img_lenght = img_width * img_height
     result = try 
-        HdrImage([RGB{Float32}(_RgbStream(io,endianness_f)...) for i ∈ 1:img_lenght], (img_width, img_height))
+        HdrImage([RGB{Float32}(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))
     catch e
         isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head"))
         rethrow(e)
     end
 end
 
-struct _RgbStream 
+# Utility interface for a stram containing Floats. Useful to read sets of float in a more compact notation
+struct _FloatStream
     io::IO
     endian_f
+    n::Integer
 end
 
-function iterate(s::_RgbStream, state = 1)
-    if state <= 3
+# Iterator over the interface
+function iterate(s::_FloatStream, state = 1)
+    if state <= s.n
         eof(s.io) && throw(EOFError())
         (_read_float(s.io, s.endian_f), state + 1)
     else
