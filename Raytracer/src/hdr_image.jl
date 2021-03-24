@@ -220,23 +220,6 @@ function _read_float(io::IO, endianness_f)
     endianness_f(reinterpret(Float32, data)[1])
 end
 
-
-function Base.read(io::IO, ::FE"pfm")
-    magic = strip(_read_line(io))
-    magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
-    img_size_str = _read_line(io)
-    img_width, img_height = _parse_img_size(img_size_str)
-    endianness_str = _read_line(io)
-    endianness_f = _parse_endianness(endianness_str)
-    img_lenght = img_width * img_height
-    try 
-        HdrImage([RGB{Float32}(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))
-    catch e
-        isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
-        rethrow(e)
-    end
-end
-
 # Utility interface for a stram containing Floats. Useful to read sets of float in a more compact notation
 struct _FloatStream
     io::IO
@@ -251,6 +234,22 @@ function iterate(s::_FloatStream, state = 1)
         (_read_float(s.io, s.endian_f), state + 1)
     else
         nothing
+    end
+end
+
+function Base.read(io::IO, ::FE"pfm")
+    magic = strip(_read_line(io))
+    magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
+    img_size_str = _read_line(io)
+    img_width, img_height = _parse_img_size(img_size_str)
+    endianness_str = _read_line(io)
+    endianness_f = _parse_endianness(endianness_str)
+    img_lenght = img_width * img_height
+    try 
+        HdrImage([RGB{Float32}(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))
+    catch e
+        isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
+        rethrow(e)
     end
 end
 
