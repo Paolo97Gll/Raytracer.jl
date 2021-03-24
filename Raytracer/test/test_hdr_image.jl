@@ -170,6 +170,16 @@
         @test_throws InvalidPfmFileFormat _parse_endianness("abba")
         @test_throws InvalidPfmFileFormat _parse_endianness("2.0")
 
+        @test _parse_int("12") === UInt(12)
+        @test_throws InvalidPfmFileFormat _parse_int("abba")
+        @test_throws InvalidPfmFileFormat _parse_int("-1")
+        @test_throws InvalidPfmFileFormat _parse_int("1.0")
+
+        @test _parse_img_size("1920 1080") == UInt[1920, 1080]
+        @test_throws InvalidPfmFileFormat _parse_img_size("abba 1920")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920 -1080")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920 1080 256")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920")
     end
 
 

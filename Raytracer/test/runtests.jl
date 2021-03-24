@@ -1,7 +1,7 @@
 using Raytracer
 using Test
 
-using Raytracer: little_endian, HdrImage, InvalidPfmFileFormat, _parse_endianness
+using Raytracer: little_endian, HdrImage, InvalidPfmFileFormat, _parse_endianness, _parse_int, _parse_img_size
 import ColorTypes.RGB
 
 include("test_color.jl")
