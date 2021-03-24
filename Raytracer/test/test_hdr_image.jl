@@ -164,6 +164,12 @@
                                             0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00])
             @test take!(io) == expected_output
         end
+
+        @test _parse_endianness("1.0") == ntoh
+        @test _parse_endianness("-1.0") == ltoh
+        @test_throws InvalidPfmFileFormat _parse_endianness("abba")
+        @test_throws InvalidPfmFileFormat _parse_endianness("2.0")
+
     end
 
 
