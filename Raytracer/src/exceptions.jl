@@ -1,4 +1,7 @@
-struct InvalidPfmFileFormat <: Exception
+abstract type RaytracerException <: Exception end
+
+
+struct InvalidPfmFileFormat <: RaytracerException
     message::String
 end
-Base.showerror(io::IO, e::InvalidPfmFileFormat) = print(io, e.message)
+Base.showerror(io::IO, e::InvalidPfmFileFormat) = print(io, typeof(e), ": ", e.message)
