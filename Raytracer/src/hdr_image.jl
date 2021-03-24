@@ -160,6 +160,35 @@ function write(io::IO, image::HdrImage)
 end
 
 
+function _read_line!(io::IO)
+    eof(io) && return nothing
+    line = readline(io, keep=true)
+    ('\r' ∈ line) && throw(InvalidPfmFileFormat("newline is not LF conform"))
+    isascii(line) || throw(InvalidPfmFileFormat("found non-ascii line"))
+    line
+end
+
+
+function _read_float!(io::IO, endianness_f)
+    eof(io) && return nothing
+    data = Array{UInt8, 1}(undef, 4)
+    try
+        readbytes!(io, data, 4)
+    catch e
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("corrupted binary data"))
+        rethrow(e)
+    end
+    endianness_f(reinterpret(Float32, data)[1])
+end
+
+
+# write on stream in PFM format
+# need HdrImage broadcasting
+function read(io::IO, image::HdrImage)
+    
+end
+
+
 #########
 # OTHER #
 #########
