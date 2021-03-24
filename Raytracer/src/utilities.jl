@@ -18,9 +18,10 @@ request the given stream to be decoded from the given encoding.
 
 ```
 """ # TODO insert example here
-
 struct FE{stream_type} end
 
 macro FE_str(s)
     :(FE{$(Expr(:quote, Symbol(s)))})
 end
+
+FE(s) = FE{Symbol(s)}()
