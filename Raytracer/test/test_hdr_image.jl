@@ -165,6 +165,25 @@
             @test take!(io) == expected_output
         end
 
+        # test _parse_endianness
+        @test _parse_endianness("1.0") == ntoh
+        @test _parse_endianness("-1.0") == ltoh
+        @test_throws InvalidPfmFileFormat _parse_endianness("abba")
+        @test_throws InvalidPfmFileFormat _parse_endianness("2.0")
+
+        # test _parse_int
+        @test _parse_int("12") === UInt(12)
+        @test_throws InvalidPfmFileFormat _parse_int("abba")
+        @test_throws InvalidPfmFileFormat _parse_int("-1")
+        @test_throws InvalidPfmFileFormat _parse_int("1.0")
+
+        # test _parse_img_size
+        @test _parse_img_size("1920 1080") == UInt[1920, 1080]
+        @test_throws InvalidPfmFileFormat _parse_img_size("abba 1920")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920 -1080")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920 1080 256")
+        @test_throws InvalidPfmFileFormat _parse_img_size("1920")
+
         # test _read_line
         io = IOBuffer(b"hello\nworld")
         @test _read_line!(io) == "hello\n"
@@ -174,13 +193,18 @@
         @test_throws InvalidPfmFileFormat _read_line!(io)
 
         # test _read_float
+        # little endian
         io = IOBuffer()
-        write(io, Float32(2))
+        write(io, htol(Float32(2)))
         seekstart(io)
         @test _read_float!(io, ltoh) == Float32(2)
         @test _read_float!(io, ltoh) === nothing
-
-        
+        # big endian
+        io = IOBuffer()
+        write(io, hton(Float32(2)))
+        seekstart(io)
+        @test _read_float!(io, ntoh) == Float32(2)
+        @test _read_float!(io, ntoh) === nothing
     end
 
 
