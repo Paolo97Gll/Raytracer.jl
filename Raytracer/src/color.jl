@@ -17,10 +17,10 @@
 ##############
 
 
-# Element-wise addition between two RGB type instances
+# Element-wise addition of two RGB type instances
 (+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
 
-# Element-wise subtraction di between two RGB type instances
+# Element-wise subtraction of two RGB type instances
 (-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
 
 # Scalar multiplication for a RGB type instance
@@ -68,7 +68,7 @@ end
 getindex(c::RGB, i::CartesianIndex{1}) = getindex(c, Tuple(i)[1])
 
 
-# setindex! not implemented since RGB si immutable
+# setindex! not implemented since RGB is immutable
 
 
 function iterate(c::RGB, state = 1)
