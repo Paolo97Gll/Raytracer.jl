@@ -221,10 +221,29 @@ function _read_float(io::IO, endianness_f)
 end
 
 
-# write on stream in PFM format
-# need HdrImage broadcasting
-function read_pfm(io::IO, image::HdrImage)
-    # TODO implement read function
+function Base.read(io::IO, ::FE"pfm")
+    magic = strip(_read_line(io))
+    magic == "PF" || throw(InvalidPfmFileFormat("invalid magic in PFM file: expected PF got $magic."))
+    img_size_str = _read_line(io)
+    img_width, img_height = _parse_img_size(img_size_str)
+    endianness_str = _read_line(io)
+    endianness_f = _parse_endianness(endianness_str)
+    result = try HdrImage(reshape([RGB{Float32}(_RgbStream(io,endianness_f)...) for i ∈ 1:img_width*img_height],
+        (img_width, img_height)))
+    catch e
+        isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head"))
+        rethrow(e)
+    end
+end
+
+struct _RgbStream 
+    io::IO
+    endian_f
+end
+
+function iterate(s::_RgbStream, state = 1)
+    #eof(s.io) && throw(EOFError())
+    state > 3 ? nothing : (_read_float(s.io, s.endian_f), state + 1)
 end
 
 
