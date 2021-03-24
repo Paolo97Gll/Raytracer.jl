@@ -69,8 +69,9 @@ end
 
 """
     HdrImage(arr, img_width, img_height)
+    HdrImage(arr, shape)
 
-Construct an `HdrImage{RGB{Float32}}` wrapping a matrix obtained from `reshape(arr, img_width, img_height)`.
+Construct an `HdrImage{RGB{Float32}}` wrapping a matrix obtained from `reshape`.
 
 # Examples
 ```jldoctest
@@ -86,6 +87,9 @@ julia> a = HdrImage(arr, 3, 2)
 """
 function HdrImage(arr::AbstractArray{<:Any, 1}, im_width::Integer, im_height::Integer)
     HdrImage(reshape(arr, im_width, im_height))
+end
+function HdrImage(arr::AbstractArray{<:Any, 1}, shape)
+    HdrImage(reshape(arr, shape))
 end
 
 ##############
