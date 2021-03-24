@@ -160,9 +160,9 @@ function write(io::IO, image::HdrImage)
 end
 
 
-# #########
-# # OTHER #
-# #########
+#########
+# OTHER #
+#########
 
 
 eltype(::HdrImage{T}) where {T} = T
