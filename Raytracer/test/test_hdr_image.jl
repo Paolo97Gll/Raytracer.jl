@@ -42,6 +42,10 @@
         image = HdrImage(arr, img_width, img_height)
         @test image.pixel_matrix == reshape(arr, img_width, img_height)
         @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
+        shape = (img_width, img_height)
+        image = HdrImage(arr, shape)
+        @test image.pixel_matrix == reshape(arr, shape)
+        @test all(image.pixel_matrix .=== reshape(arr, shape))
     end
 
 
