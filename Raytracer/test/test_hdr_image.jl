@@ -164,6 +164,23 @@
                                             0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00])
             @test take!(io) == expected_output
         end
+
+        # test _read_line
+        io = IOBuffer(b"hello\nworld")
+        @test _read_line!(io) == "hello\n"
+        @test _read_line!(io) == "world"
+        @test _read_line!(io) === nothing
+        io = IOBuffer(b"è")
+        @test_throws InvalidPfmFileFormat _read_line!(io)
+
+        # test _read_float
+        io = IOBuffer()
+        write(io, Float32(2))
+        seekstart(io)
+        @test _read_float!(io, ltoh) == Float32(2)
+        @test _read_float!(io, ltoh) === nothing
+
+        
     end
 
 
