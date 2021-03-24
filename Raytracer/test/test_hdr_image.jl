@@ -185,6 +185,7 @@
         @test_throws InvalidPfmFileFormat _parse_img_size("1920")
 
         # test _read_line
+        # TODO Paolo: improve tests with all the possible cases
         io = IOBuffer(b"hello\nworld")
         @test _read_line!(io) == "hello\n"
         @test _read_line!(io) == "world"
@@ -193,6 +194,7 @@
         @test_throws InvalidPfmFileFormat _read_line!(io)
 
         # test _read_float
+        # TODO Paolo: improve tests with all the possible cases
         # little endian
         io = IOBuffer()
         write(io, htol(Float32(2)))

@@ -159,6 +159,7 @@ function write(io::IO, image::HdrImage)
         (c for c ∈ image[:, end:-1:begin])...)
 end
 
+
 function _parse_img_size(line::String)
     elements = split(line, ' ')
     correct_length = 2
@@ -203,7 +204,6 @@ function _read_line!(io::IO)
     line
 end
 
-
 function _read_float!(io::IO, endianness_f)
     eof(io) && return nothing
     data = Array{UInt8, 1}(undef, 4)
@@ -219,8 +219,8 @@ end
 
 # write on stream in PFM format
 # need HdrImage broadcasting
-function read(io::IO, image::HdrImage)
-    
+function read_pfm(io::IO, image::HdrImage)
+    # TODO implement read function
 end
 
 
