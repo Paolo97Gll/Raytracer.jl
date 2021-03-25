@@ -230,6 +230,13 @@
         @test all(img .≈ test_matrix)
         
         @test_throws InvalidPfmFileFormat read(IOBuffer(b"PF\n3 2\n-1.0\nstop"), FE("pfm"))
+
+        #test write/read compatibility
+        img = HdrImage(test_matrix)
+        io = IOBuffer()
+        write(io, img)
+        seekstart(io)
+        @test all(read(io, FE("pfm")) .≈ img)
     end
 
 
