@@ -220,12 +220,14 @@
         @test all((_FloatStream(io, ltoh, 3)...,) .≈ test_float[1:3])
         @test_throws EOFError (_FloatStream(io, ltoh, 3)...,)
 
+        test_matrix = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
+                                   RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
+                                   RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
+
         # test read(io, ::FE"pfm")
         img = read(IOBuffer(expected_output), FE("pfm"))
-        @test size(img) == (3, 2)
-        @test all(img .≈ [RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
-                          RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
-                          RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)])
+        @test size(img) == size(test_matrix)
+        @test all(img .≈ test_matrix)
         
         @test_throws InvalidPfmFileFormat read(IOBuffer(b"PF\n3 2\n-1.0\nstop"), FE("pfm"))
     end
