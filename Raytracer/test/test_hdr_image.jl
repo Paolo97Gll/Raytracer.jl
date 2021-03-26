@@ -117,6 +117,9 @@
         @test all((img_1 .* img_2) .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8]))
     end
 
+    test_matrix = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
+                               RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
+                               RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
 
     @testset "IO" begin
         io = IOBuffer()
@@ -138,13 +141,7 @@
         @test String(take!(io)) == "3x2 HdrImage{RGB{Float32}}\n (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
         
         # test color write to IO
-        image = HdrImage{RGB{Float32}}(3,2)
-        image[1,1] = RGB(10., 20., 30.)
-        image[2,1] = RGB(40., 50., 60.)
-        image[3,1] = RGB(70., 80., 90.)
-        image[1,2] = RGB(100., 200., 300.)
-        image[2,2] = RGB(400., 500., 600.)
-        image[3,2] = RGB(700., 800., 900.)
+        image = HdrImage(test_matrix)
         io = IOBuffer()
         write(io, FE("pfm"), image)
         if (little_endian)
@@ -221,10 +218,6 @@
         seekstart(io)
         @test all((_FloatStream(io, endian_f, 3)...,) .≈ test_float[1:3])
         @test_throws EOFError (_FloatStream(io, endian_f, 3)...,)
-
-        test_matrix = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
-                                   RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
-                                   RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
 
         # test _read_matrix
         io = IOBuffer()
