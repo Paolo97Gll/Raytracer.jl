@@ -246,7 +246,7 @@ function Base.read(io::IO, ::FE"pfm")
     endianness_f = _parse_endianness(endianness_str)
     img_lenght = img_width * img_height
     try 
-        HdrImage(reshape([RGB{Float32}(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght][end:-1:begin], (img_width, img_height))[end:-1:begin,:])
+        HdrImage(reshape([RGB(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))[:, end:-1:begin])
     catch e
         isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
         rethrow(e)
