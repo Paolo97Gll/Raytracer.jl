@@ -163,7 +163,7 @@ function write(io::IO, ::FE"pfm", image::HdrImage)
         (c for c ∈ image[:, end:-1:begin])...)
 end
 
-
+# parse a string formatted like "$img_width $img_height" and return both values
 function _parse_img_size(line::String)
     elements = split(line, ' ')
     correct_length = 2
@@ -171,6 +171,7 @@ function _parse_img_size(line::String)
     img_width, img_height = map(_parse_int ∘ string, elements)
 end
 
+# verify that the given String is parsable to type and return its parsed value
 function _parse_int(str::String)
     DestT = UInt
     try
@@ -181,6 +182,10 @@ function _parse_int(str::String)
     end
 end
 
+# verify that the given String is parsable to type Float32 and is equal to ±1.0
+# if the parsed value is equal to +1.0 then file endianness is big-endian
+# else if it is equal to -1.0 then endianness is little-endian
+# return a function that translates from file endianness to host endianness
 function _parse_endianness(line::String)
     DestT = Float32
     endian_spec = try
@@ -200,6 +205,9 @@ function _parse_endianness(line::String)
     end
 end
 
+# read line from stream, return nothing if eof, throw exceptions if read string is not ascii
+# and if newlines are not LF conform (it may signal that file corruption occurred
+# in file transfer from other systems) else return line
 function _read_line(io::IO)
     eof(io) && return nothing
     line = readline(io, keep=true)
@@ -208,6 +216,7 @@ function _read_line(io::IO)
     line
 end
 
+# read a Float32 from stream, correct endianness using given function, return corrected value
 function _read_float(io::IO, endianness_f)
     eof(io) && return nothing
     data = Array{UInt8, 1}(undef, 4)
@@ -246,6 +255,7 @@ function _read_matrix(io::IO, endian_f, mat_width, mat_height)
     mat
 end
 
+# read PFM file from stream
 function Base.read(io::IO, ::FE"pfm")
     magic = strip(_read_line(io))
     magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
