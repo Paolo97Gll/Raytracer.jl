@@ -139,11 +139,6 @@ end
 # IO #
 ######
 
-
-# needed for show
-size(image::HdrImage) = size(image.pixel_matrix)
-
-
 # Show in compact mode (i.e. inside a container)
 function show(io::IO, image::HdrImage{T}) where {T}
     print_matrix(io, image.pixel_matrix)
@@ -280,3 +275,5 @@ end
 eltype(::HdrImage{T}) where {T} = T
 
 fill!(image::HdrImage, x) = HdrImage(fill!(image.pixel_matrix, x))
+
+size(image::HdrImage) = size(image.pixel_matrix)
