@@ -146,7 +146,7 @@
         image[2,2] = RGB(400., 500., 600.)
         image[3,2] = RGB(700., 800., 900.)
         io = IOBuffer()
-        write(io, image)
+        write(io, FE("pfm"), image)
         if (little_endian)
             # little endian
             expected_output = Array{UInt8}([0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x2d, 0x31, 0x2e, 0x30, 0x0a,
@@ -247,7 +247,7 @@
         #test write/read compatibility
         img = HdrImage(test_matrix)
         io = IOBuffer()
-        write(io, img)
+        write(io, FE("pfm"), img)
         seekstart(io)
         @test all(read(io, FE("pfm")) .≈ img)
     end
