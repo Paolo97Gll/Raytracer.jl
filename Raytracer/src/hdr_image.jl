@@ -158,7 +158,7 @@ end
 
 # write on stream in PFM format
 # need HdrImage broadcasting
-function write(io::IO, image::HdrImage)
+function write(io::IO, ::FE"pfm", image::HdrImage)
     write(io, transcode(UInt8, "PF\n$(join(size(image)," "))\n$(little_endian ? -1. : 1.)\n"),
         (c for c ∈ image[:, end:-1:begin])...)
 end
