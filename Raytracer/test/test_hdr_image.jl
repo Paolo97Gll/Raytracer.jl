@@ -271,7 +271,7 @@
         @testset "read" begin
             img = read(IOBuffer(expected_output), FE("pfm"))
             @test size(img) == size(test_matrix)
-            @test all(img .≈ test_matrix)
+            @test all(img .== test_matrix)
             
             # test exceptions
             @test_throws InvalidPfmFileFormat read(IOBuffer(b"PF\n3 2\n-1.0\nstop"), FE("pfm"))
@@ -283,7 +283,7 @@
             io = IOBuffer()
             write(io, FE("pfm"), img)
             seekstart(io)
-            @test all(read(io, FE("pfm")) .≈ img)
+            @test all(read(io, FE("pfm")) .== img)
         end
     end
 
