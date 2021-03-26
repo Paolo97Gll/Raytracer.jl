@@ -237,16 +237,24 @@ function iterate(s::_FloatStream, state = 1)
     end
 end
 
+# utility function to read the image matrix from file
+function _read_matrix(io::IO, endian_f, mat_width, mat_height)
+    mat = Matrix{RGB{Float32}}(undef, mat_width, mat_height)
+    for i in LinearIndices(mat)
+        mat[i] = RGB(_FloatStream(io, endian_f, 3)...)
+    end
+    mat
+end
+
 function Base.read(io::IO, ::FE"pfm")
     magic = strip(_read_line(io))
     magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
     img_size_str = _read_line(io)
     img_width, img_height = _parse_img_size(img_size_str)
-    endianness_str = _read_line(io)
-    endianness_f = _parse_endianness(endianness_str)
-    img_lenght = img_width * img_height
+    endian_str = _read_line(io)
+    endian_f = _parse_endianness(endian_str)
     try 
-        HdrImage(reshape([RGB(_FloatStream(io, endianness_f, 3)...) for i ∈ 1:img_lenght], (img_width, img_height))[:, end:-1:begin])
+        HdrImage(_read_matrix(io, endian_f, img_width, img_height)[:, end:-1:begin])
     catch e
         isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
         rethrow(e)
