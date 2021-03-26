@@ -19,7 +19,7 @@
 """
     HdrImage{T}
 
-Class representing an HDR image in a `Matrix` of eltype `T`.
+Wrapper of a `Matrix` of elements of type `T`, used to represent an image in hdr format.
 """
 struct HdrImage{T}
     pixel_matrix::Matrix{T}
@@ -153,6 +153,22 @@ end
 
 # write on stream in PFM format
 # need HdrImage broadcasting
+"""
+    write(io::IO, fe::FE, image)
+
+Write an image to stream in an encoding determined by the [`FE`](@ref).
+# Examples
+```jldoctest
+julia> image = HdrImage(RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
+                                     RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
+                                     RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]);
+
+julia> io = IOBuffer();
+
+julia> write(io, FE("pfm"), image) # write to stream in pfm format, return number of bytes written
+84
+```
+"""
 function write(io::IO, ::FE"pfm", image::HdrImage)
     write(io, transcode(UInt8, "PF\n$(join(size(image)," "))\n$(little_endian ? -1. : 1.)\n"),
         (c for c ∈ image[:, end:-1:begin])...)
@@ -251,6 +267,11 @@ function _read_matrix(io::IO, endian_f, mat_width, mat_height)
 end
 
 # read PFM file from stream
+"""
+    read(io::IO, fe::FE)
+
+Read an image from stream. The decoding method is determined by the [`FE`](@ref).
+"""
 function Base.read(io::IO, ::FE"pfm")
     magic = strip(_read_line(io))
     magic == "PF" || throw(InvalidPfmFileFormat("invalid head in PFM file: magic: expected \"PF\" got $magic."))
