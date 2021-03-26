@@ -129,9 +129,6 @@
                             c3 c6]
         image = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
 
-        # test size
-        @test size(image) == (img_width, img_height)
-
         # test color pretty printing
         # compact
         show(io, image)
@@ -260,5 +257,8 @@
         @test all(HdrImage(img_width, img_height) .== fill!(a, zero(RGB{Float32})))
         a = HdrImage(ones(RGB{Float32}, img_width, img_height))
         @test all(fill!(HdrImage(img_width, img_height), one(RGB{Float32})) .== a)
+
+        # test size
+        @test size(image) == (img_width, img_height)
     end
 end
