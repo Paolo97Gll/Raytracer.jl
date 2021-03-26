@@ -212,17 +212,30 @@
         @test _read_float(io, ntoh) == Float32(2)
         @test _read_float(io, ntoh) === nothing
 
+        endian_f = little_endian ? ltoh : ntoh
+
         # test _FloatStream interface
         io = IOBuffer()
         test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
-        write(io, htol.(test_float)...)
+        write(io, test_float...)
         seekstart(io)
-        @test all((_FloatStream(io, ltoh, 3)...,) .≈ test_float[1:3])
-        @test_throws EOFError (_FloatStream(io, ltoh, 3)...,)
+        @test all((_FloatStream(io, endian_f, 3)...,) .≈ test_float[1:3])
+        @test_throws EOFError (_FloatStream(io, endian_f, 3)...,)
 
         test_matrix = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
                                    RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
                                    RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
+
+        # test _read_matrix
+        io = IOBuffer()
+        write(io, test_matrix...)
+        seekstart(io)
+        @test all(_read_matrix(io, endian_f, size(test_matrix)...) .== test_matrix)
+
+        io = IOBuffer()
+        write(io, test_matrix[begin:end-1])
+        seekstart(io)
+        @test_throws EOFError _read_matrix(io, endian_f, size(test_matrix)...)
 
         # test read(io, ::FE"pfm")
         img = read(IOBuffer(expected_output), FE("pfm"))
