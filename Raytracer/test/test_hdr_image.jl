@@ -1,4 +1,5 @@
 @testset "HDR Image" begin
+    # testset variables
     c1 = RGB(1., 2., 3.)
     c2 = RGB(4., 5., 6.)
     c3 = RGB(7., 8., 9.)
@@ -11,85 +12,116 @@
 
     @testset "Constructors" begin
         # test constructor from matrix
-        rgb_pixel_matrix = [c1 c3 c5
-                            c2 c4 c6]
-        image = HdrImage(rgb_pixel_matrix)
-        @test all(image.pixel_matrix .=== rgb_pixel_matrix)
+        @testset "from matrix" begin
+            rgb_pixel_matrix = [c1 c3 c5
+                                c2 c4 c6]
+            image = HdrImage(rgb_pixel_matrix)
+            @test all(image.pixel_matrix .=== rgb_pixel_matrix)
+        end
 
         # test custom constructors
-        img_width, img_height = 3, 2
-        rgb_zero = zero(RGB{Float32})
-        rgb_zeros = [rgb_zero rgb_zero
-                     rgb_zero rgb_zero
-                     rgb_zero rgb_zero]
+        @testset "size constructor given type" begin
+            img_width, img_height = 3, 2
+            rgb_zeros = zeros(RGB{Float64}, img_width, img_height)
+    
+            image = HdrImage{RGB{Float64}}(img_width, img_height)
+            @test image.pixel_matrix == rgb_zeros
+            @test all(image.pixel_matrix .=== rgb_zeros)
+            
+            # convenience alias
+            image = HdrImage(RGB{Float64}, img_width, img_height)
+            @test image.pixel_matrix == rgb_zeros
+            @test all(image.pixel_matrix .=== rgb_zeros)
+        end
 
-        image = HdrImage{RGB{Float32}}(img_width, img_height)
-        @test image.pixel_matrix == rgb_zeros
-        @test all(image.pixel_matrix .=== rgb_zeros)
+        @testset "size constructor default type" begin
+            img_width, img_height = 3, 2
+            rgb_zeros = zeros(RGB{Float32}, img_width, img_height)
+            image = HdrImage(img_width, img_height)
+            @test image.pixel_matrix == rgb_zeros
+            @test all(image.pixel_matrix .=== rgb_zeros)
 
-        image = HdrImage(RGB{Float32}, img_width, img_height)
-        @test image.pixel_matrix == rgb_zeros
-        @test all(image.pixel_matrix .=== rgb_zeros)
+            # test correct defaulting
+            @test image.pixel_matrix == HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix
+            @test all(image.pixel_matrix .=== HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix)
+            @test all(image.pixel_matrix .!== HdrImage{RGB{Float64}}(img_width, img_height).pixel_matrix)
+        end
 
-        image = HdrImage(img_width, img_height)
-        @test image.pixel_matrix == rgb_zeros
-        @test all(image.pixel_matrix .=== rgb_zeros)
-        @test image.pixel_matrix == HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix
-        @test all(image.pixel_matrix .=== HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix)
-        @test all(image.pixel_matrix .!== HdrImage{RGB{Float64}}(img_width, img_height).pixel_matrix)
+        @testset "array and size" begin
+            img_width, img_height = 3, 2
+            arr = collect(RGB(1., 2., 3.) .+ 3.0i for i ∈ 0:img_width*img_height-1)
+            image = HdrImage(arr, img_width, img_height)
+            @test image.pixel_matrix == reshape(arr, img_width, img_height)
+            @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
+        end
 
-        arr = Array(collect(RGB(map(Float32, 3(i-1)+1:3i)...) for i ∈ 1:img_width*img_height)) 
-        image = HdrImage(arr, img_width, img_height)
-        @test image.pixel_matrix == reshape(arr, img_width, img_height)
-        @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
-        shape = (img_width, img_height)
-        image = HdrImage(arr, shape)
-        @test image.pixel_matrix == reshape(arr, shape)
-        @test all(image.pixel_matrix .=== reshape(arr, shape))
+        @testset "array and shape" begin
+            img_width, img_height = 3, 2
+            shape = (img_width, img_height)
+            arr = collect(RGB(1., 2., 3.) .+ 3.0i for i ∈ 0:img_width*img_height-1)
+            image = HdrImage(arr, shape)
+            @test image.pixel_matrix == reshape(arr, shape)
+            @test all(image.pixel_matrix .=== reshape(arr, shape))
+        end
     end
 
 
     @testset "Iterations" begin
+        # testset variables
         rgb_pixel_matrix = [c1 c3 c5
                             c2 c4 c6]
         image = HdrImage(rgb_pixel_matrix)
 
         # test indexing properties
-        @test length(image) === 6
-        @test firstindex(image) === 1
-        @test lastindex(image) === 6
+        @testset "indexing properties" begin
+            @test length(image) === 6
+            @test firstindex(image) === 1
+            @test lastindex(image) === 6
+        end
 
-        # test indexing
-        @test c1 == image[begin]
-        @test c1 == image[1]
-        @test c2 == image[2]
-        @test c3 == image[3]
-        @test c4 == image[4]
-        @test c5 == image[5]
-        @test c6 == image[end]
-        @test c6 == image[6]
-        @test_throws BoundsError image[7]
+        # test get value
+        @testset "get value" begin
+            # linear indexing
+            @test c1 == image[begin]
+            @test c1 == image[1]
+            @test c2 == image[2]
+            @test c3 == image[3]
+            @test c4 == image[4]
+            @test c5 == image[5]
+            @test c6 == image[end]
+            @test c6 == image[6]
 
-        @test c1 == image[1,1]
-        @test c2 == image[2,1]
-        @test c3 == image[1,2]
-        @test c4 == image[2,2]
-        @test c5 == image[1,3]
-        @test c6 == image[2,3]
-        @test_throws BoundsError image[0,1]
-        @test_throws BoundsError image[1,0]
+            # test exceptions
+            @test_throws BoundsError image[7]
+            
+            # cartesian indexing
+            @test c1 == image[1,1]
+            @test c2 == image[2,1]
+            @test c3 == image[1,2]
+            @test c4 == image[2,2]
+            @test c5 == image[1,3]
+            @test c6 == image[2,3]
 
-        @test c3 == image[CartesianIndex(1,2)]
-        @test_throws BoundsError image[CartesianIndex(6,7)]
+            @test c3 == image[CartesianIndex(1,2)]
+
+            # test exceptions
+            @test_throws BoundsError image[0,1]
+            @test_throws BoundsError image[1,0]
+            @test_throws BoundsError image[CartesianIndex(6,7)]
+        end
 
         # test set value
-        _image = HdrImage{RGB{Float64}}(1, 2)
-        _image[1] = c1
-        _image[2] = c2
-        @test _image.pixel_matrix == [c1 c2]
+        @testset "set value" begin
+            _image = HdrImage{RGB{Float64}}(1, 2)
+            _image[1] = c1
+            _image[2] = c2
+            @test _image.pixel_matrix == [c1 c2]
+        end
 
         # test iterability
-        @test all(i == j for (i, j) in zip((c1, c2, c3, c4, c5, c6), image))
+        @testset "iterability" begin
+            @test all(i == j for (i, j) in zip((c1, c2, c3, c4, c5, c6), image))
+        end
     end
 
 
@@ -117,148 +149,169 @@
         @test all((img_1 .* img_2) .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8]))
     end
 
-    test_matrix = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
-                               RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
-                               RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
-
+    
     @testset "IO" begin
-        io = IOBuffer()
-        img_width, img_height = 3, 2
-        rgb_pixel_matrix = [c1 c4
-                            c2 c5
-                            c3 c6]
-        image = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
+        # testset variables
+        endian_f        = little_endian ? ltoh : ntoh
+        test_matrix     = RGB{Float32}[RGB(1.0e1, 2.0e1, 3.0e1) RGB(1.0e2, 2.0e2, 3.0e2)
+                                       RGB(4.0e1, 5.0e1, 6.0e1) RGB(4.0e2, 5.0e2, 6.0e2)
+                                       RGB(7.0e1, 8.0e1, 9.0e1) RGB(7.0e2, 8.0e2, 9.0e2)]
+        expected_output = open(little_endian ? "reference_le.pfm" : "reference_be.pfm") do io
+                              read(io)
+                          end
 
         # test color pretty printing
-        # compact
-        show(io, image)
-        @test String(take!(io)) == " (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
-        # extended
-        show(io, "text/plain", image)
-        @test String(take!(io)) == "3x2 HdrImage{RGB{Float32}}\n (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
+        @testset "show" begin
+            io = IOBuffer()
+            rgb_pixel_matrix = [c1 c4
+                                c2 c5
+                                c3 c6]
+            image = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
+            # compact
+            show(io, image)
+            @test String(take!(io)) == " (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
+            # extended
+            show(io, "text/plain", image)
+            @test String(take!(io)) == "3x2 HdrImage{RGB{Float32}}\n (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
+        end
         
         # test color write to IO
-        image = HdrImage(test_matrix)
-        io = IOBuffer()
-        write(io, FE("pfm"), image)
-        if (little_endian)
-            # little endian
-            expected_output = Array{UInt8}([0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x2d, 0x31, 0x2e, 0x30, 0x0a,
-                                            0x00, 0x00, 0xc8, 0x42, 0x00, 0x00, 0x48, 0x43, 0x00, 0x00, 0x96, 0x43,
-                                            0x00, 0x00, 0xc8, 0x43, 0x00, 0x00, 0xfa, 0x43, 0x00, 0x00, 0x16, 0x44,
-                                            0x00, 0x00, 0x2f, 0x44, 0x00, 0x00, 0x48, 0x44, 0x00, 0x00, 0x61, 0x44,
-                                            0x00, 0x00, 0x20, 0x41, 0x00, 0x00, 0xa0, 0x41, 0x00, 0x00, 0xf0, 0x41,
-                                            0x00, 0x00, 0x20, 0x42, 0x00, 0x00, 0x48, 0x42, 0x00, 0x00, 0x70, 0x42,
-                                            0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42])
-            @test take!(io) == expected_output
-        else
-            # big endian
-            expected_output = Array{UInt8}([0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x31, 0x2e, 0x30, 0x0a, 0x42,
-                                            0xc8, 0x00, 0x00, 0x43, 0x48, 0x00, 0x00, 0x43, 0x96, 0x00, 0x00, 0x43,
-                                            0xc8, 0x00, 0x00, 0x43, 0xfa, 0x00, 0x00, 0x44, 0x16, 0x00, 0x00, 0x44,
-                                            0x2f, 0x00, 0x00, 0x44, 0x48, 0x00, 0x00, 0x44, 0x61, 0x00, 0x00, 0x41,
-                                            0x20, 0x00, 0x00, 0x41, 0xa0, 0x00, 0x00, 0x41, 0xf0, 0x00, 0x00, 0x42,
-                                            0x20, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00, 0x42, 0x70, 0x00, 0x00, 0x42,
-                                            0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00])
+        @testset "write" begin
+            image = HdrImage(test_matrix)
+            io = IOBuffer()
+            write(io, FE("pfm"), image)
             @test take!(io) == expected_output
         end
 
         # test _parse_endianness
-        @test _parse_endianness("1.0") == ntoh
-        @test _parse_endianness("-1.0") == ltoh
-        @test_throws InvalidPfmFileFormat _parse_endianness("abba")
-        @test_throws InvalidPfmFileFormat _parse_endianness("2.0")
+        @testset "_parse_endianness" begin
+            @test _parse_endianness("1.0") == ntoh
+            @test _parse_endianness("-1.0") == ltoh
+            @test_throws InvalidPfmFileFormat _parse_endianness("abba")
+            @test_throws InvalidPfmFileFormat _parse_endianness("2.0")
+        end
 
         # test _parse_int
-        @test _parse_int("12") === UInt(12)
-        @test_throws InvalidPfmFileFormat _parse_int("abba")
-        @test_throws InvalidPfmFileFormat _parse_int("-1")
-        @test_throws InvalidPfmFileFormat _parse_int("1.0")
+        @testset "_parse_int" begin
+            @test _parse_int("12") === UInt(12)
+            @test_throws InvalidPfmFileFormat _parse_int("abba")
+            @test_throws InvalidPfmFileFormat _parse_int("-1")
+            @test_throws InvalidPfmFileFormat _parse_int("1.0")
+        end
 
         # test _parse_img_size
-        @test _parse_img_size("1920 1080") == UInt[1920, 1080]
-        @test_throws InvalidPfmFileFormat _parse_img_size("abba 1920")
-        @test_throws InvalidPfmFileFormat _parse_img_size("1920 -1080")
-        @test_throws InvalidPfmFileFormat _parse_img_size("1920 1080 256")
-        @test_throws InvalidPfmFileFormat _parse_img_size("1920")
+        @testset "_parse_img_size" begin
+            @test _parse_img_size("1920 1080") == UInt[1920, 1080]
+
+            # test exceptions
+            @test_throws InvalidPfmFileFormat _parse_img_size("abba 1920")
+            @test_throws InvalidPfmFileFormat _parse_img_size("1920 -1080")
+            @test_throws InvalidPfmFileFormat _parse_img_size("1920 1080 256")
+            @test_throws InvalidPfmFileFormat _parse_img_size("1920")
+        end
 
         # test _read_line
         # TODO Paolo: improve tests with all the possible cases
-        io = IOBuffer(b"hello\nworld")
-        @test _read_line(io) == "hello\n"
-        @test _read_line(io) == "world"
-        @test _read_line(io) === nothing
-        io = IOBuffer(b"è")
-        @test_throws InvalidPfmFileFormat _read_line(io)
+        @testset "_read_line" begin
+            io = IOBuffer(b"hello\nworld")
+            @test _read_line(io) == "hello\n"
+            @test _read_line(io) == "world"
+            @test _read_line(io) === nothing
+            
+            # test exceptions
+            io = IOBuffer(b"è")
+            @test_throws InvalidPfmFileFormat _read_line(io)
+        end
 
         # test _read_float
         # TODO Paolo: improve tests with all the possible cases
-        # little endian
-        io = IOBuffer()
-        write(io, htol(Float32(2)))
-        seekstart(io)
-        @test _read_float(io, ltoh) == Float32(2)
-        @test _read_float(io, ltoh) === nothing
-        # big endian
-        io = IOBuffer()
-        write(io, hton(Float32(2)))
-        seekstart(io)
-        @test _read_float(io, ntoh) == Float32(2)
-        @test _read_float(io, ntoh) === nothing
-
-        endian_f = little_endian ? ltoh : ntoh
+        @testset "_read_float" begin
+            # little endian
+            io = IOBuffer()
+            write(io, htol(Float32(2)))
+            seekstart(io)
+            @test _read_float(io, ltoh) == Float32(2)
+            @test _read_float(io, ltoh) === nothing
+            
+            # big endian
+            io = IOBuffer()
+            write(io, hton(Float32(2)))
+            seekstart(io)
+            @test _read_float(io, ntoh) == Float32(2)
+            @test _read_float(io, ntoh) === nothing
+        end
 
         # test _FloatStream interface
-        io = IOBuffer()
-        test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
-        write(io, test_float...)
-        seekstart(io)
-        @test all((_FloatStream(io, endian_f, 3)...,) .≈ test_float[1:3])
-        @test_throws EOFError (_FloatStream(io, endian_f, 3)...,)
+        @testset "_FloatStream" begin
+            io = IOBuffer()
+            test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
+            write(io, test_float...)
+            seekstart(io)
+            @test all((_FloatStream(io, endian_f, 3)...,) .≈ test_float[1:3])
+            
+            # test exceptions
+            @test_throws EOFError (_FloatStream(io, endian_f, 3)...,)
+        end
 
         # test _read_matrix
-        io = IOBuffer()
-        write(io, test_matrix...)
-        seekstart(io)
-        @test all(_read_matrix(io, endian_f, size(test_matrix)...) .== test_matrix)
-
-        io = IOBuffer()
-        write(io, test_matrix[begin:end-1])
-        seekstart(io)
-        @test_throws EOFError _read_matrix(io, endian_f, size(test_matrix)...)
+        @testset "_read_matrix" begin
+            io = IOBuffer()
+            write(io, test_matrix...)
+            seekstart(io)
+            @test all(_read_matrix(io, endian_f, size(test_matrix)...) .== test_matrix)
+            
+            # test exceptions
+            io = IOBuffer()
+            write(io, test_matrix[begin:end-1])
+            seekstart(io)
+            @test_throws EOFError _read_matrix(io, endian_f, size(test_matrix)...)
+        end
 
         # test read(io, ::FE"pfm")
-        img = read(IOBuffer(expected_output), FE("pfm"))
-        @test size(img) == size(test_matrix)
-        @test all(img .≈ test_matrix)
-        
-        @test_throws InvalidPfmFileFormat read(IOBuffer(b"PF\n3 2\n-1.0\nstop"), FE("pfm"))
+        @testset "read" begin
+            img = read(IOBuffer(expected_output), FE("pfm"))
+            @test size(img) == size(test_matrix)
+            @test all(img .≈ test_matrix)
+            
+            # test exceptions
+            @test_throws InvalidPfmFileFormat read(IOBuffer(b"PF\n3 2\n-1.0\nstop"), FE("pfm"))
+        end
 
         #test write/read compatibility
-        img = HdrImage(test_matrix)
-        io = IOBuffer()
-        write(io, FE("pfm"), img)
-        seekstart(io)
-        @test all(read(io, FE("pfm")) .≈ img)
+        @testset "write/read compatibility" begin
+            img = HdrImage(test_matrix)
+            io = IOBuffer()
+            write(io, FE("pfm"), img)
+            seekstart(io)
+            @test all(read(io, FE("pfm")) .≈ img)
+        end
     end
 
 
     @testset "Other" begin
+        # testset variables
         img_width, img_height = 2, 3
         rgb_pixel_matrix = [c1 c3 c5
                             c2 c4 c6]
         image = HdrImage(rgb_pixel_matrix)
 
         # test eltype
-        @test eltype(image) == RGB{Float64}
+        @testset "eltype" begin
+            @test eltype(image) == RGB{Float64}
+        end
 
         # test fill!
-        a = HdrImage(fill(RGB(NaN32,NaN32,NaN32), img_width, img_height))
-        @test all(HdrImage(img_width, img_height) .== fill!(a, zero(RGB{Float32})))
-        a = HdrImage(ones(RGB{Float32}, img_width, img_height))
-        @test all(fill!(HdrImage(img_width, img_height), one(RGB{Float32})) .== a)
+        @testset "fill!" begin
+            a = HdrImage(fill(RGB(NaN32,NaN32,NaN32), img_width, img_height))
+            @test all(HdrImage(img_width, img_height) .== fill!(a, zero(RGB{Float32})))
+
+            a = HdrImage(ones(RGB{Float32}, img_width, img_height))
+            @test all(fill!(HdrImage(img_width, img_height), one(RGB{Float32})) .== a)
+        end
 
         # test size
-        @test size(image) == (img_width, img_height)
+        @testset "size" begin
+            @test size(image) == (img_width, img_height)
+        end
     end
 end

@@ -1,62 +1,88 @@
 @testset "Color" begin
     @testset "Operations" begin
+        # testset variables
         c1 = RGB(1., 2., 3.)
         c2 = RGB(.4, .5, .6)
 
         # test elementwise addition
-        @test c1 + c2 == RGB(1.4, 2.5, 3.6)
+        @testset "addition" begin
+            @test c1 + c2 == RGB(1.4, 2.5, 3.6)
+        end
 
         # test elementwise subtraction
-        @test c1 - c2 == RGB(.6, 1.5, 2.4)
-
-        # test scalar multiplication
-        a = 2
-        @test a * c1 == RGB(2., 4., 6.)
-        @test c1 * a == RGB(2., 4., 6.)
-        @test a * c1 == c1 * a
-
-        # test elementwise ≈
-        a = 0
-        for i in 1:10
-            a += .1
+        @testset "subtraction" begin
+            @test c1 - c2 == RGB(.6, 1.5, 2.4)
         end
-        @test RGB(a, 2. * a, 3. * a) ≈ c1
-
+        
+        # test scalar multiplication
+        @testset "scalar multiplication" begin
+            a = 2
+            @test a * c1 == RGB(2., 4., 6.)
+            @test c1 * a == RGB(2., 4., 6.)
+            @test a * c1 == c1 * a
+        end
+        
+        # test elementwise ≈
+        @testset "elementwise ≈" begin
+            a = 0
+            for i in 1:10
+                a += .1
+            end
+            @test RGB(a, 2. * a, 3. * a) ≈ c1
+        end
+        
         # test elementwise multiplication
-        @test c1 * c2 == RGB(1. * .4, 2. * .5, 3. * .6)
+        @testset "elementwise multiplication" begin
+            @test c1 * c2 == RGB(1. * .4, 2. * .5, 3. * .6)
+        end
     end
 
 
     @testset "Iterations" begin
+        # testset variables
         r = 1.
         g = 2.
         b = 3.
         c = RGB(r, g, b)
 
         # test indexing properties
-        @test length(c) === 3
-        @test firstindex(c) === 1
-        @test lastindex(c) === 3
-
+        @testset "indexing properties" begin
+            @test length(c) === 3
+            @test firstindex(c) === 1
+            @test lastindex(c) === 3
+        end
+        
         # test indexing
-        @test r == c[begin]
-        @test r == c[1]
-        @test g == c[2]
-        @test b == c[end]
-        @test b == c[3]
-        @test_throws BoundsError c[4]
+        @testset "get index" begin
+            # linear indexing
+            @test r == c[begin]
+            @test r == c[1]
+            @test g == c[2]
+            @test b == c[end]
+            @test b == c[3]
 
-        @test r == c[CartesianIndex(1)]
-        @test g == c[CartesianIndex(2)]
-        @test b == c[CartesianIndex(3)]
-        @test_throws BoundsError c[CartesianIndex(4)]
+            # test exceptions
+            @test_throws BoundsError c[4]
+            
+            # cartesian indexing
+            @test r == c[CartesianIndex(1)]
+            @test g == c[CartesianIndex(2)]
+            @test b == c[CartesianIndex(3)]
+
+            #test exceptions
+            @test_throws BoundsError c[CartesianIndex(4)]
+        end
 
         # test iterability
-        @test all(i == j for (i, j) in zip((r, g, b), c))
+        @testset "iterability" begin    
+            @test all(i == j for (i, j) in zip((r, g, b), c))
+        end
 
         # test splat operator 
-        cc = RGB(c...)
-        @test cc === c
+        @testset "splat operator" begin
+            cc = RGB(c...)
+            @test cc === c
+        end 
     end
 
 
