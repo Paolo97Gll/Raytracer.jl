@@ -115,26 +115,30 @@
         c_f64 = RGB{Float64}(1., 2., 3.)
 
         # test color pretty printing
-        # compact
-        show(io, c_f64)
-        @test String(take!(io)) == "(1.0 2.0 3.0)"
-        # extended
-        show(io, "text/plain", c_f64)
-        @test String(take!(io)) == "RGB color with eltype Float64\nR: 1.0, G: 2.0, B: 3.0"
+        @testset "show" begin
+            # compact
+            show(io, c_f64)
+            @test String(take!(io)) == "(1.0 2.0 3.0)"
+            # extended
+            show(io, "text/plain", c_f64)
+            @test String(take!(io)) == "RGB color with eltype Float64\nR: 1.0, G: 2.0, B: 3.0"
+        end
 
         # test color write to IO
-        # Float32
-        write(io, c_f32)
-        read_value = reinterpret(Float32, take!(io))
-        @test all(read_value .=== Array{Float32}([1., 2., 3.]))
-        @test RGB(read_value...) === c_f32
-        # Other type
-        warn_message = "Implicit conversion from Float64 to Float32, since PFM images works with 32bit floating point values"
-        @test_logs (:warn, warn_message) write(io, c_f64)
-        read_value = reinterpret(Float32, take!(io))
-        @test all(read_value .=== Array{Float32}([1., 2., 3.]))
-        @test RGB(read_value...) === c_f32
-        @test RGB(read_value...) !== c_f64
+        @testset "write" begin
+            # Float32
+            write(io, c_f32)
+            read_value = reinterpret(Float32, take!(io))
+            @test all(read_value .=== Array{Float32}([1., 2., 3.]))
+            @test RGB(read_value...) === c_f32
+            # Other type
+            warn_message = "Implicit conversion from Float64 to Float32, since PFM images works with 32bit floating point values"
+            @test_logs (:warn, warn_message) write(io, c_f64)
+            read_value = reinterpret(Float32, take!(io))
+            @test all(read_value .=== Array{Float32}([1., 2., 3.]))
+            @test RGB(read_value...) === c_f32
+            @test RGB(read_value...) !== c_f64
+        end
 
         # test _read_float
         # TODO Paolo: improve tests with all the possible cases
@@ -181,22 +185,28 @@
 
     @testset "Other" begin
         # test eltype
-        @test eltype(RGB{Float32}) == Float32
+        @testset "eltype" begin
+            @test eltype(RGB{Float32}) == Float32
+        end
 
         # test zero
-        # from type
-        @test zero(RGB{Float32}) == RGB{Float32}(0., 0., 0.)
-        @test zero(RGB{Float64}) == RGB{Float64}(0., 0., 0.)
-        # from variable
-        c = RGB(1., 2., 3.)
-        @test zero(c) == RGB(0., 0., 0.)
+        @testset "zero" begin
+            # from type
+            @test zero(RGB{Float32}) == RGB{Float32}(0., 0., 0.)
+            @test zero(RGB{Float64}) == RGB{Float64}(0., 0., 0.)
+            # from variable
+            c = RGB(1., 2., 3.)
+            @test zero(c) == RGB(0., 0., 0.)
+        end
 
         # test one
-        # from type
-        @test one(RGB{Float32}) == RGB{Float32}(1., 1., 1.)
-        @test one(RGB{Float64}) == RGB{Float64}(1., 1., 1.)
-        # from variable
-        c = RGB(1., 2., 3.)
-        @test one(c) == RGB(1., 1., 1.)
+        @testset "one" begin
+            # from type
+            @test one(RGB{Float32}) == RGB{Float32}(1., 1., 1.)
+            @test one(RGB{Float64}) == RGB{Float64}(1., 1., 1.)
+            # from variable
+            c = RGB(1., 2., 3.)
+            @test one(c) == RGB(1., 1., 1.)
+        end
     end
 end
