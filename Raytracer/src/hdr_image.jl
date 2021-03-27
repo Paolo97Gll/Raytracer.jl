@@ -227,41 +227,12 @@ function _read_line(io::IO)
     line
 end
 
-# read a Float32 from stream, correct endianness using given function, return corrected value
-function _read_float(io::IO, endianness_f)
-    eof(io) && return nothing
-    data = Array{UInt8, 1}(undef, 4)
-    try
-        readbytes!(io, data, 4)
-    catch e
-        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid bytestream in PFM file: corrupted binary data."))
-        rethrow(e)
-    end
-    endianness_f(reinterpret(Float32, data)[1])
-end
-
-# Utility interface for a stram containing Floats. Useful to read sets of float in a more compact notation
-struct _FloatStream
-    io::IO
-    endian_f
-    n::Integer
-end
-
-# Iterator over the interface
-function iterate(s::_FloatStream, state = 1)
-    if state <= s.n
-        eof(s.io) && throw(EOFError())
-        (_read_float(s.io, s.endian_f), state + 1)
-    else
-        nothing
-    end
-end
-
 # utility function to read the image matrix from file
 function _read_matrix(io::IO, endian_f, mat_width, mat_height)
-    mat = Matrix{RGB{Float32}}(undef, mat_width, mat_height)
+    DestT = RGB{Float32}
+    mat = Matrix{DestT}(undef, mat_width, mat_height)
     for i in LinearIndices(mat)
-        mat[i] = RGB(_FloatStream(io, endian_f, 3)...)
+        mat[i] = read(io, DestT, endian_f)
     end
     mat
 end
