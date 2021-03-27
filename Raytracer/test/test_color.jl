@@ -125,16 +125,16 @@
         # test color write to IO
         # Float32
         write(io, c_f32)
-        readed_value = reinterpret(Float32, take!(io))
-        @test all(readed_value .=== Array{Float32}([1., 2., 3.]))
-        @test RGB(readed_value...) === c_f32
+        read_value = reinterpret(Float32, take!(io))
+        @test all(read_value .=== Array{Float32}([1., 2., 3.]))
+        @test RGB(read_value...) === c_f32
         # Other type
         warn_message = "Implicit conversion from Float64 to Float32, since PFM images works with 32bit floating point values"
         @test_logs (:warn, warn_message) write(io, c_f64)
-        readed_value = reinterpret(Float32, take!(io))
-        @test all(readed_value .=== Array{Float32}([1., 2., 3.]))
-        @test RGB(readed_value...) === c_f32
-        @test RGB(readed_value...) !== c_f64
+        read_value = reinterpret(Float32, take!(io))
+        @test all(read_value .=== Array{Float32}([1., 2., 3.]))
+        @test RGB(read_value...) === c_f32
+        @test RGB(read_value...) !== c_f64
 
         # test _read_float
         # TODO Paolo: improve tests with all the possible cases
