@@ -140,45 +140,15 @@
             @test RGB(read_value...) !== c_f64
         end
 
-        # test _read_float
-        # TODO Paolo: improve tests with all the possible cases
-        @testset "_read_float" begin
-            # little endian
-            io = IOBuffer()
-            write(io, htol(Float32(2)))
-            seekstart(io)
-            @test _read_float(io, ltoh) == Float32(2)
-            @test _read_float(io, ltoh) === nothing
-            
-            # big endian
-            io = IOBuffer()
-            write(io, hton(Float32(2)))
-            seekstart(io)
-            @test _read_float(io, ntoh) == Float32(2)
-            @test _read_float(io, ntoh) === nothing
-        end
-
-        # test _FloatStream interface
-        @testset "_FloatStream" begin
-            io = IOBuffer()
-            test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
-            write(io, test_float...)
-            seekstart(io)
-            @test all((_FloatStream(io, endian_f, 3)...,) .== test_float[1:3])
-            
-            # test exceptions
-            @test_throws EOFError (_FloatStream(io, endian_f, 3)...,)
-        end
-
         @testset "read" begin
             io = IOBuffer()
             test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
             write(io, test_float...)
             seekstart(io)
-            @test all(read(io, RGB{Float32}, endian_f) .== test_float[1:3])
+            @test all(read(io, RGB{Float32}) .== test_float[1:3])
             
             # test exceptions
-            @test_throws EOFError read(io, RGB{Float32}, endian_f)
+            @test_throws EOFError read(io, RGB{Float32})
         end
     end
 
