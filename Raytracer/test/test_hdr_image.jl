@@ -228,13 +228,13 @@
             io = IOBuffer()
             write(io, test_matrix...)
             seekstart(io)
-            @test all(_read_matrix(io, endian_f, size(test_matrix)...) .== test_matrix)
+            @test all(_read_matrix(io, eltype(test_matrix), size(test_matrix)...) .== test_matrix)
             
             # test exceptions
             io = IOBuffer()
             write(io, test_matrix[begin:end-1])
             seekstart(io)
-            @test_throws EOFError _read_matrix(io, endian_f, size(test_matrix)...)
+            @test_throws EOFError _read_matrix(io, eltype(test_matrix), size(test_matrix)...)
         end
 
         # test read(io, ::FE"pfm")

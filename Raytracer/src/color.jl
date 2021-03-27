@@ -158,10 +158,14 @@ function write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
 end
 
+@inline function _read(io::IO, rgbT::Type{<:RGB})
+    rgbT(_TypeStream(io, eltype(rgbT), length(rgbT))...)
+end
+
 # Read a single instance of an RGB type from stream and return it
 @inline function Base.read(io::IO, rgbT::Type{<:RGB})
     try
-        rgbT(_TypeStream(io, eltype(rgbT), length(rgbT))...)
+        _read(io, rgbT)
     catch e
         isa(e, ArgumentError) && throw(InvalidRgbStream("invalid input stream: corrupted binary data."))
         isa(e, EOFError) && throw(InvalidRgbStream("invalid input stream: not enough data to fill an instance of $rgbT."))

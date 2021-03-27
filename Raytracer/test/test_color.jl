@@ -148,7 +148,7 @@
             @test all(read(io, RGB{Float32}) .== test_float[1:3])
             
             # test exceptions
-            @test_throws EOFError read(io, RGB{Float32})
+            @test_throws InvalidRgbStream read(io, RGB{Float32})
         end
     end
 

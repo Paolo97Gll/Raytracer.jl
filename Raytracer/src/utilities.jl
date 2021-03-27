@@ -46,12 +46,12 @@ end
 FE(s) = FE{Symbol(s)}()
 
 # read a DestT instance from stream, return read value
-function _read_type(io::IO) where {DestT}
+function _read_type(DestT::Type, io::IO)
     eof(io) && return nothing
     len = sizeof(DestT)
     data = Array{UInt8, 1}(undef, len)
     readbytes!(io, data, len)
-    endianness_f(reinterpret(DestT, data)[1])
+    reinterpret(DestT, data)[1]
 end
 
 # Utility interface for a stram containing at least n T type instances. Useful to read sets of values in a more compact notation
@@ -65,7 +65,7 @@ end
 function iterate(s::_TypeStream, state = 1)
     if state <= s.n
         eof(s.io) && throw(EOFError())
-        (_read_type{s.T}(s.io), state + 1)
+        (_read_type(s.T, s.io), state + 1)
     else
         nothing
     end

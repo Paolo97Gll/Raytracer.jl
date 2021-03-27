@@ -19,8 +19,8 @@
         io = IOBuffer()
         write(io, Float32(2))
         seekstart(io)
-        @test _read_type{Float32}(io) == Float32(2)
-        @test _read_type{Float32}(io) === nothing
+        @test _read_type(Float32, io) == Float32(2)
+        @test _read_type(Float32, io) === nothing
     end
 
     # test _TypeStream interface
@@ -32,7 +32,7 @@
         @test all((_TypeStream(io, Float32, 3)...,) .== test_float[1:3])
         
         # test exceptions
-        @test_throws EOFError (_FloatStream(io, Float32, 3)...,)
+        @test_throws EOFError (_TypeStream(io, Float32, 3)...,)
     end
 
 end
