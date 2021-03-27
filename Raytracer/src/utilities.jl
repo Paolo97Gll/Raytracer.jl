@@ -44,3 +44,29 @@ macro FE_str(s)
 end
 
 FE(s) = FE{Symbol(s)}()
+
+# read a DestT instance from stream, return read value
+function _read_type{DestT}(io::IO) where {DestT}
+    eof(io) && return nothing
+    len = sizeof(DestT)
+    data = Array{UInt8, 1}(undef, len)
+    readbytes!(io, data, len)
+    endianness_f(reinterpret(DestT, data)[1])
+end
+
+# Utility interface for a stram containing at least n T type instances. Useful to read sets of values in a more compact notation
+struct _TypeStream
+    io::IO
+    T::Type
+    n::Integer
+end
+
+# Iterator over the interface
+function iterate(s::_TypeStream, state = 1)
+    if state <= s.n
+        eof(s.io) && throw(EOFError())
+        (_read_type{s.T}(s.io), state + 1)
+    else
+        nothing
+    end
+end

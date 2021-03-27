@@ -158,39 +158,15 @@ function write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
 end
 
-# read a Float32 from stream, correct endianness using given function, return corrected value
-function _read_float(io::IO, endianness_f)
-    eof(io) && return nothing
-    data = Array{UInt8, 1}(undef, 4)
+# Read a single instance of an RGB type from stream and return it
+@inline function Base.read(io::IO, rgbT::Type{<:RGB})
     try
-        readbytes!(io, data, 4)
+        rgbT(_TypeStream(io, eltype(rgbT), length(rgbT))...)
     catch e
-        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid bytestream in PFM file: corrupted binary data."))
+        isa(e, ArgumentError) && throw(InvalidRgbStream("invalid input stream: corrupted binary data."))
+        isa(e, EOFError) && throw(InvalidRgbStream("invalid input stream: not enough data to fill an instance of $rgbT."))
         rethrow(e)
     end
-    endianness_f(reinterpret(Float32, data)[1])
-end
-
-# Utility interface for a stram containing Floats. Useful to read sets of float in a more compact notation
-struct _FloatStream
-    io::IO
-    endian_f
-    n::Integer
-end
-
-# Iterator over the interface
-function iterate(s::_FloatStream, state = 1)
-    if state <= s.n
-        eof(s.io) && throw(EOFError())
-        (_read_float(s.io, s.endian_f), state + 1)
-    else
-        nothing
-    end
-end
-
-# Read a single instance of an RGB type from stream and return it
-function Base.read(io::IO, rgbT::Type{<:RGB}, endian_f)
-    rgbT(_FloatStream(io, endian_f, 3)...)
 end
 
 
