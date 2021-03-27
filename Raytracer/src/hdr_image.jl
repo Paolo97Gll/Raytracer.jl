@@ -228,7 +228,7 @@ function _read_line(io::IO)
 end
 
 # utility function to read the image matrix from file
-function _read_matrix{DestT}(io::IO, mat_width, mat_height) where {DestT}
+function _read_matrix(io::IO, mat_width, mat_height) where {DestT}
     mat = Matrix{DestT}(undef, mat_width, mat_height)
     for i in LinearIndices(mat)
         mat[i] = read(io, DestT, endian_f)

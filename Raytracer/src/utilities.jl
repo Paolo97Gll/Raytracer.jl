@@ -46,7 +46,7 @@ end
 FE(s) = FE{Symbol(s)}()
 
 # read a DestT instance from stream, return read value
-function _read_type{DestT}(io::IO) where {DestT}
+function _read_type(io::IO) where {DestT}
     eof(io) && return nothing
     len = sizeof(DestT)
     data = Array{UInt8, 1}(undef, len)
