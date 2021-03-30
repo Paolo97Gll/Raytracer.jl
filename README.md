@@ -1,6 +1,6 @@
 # Raytracer.jl
 
-![][julia-version] ![][status]
+[![][julia-version]]() [![][status]]()
 
 [julia-version]: https://img.shields.io/badge/julia_version-v1.6-green?style=for-the-badge&logo=julia
 [status]: https://img.shields.io/badge/status-work--in--progress-yellow?style=for-the-badge
