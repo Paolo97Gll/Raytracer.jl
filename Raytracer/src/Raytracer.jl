@@ -12,7 +12,7 @@ import ColorTypes: RGB, Fractional
 
 export RGB
 export HdrImage
-export InvalidPfmFileFormat
+export RaytracerException, InvalidPfmFileFormat, InvalidRgbStream
 export FE, @FE_str
 
 include("utilities.jl")

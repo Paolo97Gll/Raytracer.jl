@@ -228,11 +228,10 @@ function _read_line(io::IO)
 end
 
 # utility function to read the image matrix from file
-function _read_matrix(io::IO, endian_f, mat_width, mat_height)
-    DestT = RGB{Float32}
+function _read_matrix(io::IO, DestT::Type, mat_width, mat_height)
     mat = Matrix{DestT}(undef, mat_width, mat_height)
     for i in LinearIndices(mat)
-        mat[i] = read(io, DestT, endian_f)
+        mat[i] = _read(io, DestT)
     end
     mat
 end
@@ -251,8 +250,9 @@ function Base.read(io::IO, ::FE"pfm")
     endian_str = _read_line(io)
     endian_f = _parse_endianness(endian_str)
     try 
-        HdrImage(_read_matrix(io, endian_f, img_width, img_height)[:, end:-1:begin])
+        HdrImage(map(endian_f,_read_matrix(io, RGB{Float32}, img_width, img_height)[:, end:-1:begin]))
     catch e
+        isa(e, ArgumentError) && throw(InvalidPfmFileFormat("invalid bytestream in PFM file: corrupted binary data."))
         isa(e, EOFError) && rethrow(InvalidPfmFileFormat("invalid bytestream in PFM file: found less floats than declared in head."))
         rethrow(e)
     end
