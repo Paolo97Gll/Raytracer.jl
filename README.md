@@ -2,9 +2,17 @@
 
 Raytracing package for the generation of photorealistic images in Julia.
 
+_The project is WIP._
+
 ## Installation
 
-Coming soon!
+Il pacchetto è ancora in fase di sviluppo e non è disponibile in nessun registro ufficiale di julia. Per aggiungere questo pacchetto all'ambiente di lavoro, aprire julia e digitare i seguenti comandi:
+
+```julia
+julia> using Pkg
+julia> Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
+```
+
 
 ## Usage
 
