@@ -8,7 +8,7 @@
 
 Raytracing package for the generation of photorealistic images in Julia.
 
-🚧 _This is a work-in-progress project. Usage instructions and examples will come in the near future as project development progresses._
+🚧 _This is a work-in-progress project: it is not ready to use and much of the code has yet to be written. Usage instructions and examples will come in the near future as project development progresses._
 
 ## Installation
 
