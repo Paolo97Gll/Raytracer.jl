@@ -1,8 +1,13 @@
 # Raytracer.jl
 
+![][julia-version] ![][status]
+
+[julia-version]: https://img.shields.io/badge/julia_version-v1.6-green?style=for-the-badge&logo=julia
+[status]: https://img.shields.io/badge/status-work--in--progress-yellow?style=for-the-badge
+
 Raytracing package for the generation of photorealistic images in Julia.
 
-_The project is WIP._
+🚧 _This is a work-in-progress project. Usage instructions and examples will come in the near future as project development progresses._
 
 ## Installation
 
@@ -24,6 +29,21 @@ Coming soon!
 Coming soon!
 
 ## Contributing
+
+To contribute to package development, clone this repository:
+
+```bash
+git clone https://github.com/Paolo97Gll/Raytracer.jl.git
+cd Raytracer.jl
+```
+
+Then open julia and type the following commands:
+
+```julia
+julia> using Pkg
+julia> Pkg.activate(".")
+julia> Pkg.instantiate()
+```
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
