@@ -6,13 +6,14 @@ _The project is WIP._
 
 ## Installation
 
-Il pacchetto è ancora in fase di sviluppo e non è disponibile in nessun registro ufficiale di julia. Per aggiungere questo pacchetto all'ambiente di lavoro, aprire julia e digitare i seguenti comandi:
+Julia version required: >=1.6
+
+The package is still under development and is not available in the official registry. To add this package to your work environment, open julia and type the following commands:
 
 ```julia
 julia> using Pkg
 julia> Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
 ```
-
 
 ## Usage
 
