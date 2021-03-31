@@ -135,6 +135,28 @@ BroadcastStyle(::Style{HdrImage}, ::BroadcastStyle) = Style{HdrImage}()
 end
 
 
+######################
+# COLOR MANIPULATION #
+######################
+
+
+function average_luminosity(image::HdrImage; delta=eps())
+    ...
+end
+
+function normalize_image(image::HdrImage, factor; luminosity=nothing)
+    
+end
+
+function _clamp(number)
+    
+end
+
+function clamp_image(image::HdrImage)
+    
+end
+
+
 ######
 # IO #
 ######
@@ -148,6 +170,13 @@ end
 function show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
     println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
     print_matrix(io, image.pixel_matrix)
+end
+
+
+
+
+function write(io::IO, ::FE"png", image::HdrImage)
+    ...
 end
 
 

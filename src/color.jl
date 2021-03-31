@@ -129,6 +129,16 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
 end
 
 
+####################
+# COLOR PROPERTIES #
+####################
+
+
+function luminosity(c::RGB)
+    ...
+end
+
+
 ######
 # IO #
 ######
