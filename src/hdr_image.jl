@@ -164,13 +164,6 @@ function show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
 end
 
 
-
-
-function write(io::IO, ::FE"png", image::HdrImage)
-    ...
-end
-
-
 # write on stream in PFM format
 # need HdrImage broadcasting
 """
