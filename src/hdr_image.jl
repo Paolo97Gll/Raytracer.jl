@@ -148,10 +148,6 @@ function normalize_image(image::HdrImage, α::Number; luminosity=average_luminos
     HdrImage([α / luminosity * pix for pix ∈ image], size(image))
 end
 
-function _clamp(number)
-    x / (1 + x)
-end
-
 function clamp_image(image::HdrImage)
     _clamp.(image)
 end
