@@ -141,11 +141,7 @@ end
 
 
 function average_luminosity(image::HdrImage; delta=eps())
-    tot = 0
-    for pixel in image.pixel_matrix
-        tot += log10(delta + luminosity(pixel))
-    end
-    10^(tot/length(image.pixel_matrix))
+    10^(sum(map(x -> log10(delta + luminosity(x)), image))/length(image))
 end
 
 function normalize_image(image::HdrImage, α::Number; luminosity=average_luminosity(image))
