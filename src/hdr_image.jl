@@ -149,11 +149,11 @@ function normalize_image(image::HdrImage, factor; luminosity=nothing)
 end
 
 function _clamp(number)
-    
+    x / (1 + x)
 end
 
 function clamp_image(image::HdrImage)
-    
+    _clamp.(image)
 end
 
 
