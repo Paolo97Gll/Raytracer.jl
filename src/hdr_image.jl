@@ -190,10 +190,10 @@ function write(io::IO, ::FE"pfm", image::HdrImage)
     write(io, transcode(UInt8, "PF\n$(join(size(image)," "))\n$(little_endian ? -1. : 1.)\n"),
         (c for c ∈ image[:, end:-1:begin])...)
 end
-#function write(io::IO, fe::FE; γ::Number = 1)
-#    image = _γ_correction.(image)
-#    save(DataFormat(get_symbol(fe)))
-#end
+function write(io::IO, fe::FE, image::HdrImage; γ::Number = 1)
+    image = _γ_correction.(image)
+    save(Stream{DataFormat(get_symbol(fe))}(io), image.pixel_matrix)
+end
 
 function save(filename::AbstractString, image::HdrImage; γ::Number = 1)
     image = _γ_correction.(image)
