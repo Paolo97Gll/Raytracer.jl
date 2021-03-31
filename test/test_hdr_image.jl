@@ -149,6 +149,15 @@ end
 end
 
 
+@testset "Tone mapping" begin
+    @testset "average_luminosity" begin
+        image = HdrImage([RGB(  5.0,   10.0,   15.0) RGB(500.0, 1000.0, 1500.0)])
+        @test average_luminosity(image) ≈ 100.
+    end
+
+end
+
+
 @testset "IO" begin
     # testset variables
     endian_f        = little_endian ? ltoh : ntoh
