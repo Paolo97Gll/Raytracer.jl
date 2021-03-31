@@ -148,6 +148,23 @@ end
     @test all((img_1 .* img_2) .≈ HdrImage([c1*c5 c3*c7; c2*c6 c4*c8]))
 end
 
+@testset "Tone mapping" begin
+    @testset "normalize_image" begin
+        img = HdrImage([RGB(  5.0,   10.0,   15.0)
+                        RGB(500.0, 1000.0, 1500.0)], 2, 1)
+
+        img = normalize_image(img, 1000.0, luminosity=100.0)
+        @test all(img .≈ [RGB(0.5e2, 1.0e2, 1.5e2), RGB(0.5e4, 1.0e4, 1.5e4)])
+    end
+
+    @testset "clamp_image" begin
+        img = HdrImage([RGB(0.5e1, 1.0e1, 1.5e1)
+                        RGB(0.5e3, 1.0e3, 1.5e3)], 2, 1)
+        img = clamp_image(img)
+        @test all(0 <= col <= 1 for pix ∈ img for col ∈ pix)
+    end
+end
+
 
 @testset "IO" begin
     # testset variables
