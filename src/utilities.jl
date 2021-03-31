@@ -45,7 +45,7 @@ end
 
 FE(s) = FE{Symbol(s)}()
 
-get_symbol(::FE{sym}) where {sim} = sim
+get_symbol(::FE{sym}) where {sym} = sym
 
 # read a DestT instance from stream, return read value
 function _read_type(DestT::Type, io::IO)
