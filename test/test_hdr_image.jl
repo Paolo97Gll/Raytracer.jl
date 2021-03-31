@@ -163,10 +163,7 @@ end
         img = clamp_image(img)
         @test all(0 <= col <= 1 for pix ∈ img for col ∈ pix)
     end
-end
-
-
-@testset "Tone mapping" begin
+    
     @testset "average_luminosity" begin
         image = HdrImage([RGB(  5.0,   10.0,   15.0) RGB(500.0, 1000.0, 1500.0)])
         @test average_luminosity(image) ≈ 100.
