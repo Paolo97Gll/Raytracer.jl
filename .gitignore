@@ -1,1 +1,9 @@
 .vscode/
+*.png
+*.jpeg
+*.jpg
+*.tif
+*.tiff
+*.bmp
+*.gif
+*.webp
