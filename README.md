@@ -12,7 +12,7 @@ Raytracing package for the generation of photorealistic images in Julia.
 
 ## Installation
 
-Julia version required: >=1.6
+Julia version required: ≥1.6
 
 The package is still under development and is not available in the official registry. To add this package to your work environment, open julia and type the following commands:
 
@@ -33,7 +33,7 @@ Coming soon!
 
 To contribute to package development, clone this repository:
 
-```bash
+```shell
 git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
