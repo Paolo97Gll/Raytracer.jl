@@ -196,8 +196,10 @@ function write(io::IO, fe::FE, image::HdrImage; γ::Number = 1)
 end
 
 function save(filename::AbstractString, image::HdrImage; γ::Number = 1)
-    image = _γ_correction.(image, γ)
-    save(filename, image.pixel_matrix, permute_horizontal=true)
+    fe = FE(uppercase(split(filename, ".")[end]))
+    open(filename, "w") do io
+        write(io, fe, image, γ=γ)
+    end
 end
 
 # parse a string formatted like "$img_width $img_height" and return both values
