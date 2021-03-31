@@ -135,9 +135,9 @@ BroadcastStyle(::Style{HdrImage}, ::BroadcastStyle) = Style{HdrImage}()
 end
 
 
-######################
-# COLOR MANIPULATION #
-######################
+################
+# TONE MAPPING #
+################
 
 
 function average_luminosity(image::HdrImage; delta=eps())
