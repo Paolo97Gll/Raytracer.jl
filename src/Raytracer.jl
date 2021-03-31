@@ -15,7 +15,7 @@ export RGB
 export HdrImage
 export RaytracerException, InvalidPfmFileFormat, InvalidRgbStream
 export FE, @FE_str
-export normalize_image, clamp_image
+export normalize_image, clamp_image, save, write
 
 include("utilities.jl")
 include("exceptions.jl")
