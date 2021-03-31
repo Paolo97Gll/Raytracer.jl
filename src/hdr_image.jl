@@ -191,12 +191,12 @@ function write(io::IO, ::FE"pfm", image::HdrImage)
         (c for c ∈ image[:, end:-1:begin])...)
 end
 function write(io::IO, fe::FE, image::HdrImage; γ::Number = 1)
-    image = _γ_correction.(image)
+    image = _γ_correction.(image, γ)
     save(Stream{DataFormat(get_symbol(fe))}(io), image.pixel_matrix)
 end
 
 function save(filename::AbstractString, image::HdrImage; γ::Number = 1)
-    image = _γ_correction.(image)
+    image = _γ_correction.(image, γ)
     save(filename, image.pixel_matrix)
 end
 
