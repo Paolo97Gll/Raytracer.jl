@@ -106,6 +106,14 @@ end
 end
 
 
+@testset "Color manipulation" begin
+    c = RGB(1., 2., 3.)
+    
+    @test luminosity(c) ≈ 2.
+    @test _clamp(c) ≈ RGB(1/2, 2/3, 3/4)
+end
+
+
 @testset "IO" begin
     endian_f = little_endian ? ltoh : ntoh
 

@@ -129,14 +129,17 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
 end
 
 
-####################
-# COLOR PROPERTIES #
-####################
+######################
+# COLOR MANIPULATION #
+######################
 
 
 function luminosity(c::RGB)
-    ...
+    (max(c...) + min(c...)) / 2
 end
+
+
+_clamp(c::RGB) = RGB(map(x -> x / (1+x), c)...)
 
 
 ######
