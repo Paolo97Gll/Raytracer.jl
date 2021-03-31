@@ -139,11 +139,11 @@ end
 # TONE MAPPING #
 ################
 
-function average_luminosity(image::HdrImage; delta=eps())
-    10^(sum(map(x -> log10(delta + luminosity(x)), image))/length(image))
+function average_luminosity(image::HdrImage; δ::Number = eps()) 
+    10^(sum(map(x -> log10(δ + luminosity(x)), image))/length(image))
 end
 
-function normalize_image(image::HdrImage, α::Number; luminosity=average_luminosity(image))
+function normalize_image(image::HdrImage, α::Number; luminosity::Number = average_luminosity(image))
     HdrImage([α / luminosity * pix for pix ∈ image], size(image))
 end
 
@@ -189,6 +189,13 @@ julia> write(io, FE("pfm"), image) # write to stream in pfm format, return numbe
 function write(io::IO, ::FE"pfm", image::HdrImage)
     write(io, transcode(UInt8, "PF\n$(join(size(image)," "))\n$(little_endian ? -1. : 1.)\n"),
         (c for c ∈ image[:, end:-1:begin])...)
+end
+#function write(io::IO, fe::FE; γ::Number = 1)
+#    save(DataFormat(get_symbol(fe)))
+#end
+
+function save(filename::AbstractString, image::HdrImage; γ::Number = 1)
+    save(filename, image.pixel_matrix)
 end
 
 # parse a string formatted like "$img_width $img_height" and return both values
