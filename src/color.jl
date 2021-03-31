@@ -141,6 +141,8 @@ end
 
 _clamp(c::RGB) = RGB(map(x -> x / (1+x), c)...)
 
+_γ_correction(c::RGB, γ::Number) = RGB(map(x -> x^(1/γ), c)...)
+
 
 ######
 # IO #
