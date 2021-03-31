@@ -111,6 +111,8 @@ end
     
     @test luminosity(c) ≈ 2.
     @test _clamp(c) ≈ RGB(1/2, 2/3, 3/4)
+    @test _γ_correction(c, 1) ≈ c
+    @test _γ_correction(c, 1.2) ≈ RGB(1^(1/1.2), 2^(1/1.2), 3^(1/1.2))
 end
 
 
