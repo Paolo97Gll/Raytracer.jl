@@ -144,16 +144,12 @@ function average_luminosity(image::HdrImage; delta=eps())
     ...
 end
 
-function normalize_image(image::HdrImage, factor; luminosity=nothing)
-    
-end
-
-function _clamp(number)
-    
+function normalize_image(image::HdrImage, α::Number; luminosity=average_luminosity(image))
+    HdrImage([α / luminosity * pix for pix ∈ image], size(image))
 end
 
 function clamp_image(image::HdrImage)
-    
+    _clamp.(image)
 end
 
 
