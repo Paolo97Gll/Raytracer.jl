@@ -11,10 +11,12 @@ function main()
     end
     image = normalize_image(image, 0.5)
     image = clamp_image(image)
-    save("prova.png", image)
-    # open("prova_w.png", "w") do io
-    #     write(io, FE("PNG"), image)
-    # end
+    # save
+    save("prova_save.png", image)
+    # write
+    open("prova_write.png", "w") do io
+        write(io, FE("PNG"), image)
+    end
 end
 
 main()
