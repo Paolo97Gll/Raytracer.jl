@@ -139,11 +139,6 @@ end
 # TONE MAPPING #
 ################
 
-
-function average_luminosity(image::HdrImage; delta=eps())
-    ...
-end
-
 function normalize_image(image::HdrImage, α::Number; luminosity=average_luminosity(image))
     HdrImage([α / luminosity * pix for pix ∈ image], size(image))
 end
