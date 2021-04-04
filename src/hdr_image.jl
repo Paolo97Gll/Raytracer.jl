@@ -151,6 +151,9 @@ function clamp_image(image::HdrImage)
     _clamp.(image)
 end
 
+function γ_correction(image::HdrImage, γ::Number)
+    _γ_correction.(image, γ)
+end
 
 ######
 # IO #
