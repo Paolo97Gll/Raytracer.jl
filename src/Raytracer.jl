@@ -10,7 +10,7 @@ import Base: readline, read
 import Base.Broadcast: BroadcastStyle, Style, Broadcasted, combine_eltypes
 import Base.Broadcast: broadcastable, copy, similar
 import ColorTypes: RGB, Fractional
-import ImageIO: save, load
+import FileIO: save, load
 
 export RGB
 export HdrImage
