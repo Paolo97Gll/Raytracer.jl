@@ -4,19 +4,12 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 
 using Raytracer
+using ImageIO
 
 function main()
-    image = open("test/memorial.pfm") do io
-        read(io, FE("pfm"))
-    end
-    image = normalize_image(image, 0.5)
-    image = clamp_image(image)
-    # save
-    save("prova_save.png", image)
-    # write
-    open("prova_write.png", "w") do io
-        write(io, FE("PNG"), image)
-    end
+    image = load("test/memorial.pfm") |> HdrImage
+    image = normalize_image(image, 0.5) |> clamp_image
+    save("test/savetest.png", image)
 end
 
 main()
