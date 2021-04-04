@@ -9,15 +9,13 @@ import Base: readline, read
 import Base.Broadcast: BroadcastStyle, Style, Broadcasted, combine_eltypes
 import Base.Broadcast: broadcastable, copy, similar
 import ColorTypes: RGB, Fractional
-import ImageIO: DataFormat, Stream, save, File
+import ImageIO: DataFormat, Stream, File, save, load
 
 export RGB
 export HdrImage
 export RaytracerException, InvalidPfmFileFormat, InvalidRgbStream
-export FE, @FE_str
-export normalize_image, clamp_image, save, write
+export normalize_image, clamp_image, save, load
 
-include("utilities.jl")
 include("exceptions.jl")
 include("color.jl")
 include("hdr_image.jl")

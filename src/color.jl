@@ -173,10 +173,6 @@ function write(io::IO, c::RGB)
     write(io, convert.(Float32, c))
 end
 
-@inline function _read(io::IO, rgbT::Type{<:RGB})
-    rgbT(_TypeStream(io, eltype(rgbT), length(rgbT))...)
-end
-
 # Read a single instance of an RGB type from stream and return it
 @inline function Base.read(io::IO, rgbT::Type{<:RGB})
     try
