@@ -14,7 +14,6 @@ import FileIO: save, load
 
 export RGB
 export HdrImage
-export RaytracerException, InvalidRgbStream
 export normalize_image, clamp_image, γ_correction
 export save, load
 
