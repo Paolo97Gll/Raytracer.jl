@@ -139,9 +139,9 @@ function luminosity(c::RGB)
 end
 
 
-_clamp(c::RGB) = RGB(map(x -> x / (1+x), c)...)
+_clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1+x), c)...)
 
-_γ_correction(c::RGB, γ::Number) = RGB(map(x -> x^(1/γ), c)...)
+_γ_correction(c::RGB{T}, γ::Number) where {T} = RGB{T}(map(x -> x^(1/γ), c)...)
 
 
 ######
