@@ -20,7 +20,6 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
     exit(err_code)
 end
 
-
 function parse_commandline()
     s = ArgParseSettings(
         description = "Raytracing for the generation of photorealistic images in Julia.",
@@ -37,15 +36,15 @@ function parse_commandline()
             help = "exec tone mapping of a pfm image and save it to file"
     end
 
-    debug_dict = Dict(
-        :nargs => '?',
-        :help => "Enable more detailed informations. If LOGFILE filename is specified, debugging output is redirected to LOGFILE",
-        :arg_type => String,
-        :constant => "",
-        :metavar => "LOGFILE"
-    )
-    add_arg_table!(s["generate"], ["--debug", "-d"], debug_dict)
-    add_arg_table!(s["tonemapping"], ["--debug", "-d"], debug_dict)
+    # debug_dict = Dict(
+    #     :nargs => '?',
+    #     :help => "Enable more detailed informations. If LOGFILE filename is specified, debugging output is redirected to LOGFILE",
+    #     :arg_type => String,
+    #     :constant => "",
+    #     :metavar => "LOGFILE"
+    # )
+    # add_arg_table!(s["generate"], ["--debug", "-d"], debug_dict)
+    # add_arg_table!(s["tonemapping"], ["--debug", "-d"], debug_dict)
 
     add_arg_group!(s["tonemapping"], "tonemapping settings");
     @add_arg_table! s["tonemapping"] begin
@@ -75,43 +74,46 @@ end
 
 function main()
     parsed_args = parse_commandline()
+    parsed_command = parsed_args["%COMMAND%"]
+    parsed_args = parsed_args[parsed_command]
+
+    # if parsed_args["debug"] !== nothing
+    #     println()
+    #     if parsed_args["debug"] == ""
+    #         println("Debug on console")
+    #     else
+    #         println("Debug file: '$(parsed_args["debug"])'")
+    #         if isfile(parsed_args["debug"])
+    #             print("File already existing, overwrite? [y|n] ")
+    #             answer = readline()
+    #             if answer != "y"
+    #                 println("Aborting.")
+    #                 return
+    #             end
+    #         end
+    #         open(parsed_args["debug"], "w") do io
+    #         end
+    #     end
+    # end
     
     # generate
-    if parsed_args["%COMMAND%"] == "generate"
+    if parsed_command == "generate"
+        println("\n-----------------------------")
+        println("GENERATE PHOTOREALISTIC IMAGE\n")
         println("Not yet implemented.")
 
     # tonemapping
-    elseif parsed_args["%COMMAND%"] == "tonemapping"
-        parsed_args = parsed_args["tonemapping"]
-        try
-            image = load(parsed_args["input_file"]) |> HdrImage
-            image = normalize_image(image, parsed_args["alpha"]) |> clamp_image
-            image = γ_correction(image, parsed_args["gamma"])
-            save_output = @capture_out begin
-                save(parsed_args["output_file"], image.pixel_matrix)
-            end
-            if parsed_args["debug"] !== nothing
-                if parsed_args == ""
-                    println(stderr, save_output)
-                else
-                    open(parsed_args["debug"]) do io
-                        println(io, save_output)
-                    end
-                end
-            end
-        catch e
-            println("Something went wrong.")
-            if parsed_args["debug"] !== nothing
-                if parsed_args == ""
-                    showerror(stderr, e)
-                else
-                    open(parsed_args["debug"]) do io
-                        showerror(io, e)
-                    end
-                end
-            end
-        end
-
+    elseif parsed_command == "tonemapping"
+        println("\n--------------------")
+        println("TONE MAPPING PROCESS\n")
+        println("Loading input file '$(parsed_args["input_file"])'...")
+        image = load(parsed_args["input_file"]) |> HdrImage
+        println("Applying tone mapping...")
+        image = normalize_image(image, parsed_args["alpha"]) |> clamp_image
+        image = γ_correction(image, parsed_args["gamma"])
+        println("Saving final image to '$(parsed_args["output_file"])'...")
+        save(parsed_args["output_file"], image.pixel_matrix)
+        println("Done!")
     end
 end
 
