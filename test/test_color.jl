@@ -117,7 +117,7 @@ end
 
 
 @testset "IO" begin
-    endian_f = little_endian ? ltoh : ntoh
+    endian_f = ENDIAN_BOM == 0x04030201 ? ltoh : ntoh
 
     io = IOBuffer()
     c_f32 = RGB{Float32}(1., 2., 3.)
