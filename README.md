@@ -8,26 +8,112 @@
 
 Raytracing package for the generation of photorealistic images in Julia.
 
+Julia version required: ≥1.6
+
 🚧 _This is a work-in-progress project: it is not ready to use and much of the code has yet to be written. Usage instructions and examples will come in the near future as project development progresses._
 
-## Installation
+## Package
 
-Julia version required: ≥1.6
+### Installation
 
 The package is still under development and is not available in the official registry. To add this package to your work environment, open julia and type the following commands:
 
 ```julia
-julia> using Pkg
-julia> Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
+import Pkg
+Pkg.add(url="https://github.com/Samuele-Colombo/FileIO.jl")
+Pkg.add(url="https://github.com/Samuele-Colombo/ImagePFM.jl")
+Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
 ```
 
-## Usage
+We use a [custom version](https://github.com/Samuele-Colombo/FileIO.jl) of the FileIO package that provides load/save functionalities for pfm files: this integration is done by the package [ImagePFM](https://github.com/Samuele-Colombo/ImagePFM.jl). If FileIO is already present (e.g. the original package), it will be overwritten by this custom version.
+
+### Usage
 
 Coming soon!
 
-## Examples
+### Examples
 
 Coming soon!
+
+## Main application
+
+A command line tool `raytracer_cli.jl` is available to manage through this package the generation and rendering of photorealistic images.
+
+### Installation
+
+To use it, clone this repository:
+
+```shell
+git clone https://github.com/Paolo97Gll/Raytracer.jl.git
+cd Raytracer.jl
+```
+
+Then open julia and type the following commands to update your environment:
+
+```julia
+import Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+```
+
+### Usage
+
+```text
+usage: raytracer_cli.jl [-h] {generate|tonemapping}
+
+Raytracing for the generation of photorealistic images in Julia.
+
+commands:
+  generate     generate photorealistic image from input file
+  tonemapping  exec tone mapping of a pfm image and save it to file
+
+optional arguments:
+  -h, --help   show this help message and exit
+```
+
+#### Command `generate`
+
+Coming soon!
+
+#### Command `tonemapping`
+
+```text
+usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
+                        input_file output_file
+
+optional arguments:
+  -h, --help         show this help message and exit
+
+tonemapping settings:
+  -a, --alpha ALPHA  scaling factor for the normalization process
+                     (type: Float64, default: 0.5)
+  -g, --gamma GAMMA  gamma value for the tone mapping process (type:
+                     Float64, default: 1.0)
+
+files:
+  input_file         path to input file, it must be a PFM file
+  output_file        output file name
+```
+
+### Examples
+
+#### Generation of a photorealistic image
+
+Coming soon!
+
+#### Tone mapping
+
+You can use the `tonemapping` command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
+
+```text
+julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
+```
+
+You can also change the default values of `alpha` and/or `gamma`:
+
+```shell
+julia raytracer_cli.jl tonemapping --alpha 0.75 --gamma 1.3 test/memorial.pfm memorial.jpg
+```
 
 ## Contributing
 
@@ -38,12 +124,12 @@ git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then open julia and type the following commands:
+Then open julia and type the following commands to update your environment:
 
 ```julia
-julia> using Pkg
-julia> Pkg.activate(".")
-julia> Pkg.instantiate()
+import Pkg
+Pkg.activate(".")
+Pkg.instantiate()
 ```
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
