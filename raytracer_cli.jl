@@ -30,7 +30,7 @@ function parse_commandline()
     @add_arg_table! s begin
         "generate"
             action = :command
-            help = "generate from input"
+            help = "generate photorealistic image from input file"
         "tonemapping"
             action = :command
             help = "exec tone mapping of a pfm image and save it to file"
