@@ -280,11 +280,11 @@ version = "0.2.9"
 
 [[ImagePFM]]
 deps = ["ColorTypes", "FileIO", "Test"]
-git-tree-sha1 = "9f32ed9fe8408b3c7f397cde7ef363614e5cc763"
+git-tree-sha1 = "5720a9b57582190e73b209b8ad15837a5a6d7d0d"
 repo-rev = "master"
 repo-url = "https://github.com/Samuele-Colombo/ImagePFM.jl"
 uuid = "de255290-5529-4d77-9c46-251ebffccf2e"
-version = "0.1.0"
+version = "1.0.0"
 
 [[ImageQualityIndexes]]
 deps = ["ColorVectorSpace", "ImageCore", "ImageDistances", "ImageFiltering", "OffsetArrays", "Statistics"]
