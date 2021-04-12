@@ -59,6 +59,8 @@ Pkg.instantiate()
 ### Usage
 
 ```text
+$ julia raytracer_cli.jl --help
+
 usage: raytracer_cli.jl [-h] {generate|tonemapping}
 
 Raytracing for the generation of photorealistic images in Julia.
@@ -78,6 +80,8 @@ Coming soon!
 #### Command `tonemapping`
 
 ```text
+$ julia raytracer_cli.jl tonemapping --help
+
 usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
                         input_file output_file
 
