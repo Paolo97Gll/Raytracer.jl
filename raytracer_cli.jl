@@ -6,7 +6,6 @@ Pkg.activate(normpath(@__DIR__))
 
 using ArgParse
 using Raytracer
-using Suppressor
 import FileIO: File, @format_str, query
 
 
