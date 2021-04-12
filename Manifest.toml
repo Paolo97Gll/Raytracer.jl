@@ -14,9 +14,9 @@ version = "3.3.0"
 
 [[ArgParse]]
 deps = ["Logging", "TextWrap"]
-git-tree-sha1 = "827259207cb0bada7ad160204c65f49585db6a75"
+git-tree-sha1 = "3102bce13da501c9104df33549f511cd25264d7d"
 uuid = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
-version = "1.1.3"
+version = "1.1.4"
 
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -280,7 +280,7 @@ version = "0.2.9"
 
 [[ImagePFM]]
 deps = ["ColorTypes", "FileIO", "Test"]
-git-tree-sha1 = "d4f9a64d6a3e8581df2f2d55685e77e81acf4f09"
+git-tree-sha1 = "9f32ed9fe8408b3c7f397cde7ef363614e5cc763"
 repo-rev = "master"
 repo-url = "https://github.com/Samuele-Colombo/ImagePFM.jl"
 uuid = "de255290-5529-4d77-9c46-251ebffccf2e"
