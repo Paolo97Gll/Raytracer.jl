@@ -23,8 +23,9 @@ Julia version required: ≥1.6
   - [Main application](#main-application)
     - [Installation](#installation-1)
     - [Usage](#usage-1)
-      - [Command `generate`](#command-generate)
-      - [Command `tonemapping`](#command-tonemapping)
+      - [`raytracer_cli.jl`](#raytracer_clijl)
+      - [`raytracer_cli.jl generate`](#raytracer_clijl-generate)
+      - [`raytracer_cli.jl tonemapping`](#raytracer_clijl-tonemapping)
     - [Examples](#examples-1)
       - [Generation of a photorealistic image](#generation-of-a-photorealistic-image)
       - [Tone mapping](#tone-mapping)
@@ -77,6 +78,8 @@ Pkg.instantiate()
 
 ### Usage
 
+#### `raytracer_cli.jl`
+
 ```text
 $ julia raytracer_cli.jl --help
 
@@ -92,11 +95,11 @@ optional arguments:
   -h, --help   show this help message and exit
 ```
 
-#### Command `generate`
+#### `raytracer_cli.jl generate`
 
 Coming soon!
 
-#### Command `tonemapping`
+#### `raytracer_cli.jl tonemapping`
 
 ```text
 $ julia raytracer_cli.jl tonemapping --help
