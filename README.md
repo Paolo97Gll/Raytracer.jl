@@ -67,7 +67,7 @@ Raytracing for the generation of photorealistic images in Julia.
 
 commands:
   generate     generate photorealistic image from input file
-  tonemapping  exec tone mapping of a pfm image and save it to file
+  tonemapping  apply tone mapping to a pfm image and save it to file
 
 optional arguments:
   -h, --help   show this help message and exit
@@ -85,6 +85,8 @@ $ julia raytracer_cli.jl tonemapping --help
 usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
                         input_file output_file
 
+Apply tone mapping to a pfm image and save it to file.
+
 optional arguments:
   -h, --help         show this help message and exit
 
@@ -99,6 +101,16 @@ files:
   output_file        output file name
 ```
 
+We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including:
+
+- jpg, jpeg
+- png
+- tif, tiff
+- ppm
+- bmp
+- gif
+- ...
+
 ### Examples
 
 #### Generation of a photorealistic image
@@ -109,14 +121,14 @@ Coming soon!
 
 You can use the `tonemapping` command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
 
-```text
+```shell
 julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
 ```
 
-You can also change the default values of `alpha` and/or `gamma`:
+You can also change the default values of `alpha` and/or `gamma` to obtain a better tone mapping, according to your source image:
 
 ```shell
-julia raytracer_cli.jl tonemapping --alpha 0.75 --gamma 1.3 test/memorial.pfm memorial.jpg
+julia raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
 ```
 
 ## Contributing
