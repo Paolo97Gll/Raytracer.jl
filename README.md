@@ -12,6 +12,25 @@ Julia version required: ≥1.6
 
 🚧 _This is a work-in-progress project: it is not ready to use and much of the code has yet to be written. Usage instructions and examples will come in the near future as project development progresses._
 
+## Table of Contents
+
+- [Raytracer.jl](#raytracerjl)
+  - [Table of Contents](#table-of-contents)
+  - [Package](#package)
+    - [Installation](#installation)
+    - [Usage](#usage)
+    - [Examples](#examples)
+  - [Main application](#main-application)
+    - [Installation](#installation-1)
+    - [Usage](#usage-1)
+      - [Command `generate`](#command-generate)
+      - [Command `tonemapping`](#command-tonemapping)
+    - [Examples](#examples-1)
+      - [Generation of a photorealistic image](#generation-of-a-photorealistic-image)
+      - [Tone mapping](#tone-mapping)
+  - [Contributing](#contributing)
+  - [License](#license)
+
 ## Package
 
 ### Installation
