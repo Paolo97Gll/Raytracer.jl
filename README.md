@@ -3,7 +3,7 @@
 ![julia-version][julia-version] ![status][status] ![package-version][package-version]
 
 [julia-version]: https://img.shields.io/badge/julia_version-v1.6-9558B2?style=flat&logo=julia
-[status]: https://img.shields.io/badge/project_status-work--in--progress-ba8a11?style=flat
+[status]: https://img.shields.io/badge/project_status-🚧_work--in--progress-ba8a11?style=flat
 [package-version]: https://img.shields.io/badge/package_version-0.1-blue?style=flat
 
 Raytracing package for the generation of photorealistic images in Julia.
