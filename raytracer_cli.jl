@@ -20,31 +20,22 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
 end
 
 function parse_commandline()
-    s = ArgParseSettings(
-        description = "Raytracing for the generation of photorealistic images in Julia.",
-        exc_handler = parse_commandline_error_handler,
-        version = @project_version
-    )
-
+    s = ArgParseSettings()
+    s.description = "Raytracing for the generation of photorealistic images in Julia."
+    s.exc_handler = parse_commandline_error_handler
+    s.version = @project_version
     @add_arg_table! s begin
         "generate"
             action = :command
             help = "generate photorealistic image from input file"
         "tonemapping"
             action = :command
-            help = "exec tone mapping of a pfm image and save it to file"
+            help = "apply tone mapping to a pfm image and save it to file"
     end
 
-    # debug_dict = Dict(
-    #     :nargs => '?',
-    #     :help => "Enable more detailed informations. If LOGFILE filename is specified, debugging output is redirected to LOGFILE",
-    #     :arg_type => String,
-    #     :constant => "",
-    #     :metavar => "LOGFILE"
-    # )
-    # add_arg_table!(s["generate"], ["--debug", "-d"], debug_dict)
-    # add_arg_table!(s["tonemapping"], ["--debug", "-d"], debug_dict)
+    s["generate"].description = "Generate photorealistic image from input file."
 
+    s["tonemapping"].description = "Apply tone mapping to a pfm image and save it to file."
     add_arg_group!(s["tonemapping"], "tonemapping settings");
     @add_arg_table! s["tonemapping"] begin
         "--alpha", "-a"
