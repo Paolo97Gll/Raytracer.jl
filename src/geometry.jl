@@ -39,25 +39,28 @@ end
 for T ∈ (:Vec, :Point)
     quote
         struct $T{V} <: VectorSpace{V}
-            x::V
-            y::V
-            z::V
+            v::SVector{3, V}
         end        
-    end |> eval
+
+        # Convenience constructor
+        $T(v::AbstractArray{T}) where {T} = $T(SVector{size(v)...}(v))
+        
+        # TODO Paolo: implement these
+        # (+)(p::$T, v::Vec) = $T(p.v + v.v)
+        # (-)(p::$T, v::Vec) = $T(p.v - v.v)
+
+        # Human-readable show (more extended)
+        function show(io::IO, ::MIME"text/plain", a::$T)
+            print(io, $T, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a.v)), ", "))
 end
 
-
-for T ∈ (:Vec, :Point)
-    quote
-        function (≈)(a1::$T, a2::$T)
-            Base.:≈(a1.x, a2.x) &&
-            Base.:≈(a1.y, a2.y) &&
-            Base.:≈(a1.z, a2.z)
+        # Show in compact mode (i.e. inside a container)
+        function show(io::IO, a::$T)
+            print(io, typeof(a), "(", join((string(el) for el ∈ a.v), ", "), ")")
         end
     end |> eval
 end
 
 
-(+)(p::V, v::Vec) where {V <: Union{Point, Vec}} = eval(nameof(V))(p.x + v.x, p.y + v.y, p.z + v.z)
-(-)(p::V, v::Vec) where {V <: Union{Point, Vec}} = eval(nameof(V))(p.x - v.x, p.y - v.y, p.z - v.z)
-(-)(p1::Point, p2::Point) = Vec(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z)
+# TODO Paolo: implement these
+# (-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
