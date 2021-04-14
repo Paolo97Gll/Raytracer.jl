@@ -25,15 +25,15 @@ function parse_commandline()
     s.exc_handler = parse_commandline_error_handler
     s.version = @project_version
     @add_arg_table! s begin
-        "generate"
-            action = :command
-            help = "generate photorealistic image from input file"
+        # "generate"
+        #     action = :command
+        #     help = "generate photorealistic image from input file"
         "tonemapping"
             action = :command
             help = "apply tone mapping to a pfm image and save it to file"
     end
 
-    s["generate"].description = "Generate photorealistic image from input file."
+    # s["generate"].description = "Generate photorealistic image from input file."
 
     s["tonemapping"].description = "Apply tone mapping to a pfm image and save it to file."
     add_arg_group!(s["tonemapping"], "tonemapping settings");
@@ -67,14 +67,14 @@ function main()
     parsed_command = parsed_args["%COMMAND%"]
     parsed_args = parsed_args[parsed_command]
     
-    # generate
-    if parsed_command == "generate"
-        println("\n-----------------------------")
-        println("GENERATE PHOTOREALISTIC IMAGE\n")
-        println("Not yet implemented.")
+    # # generate
+    # if parsed_command == "generate"
+    #     println("\n-----------------------------")
+    #     println("GENERATE PHOTOREALISTIC IMAGE\n")
+    #     println("Not yet implemented.")
 
     # tonemapping
-    elseif parsed_command == "tonemapping"
+    if parsed_command == "tonemapping"
         println("\n--------------------")
         println("TONE MAPPING PROCESS\n")
         println("Loading input file '$(parsed_args["input_file"])'...")

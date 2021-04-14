@@ -24,10 +24,8 @@ Julia version required: ≥1.6
     - [Installation](#installation-1)
     - [Usage](#usage-1)
       - [`raytracer_cli.jl`](#raytracer_clijl)
-      - [`raytracer_cli.jl generate`](#raytracer_clijl-generate)
       - [`raytracer_cli.jl tonemapping`](#raytracer_clijl-tonemapping)
     - [Examples](#examples-1)
-      - [Generation of a photorealistic image](#generation-of-a-photorealistic-image)
       - [Tone mapping](#tone-mapping)
   - [Contributing](#contributing)
   - [License](#license)
@@ -86,16 +84,15 @@ usage: raytracer_cli.jl [-h] {generate|tonemapping}
 Raytracing for the generation of photorealistic images in Julia.
 
 commands:
-  generate     generate photorealistic image from input file
   tonemapping  apply tone mapping to a pfm image and save it to file
 
 optional arguments:
   -h, --help   show this help message and exit
 ```
 
-#### `raytracer_cli.jl generate`
+<!-- #### `raytracer_cli.jl generate`
 
-Coming soon!
+Coming soon! -->
 
 #### `raytracer_cli.jl tonemapping`
 
@@ -131,9 +128,9 @@ We support as output image type all the formats supported by the packages [Image
 
 ### Examples
 
-#### Generation of a photorealistic image
+<!-- #### Generation of a photorealistic image
 
-Coming soon!
+Coming soon! -->
 
 #### Tone mapping
 
