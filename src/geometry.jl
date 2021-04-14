@@ -21,26 +21,13 @@ abstract type VectorSpace{T<:Real} <: RaytracerGeometry end
 eltype(::VectorSpace{T}) where {T} = T
 eltype(::Type{VectorSpace{T}}) where {T} = T
 
-
-# Show in compact mode (i.e. inside a container)
-function show(io::IO, a::VectorSpace)
-    print(io, "$(typeof(a))($(a.x) $(a.y) $(a.z))")
-end
-
-# Human-readable show (more extended)
-function show(io::IO, ::MIME"text/plain", a::VectorSpace{T}) where {T}
-    print(io, "$(typeof(a)) with eltype $T\n", "x = $(a.x), y = $(a.y), z = $(a.z)")
-end
-
-
 #####################################################################
-
 
 for T ∈ (:Vec, :Point)
     quote
         struct $T{V} <: VectorSpace{V}
             v::SVector{3, V}
-        end        
+        end
 
         # Convenience constructor
         $T(v::AbstractArray{T}) where {T} = $T(SVector{size(v)...}(v))
@@ -52,7 +39,7 @@ for T ∈ (:Vec, :Point)
         # Human-readable show (more extended)
         function show(io::IO, ::MIME"text/plain", a::$T)
             print(io, $T, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a.v)), ", "))
-end
+        end
 
         # Show in compact mode (i.e. inside a container)
         function show(io::IO, a::$T)
@@ -61,6 +48,12 @@ end
     end |> eval
 end
 
+@delegate_onefield(Vec, v, [norm])
+@delegate_onefield_astype(Vec, v, [normalize, (*)])
+norm²(v::Vec) = sum(el -> el^2, v.v)
+@delegate_onefield_twovars(Vec, v, [(≈), (⋅)])
+@delegate_onefield_twovars_astype(Vec, v, [(+), (-), (×)])
+(*)(s, v::Vec) = v * s
 
 # TODO Paolo: implement these
 # (-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
