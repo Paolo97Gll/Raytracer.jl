@@ -42,7 +42,8 @@ import TypedDelegation:
 export
     RGB, HdrImage, Vec, Point,
     normalize_image, clamp_image, γ_correction,
-    save, load
+    save, load,
+    norm²
 
 include("color.jl")
 include("hdr_image.jl")
