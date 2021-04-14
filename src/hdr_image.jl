@@ -1,19 +1,11 @@
-# This file implement the structure HdrImage, which is used to represent an HDR image
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
 #
-# Current implementation info:
-# - ITERATIONS. Since an HdrImage type is a wrapper struct around a Matrix, iterating
-#   on an image means iterating on the underlying Matrix, and in this way we'll implement.
-# - BROADCASTING. Same consideration made for the iterations.
-# - IO. Utilities for various IO operations, such as printing or writing into
-#   a stream.
-# - OTHER. Other usefull utilities.
-#
-# More informations are reported above the single implementation.
-
-
-##################
-# MAIN STRUCTURE #
-##################
+# file:
+#   hdr_image.jl
+# description:
+#   This file implement the structure HdrImage, which is used to represent an HDR image.
 
 
 """
