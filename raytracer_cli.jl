@@ -66,25 +66,6 @@ function main()
     parsed_args = parse_commandline()
     parsed_command = parsed_args["%COMMAND%"]
     parsed_args = parsed_args[parsed_command]
-
-    # if parsed_args["debug"] !== nothing
-    #     println()
-    #     if parsed_args["debug"] == ""
-    #         println("Debug on console")
-    #     else
-    #         println("Debug file: '$(parsed_args["debug"])'")
-    #         if isfile(parsed_args["debug"])
-    #             print("File already existing, overwrite? [y|n] ")
-    #             answer = readline()
-    #             if answer != "y"
-    #                 println("Aborting.")
-    #                 return
-    #             end
-    #         end
-    #         open(parsed_args["debug"], "w") do io
-    #         end
-    #     end
-    # end
     
     # generate
     if parsed_command == "generate"
