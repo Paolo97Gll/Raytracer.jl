@@ -9,6 +9,7 @@
 
 
 using Raytracer
+using StaticArrays, LinearAlgebra
 using Test, Documenter
 import Raytracer: _clamp, luminosity, average_luminosity, _γ_correction
 
