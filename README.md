@@ -20,7 +20,7 @@ Julia version required: ≥1.6
     - [Installation](#installation)
     - [Usage](#usage)
     - [Examples](#examples)
-  - [Main application](#main-application)
+  - [Command line tool](#command-line-tool)
     - [Installation](#installation-1)
     - [Usage](#usage-1)
       - [`raytracer_cli.jl`](#raytracer_clijl)
@@ -55,7 +55,7 @@ Coming soon!
 
 Coming soon!
 
-## Main application
+## Command line tool
 
 A command line tool `raytracer_cli.jl` is available to manage through this package the generation and rendering of photorealistic images.
 
