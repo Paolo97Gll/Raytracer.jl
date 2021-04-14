@@ -1,15 +1,12 @@
-# This file include all the extensions to the type ColorTypes.RGB
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
 #
-# The current implemented extensions are:
-# - OPERATIONS. Implement sum, difference and other operations between RGB types.
-# - ITERATIONS. Since an RGB type can be seen as a three-element array, it is 
-#   possible to implement the iterations through its elements (r, g and b).
-# - BROADCASTING. Same consideration made for the iterations.
-# - IO. Utilities for various IO operations, such as printing or writing into
-#   a stream.
-# - OTHER. Other usefull utilities.
-#
-# More informations are reported above the single implementation.
+# file:
+#   color.jl
+# description:
+#   This file include all the extensions to the type ColorTypes.RGB,
+#   such as operations, iterations, broadcasting and others.
 
 
 ##############
@@ -158,31 +155,6 @@ end
 function show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
-
-
-# Write into a stream (for eltype(c) == Float32)
-# Since we will work with PFM images, which uses 32-bit floating point
-# values, we can directly write Float32 values.
-write(io::IO, c::RGB{Float32}) = write(io, c...)
-
-# # Write into a stream (generic version): convert to float before writing
-# # Since we will work with PFM images, which uses 32-bit floating point
-# # values, we need to convert to Float32 before writing to stream.
-# function write(io::IO, c::RGB)
-#     @warn "Implicit conversion from $(eltype(c)) to Float32, since PFM images works with 32bit floating point values"
-#     write(io, convert.(Float32, c))
-# end
-
-# # Read a single instance of an RGB type from stream and return it
-# @inline function Base.read(io::IO, rgbT::Type{<:RGB})
-#     try
-#         _read(io, rgbT)
-#     catch e
-#         isa(e, ArgumentError) && throw(InvalidRgbStream("invalid input stream: corrupted binary data."))
-#         isa(e, EOFError) && throw(InvalidRgbStream("invalid input stream: not enough data to fill an instance of $rgbT."))
-#         rethrow(e)
-#     end
-# end
 
 
 #########
