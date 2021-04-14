@@ -1,3 +1,13 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   test_hdr_image.jl
+# description:
+#   Unit test for hdr_image.jl
+
+
 # testset variables
 c1 = RGB(1., 2., 3.)
 c2 = RGB(4., 5., 6.)
