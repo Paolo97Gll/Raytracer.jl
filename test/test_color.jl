@@ -1,3 +1,13 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   test_color.jl
+# description:
+#   Unit test for color.jl
+
+
 @testset "Operations" begin
     # testset variables
     c1 = RGB(1., 2., 3.)
@@ -132,33 +142,6 @@ end
         show(io, "text/plain", c_f64)
         @test String(take!(io)) == "RGB color with eltype Float64\nR: 1.0, G: 2.0, B: 3.0"
     end
-
-    # # test color write to IO
-    # @testset "write" begin
-    #     # Float32
-    #     write(io, c_f32)
-    #     read_value = reinterpret(Float32, take!(io))
-    #     @test all(read_value .=== Array{Float32}([1., 2., 3.]))
-    #     @test RGB(read_value...) === c_f32
-    #     # Other type
-    #     warn_message = "Implicit conversion from Float64 to Float32, since PFM images works with 32bit floating point values"
-    #     @test_logs (:warn, warn_message) write(io, c_f64)
-    #     read_value = reinterpret(Float32, take!(io))
-    #     @test all(read_value .=== Array{Float32}([1., 2., 3.]))
-    #     @test RGB(read_value...) === c_f32
-    #     @test RGB(read_value...) !== c_f64
-    # end
-
-    # @testset "read" begin
-    #     io = IOBuffer()
-    #     test_float = (1.0f0, 2.0f0, 3.0f0, 4.0f0)
-    #     write(io, test_float...)
-    #     seekstart(io)
-    #     @test all(read(io, RGB{Float32}) .== test_float[1:3])
-        
-    #     # test exceptions
-    #     @test_throws InvalidRgbStream read(io, RGB{Float32})
-    # end
 end
 
 
