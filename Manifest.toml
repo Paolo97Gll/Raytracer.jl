@@ -646,6 +646,11 @@ git-tree-sha1 = "05f74c5b3c00d5336bc109416df2df907e3bd91d"
 uuid = "06e1c1a7-607b-532d-9fad-de7d9aa2abac"
 version = "0.2.5"
 
+[[TypedDelegation]]
+git-tree-sha1 = "be153f2e165dd7149b0866de07b05f77a0329176"
+uuid = "bc724e2e-2423-57c2-8f10-788c81380fc8"
+version = "0.6.0"
+
 [[UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
