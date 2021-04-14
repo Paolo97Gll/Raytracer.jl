@@ -30,6 +30,14 @@ import FileIO:
     save, load
 import ImagePFM:
     _read
+import StaticArrays:
+    SVector
+import LinearAlgebra:
+    (⋅), (×), 
+    norm, normalize
+import TypedDelegation:
+    @delegate_onefield, @delegate_onefield_astype, 
+    @delegate_onefield_twovars, @delegate_onefield_twovars_astype
 
 export
     RGB, HdrImage, Vec, Point,
