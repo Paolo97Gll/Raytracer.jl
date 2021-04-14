@@ -1,7 +1,7 @@
 name = "Raytracer"
 uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
 authors = ["Samuele Colombo <79973069+Samuele-Colombo@users.noreply.github.com>", "Paolo Galli <49845775+Paolo97Gll@users.noreply.github.com>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
@@ -19,4 +19,16 @@ QuartzImageIO = "dca85d43-d64c-5e67-8c65-017450d5d020"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-julia = "^1.6"
+julia = "1.6"
+ArgParse = "1.1"
+BenchmarkTools = "0.7"
+ColorTypes = "0.10"
+Colors = "0.12"
+Documenter = "0.26"
+FileIO = "1.6"
+ImageIO = "0.5"
+ImageMagick = "1.2"
+ImagePFM = "1.0"
+Images = "0.23"
+Netpbm = "1.0"
+QuartzImageIO = "0.7"
