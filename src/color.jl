@@ -165,24 +165,24 @@ end
 # values, we can directly write Float32 values.
 write(io::IO, c::RGB{Float32}) = write(io, c...)
 
-# Write into a stream (generic version): convert to float before writing
-# Since we will work with PFM images, which uses 32-bit floating point
-# values, we need to convert to Float32 before writing to stream.
-function write(io::IO, c::RGB)
-    @warn "Implicit conversion from $(eltype(c)) to Float32, since PFM images works with 32bit floating point values"
-    write(io, convert.(Float32, c))
-end
+# # Write into a stream (generic version): convert to float before writing
+# # Since we will work with PFM images, which uses 32-bit floating point
+# # values, we need to convert to Float32 before writing to stream.
+# function write(io::IO, c::RGB)
+#     @warn "Implicit conversion from $(eltype(c)) to Float32, since PFM images works with 32bit floating point values"
+#     write(io, convert.(Float32, c))
+# end
 
-# Read a single instance of an RGB type from stream and return it
-@inline function Base.read(io::IO, rgbT::Type{<:RGB})
-    try
-        _read(io, rgbT)
-    catch e
-        isa(e, ArgumentError) && throw(InvalidRgbStream("invalid input stream: corrupted binary data."))
-        isa(e, EOFError) && throw(InvalidRgbStream("invalid input stream: not enough data to fill an instance of $rgbT."))
-        rethrow(e)
-    end
-end
+# # Read a single instance of an RGB type from stream and return it
+# @inline function Base.read(io::IO, rgbT::Type{<:RGB})
+#     try
+#         _read(io, rgbT)
+#     catch e
+#         isa(e, ArgumentError) && throw(InvalidRgbStream("invalid input stream: corrupted binary data."))
+#         isa(e, EOFError) && throw(InvalidRgbStream("invalid input stream: not enough data to fill an instance of $rgbT."))
+#         rethrow(e)
+#     end
+# end
 
 
 #########
