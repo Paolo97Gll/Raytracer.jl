@@ -21,7 +21,6 @@ abstract type VectorSpace{T<:Real} <: RaytracerGeometry end
 eltype(::VectorSpace{T}) where {T} = T
 eltype(::Type{VectorSpace{T}}) where {T} = T
 
-#####################################################################
 
 for T ∈ (:Vec, :Point)
     quote
@@ -31,10 +30,6 @@ for T ∈ (:Vec, :Point)
 
         # Convenience constructor
         $T(v::AbstractArray{T}) where {T} = $T(SVector{size(v)...}(v))
-        
-        # TODO Paolo: implement these
-        # (+)(p::$T, v::Vec) = $T(p.v + v.v)
-        # (-)(p::$T, v::Vec) = $T(p.v - v.v)
 
         # Human-readable show (more extended)
         function show(io::IO, ::MIME"text/plain", a::$T)
@@ -55,5 +50,6 @@ norm²(v::Vec) = sum(el -> el^2, v.v)
 @delegate_onefield_twovars_astype(Vec, v, [(+), (-), (×)])
 (*)(s, v::Vec) = v * s
 
-# TODO Paolo: implement these
-# (-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
+(-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
+(+)(p::Point, v::Vec) = Point(p.v + v.v)
+(-)(p::Point, v::Vec) = Point(p.v - v.v)
