@@ -11,7 +11,9 @@
 using Raytracer
 using StaticArrays, LinearAlgebra
 using Test, Documenter
-import Raytracer: _clamp, luminosity, average_luminosity, _γ_correction
+import Raytracer:
+    _clamp, luminosity, average_luminosity, _γ_correction,
+    norm²
 
 DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
 

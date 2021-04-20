@@ -7,29 +7,59 @@
 # description:
 #   Unit test for geometry.jl
 
-s = 3 
-vv = [1.5, 3., 4.5]
 
-sv1 = @SVector [1., 2., 3.]
-sv2 = SVector{size(vv)...}(vv)
+@testset "VectorSpace" begin
+    s = 3
 
-v1, v2 = (sv1, vv) .|> Vec
+    vv1 = [1., 2., 3.]
+    vv2 = [1.5, 3., 4.5]
+    vv3 = [10., 20., 30.]
 
-@test v1.v == sv1
-@test v2.v == sv2
-@test norm(v1) == norm(sv1)
-@test normalize(v1).v == normalize(sv1)
-@test norm²(v1) ≈ norm(sv1) ^ 2
+    sv1 = SVector{size(vv1)...}(vv1)
+    sv2 = SVector{size(vv2)...}(vv2)
+    sv3 = SVector{size(vv3)...}(vv3)
 
-@test v1 ⋅ v2 == sv1 ⋅ sv2
 
-for op ∈ (:+, :-, :×)
-    quote
-        @test $op(v1, v2).v == $op(sv1, sv2)
-    end |> eval
+    @testset "Vec" begin
+        v1, v2 = (sv1, vv2) .|> Vec
+
+        @testset "constructor" begin
+            @test v1.v == sv1
+            @test v2.v == sv2
+        end
+
+        @testset "operations" begin
+            @test norm(v1) == norm(sv1)
+            @test normalize(v1) == Vec(normalize(sv1))
+            @test norm²(v1) ≈ norm(sv1)^2
+
+            @test v1 ⋅ v2 == sv1 ⋅ sv2
+
+            @test v1 + v2 == Vec(sv1 + sv2)
+            @test v1 - v2 == Vec(sv1 - sv2)
+            @test v1 × v2 == Vec(sv1 × sv2)
+
+            @test s * v1 == v1 * s == Vec(s * sv1)
+
+            @test Vec([15, 30, 45]) ≈ v2 * 10
+        end
+    end
+
+
+    @testset "Point" begin
+        p1, p2 = (sv1, vv2) .|> Point
+        v = Vec(vv3)
+
+        @testset "constructor" begin
+            @test p1.v == sv1
+            @test p2.v == sv2
+        end
+
+        @testset "operations" begin
+            @test p1 - p2 == Vec(sv1 - sv2)
+
+            @test p1 + v == Point(sv1 + sv3)
+            @test p1 - v == Point(sv1 - sv3)
+        end
+    end
 end
-
-@test (s * v1).v == s * sv1
-@test (v1 * s).v == s * sv1
-
-@test Vec([15, 30, 45]) ≈ v2 * 10
