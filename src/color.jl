@@ -96,8 +96,7 @@ broadcastable(::Type{RGB}) = RGB # broadcastable is also applied to types
 # relies on calls to the constructor of `BroadcastStyle`. We need to create a `BroadcastStyle` 
 # exclusive to `RGB` so that we can then specialize other methods that are fed `BroadcastStyle`s
 
-struct RGBBroadcastStyle <: BroadcastStyle
-end
+struct RGBBroadcastStyle <: BroadcastStyle end
 
 # Then we specialize the constructor from instances of `RGB`
 
