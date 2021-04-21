@@ -129,4 +129,14 @@ let rotation_matrices = Dict(
         end |> eval
     end
 end
+function translation(v::AbstractVector)
+    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'translate' requires an argument of size = (3,)")) 
+
+    mat = Diagonal(ones(eltype(v), 4)) |> SMatrix{4, 4}
+    mat⁻¹ = copy(mat)
+    mat[end, 1:3]   =  v
+    mat⁻¹[end, 1:3] = -v
+    Transformation(mat, mat⁻¹)
+end
+translation(x::Real, y::Real, z::Real) = translation(Vec(x,y,z)) 
 # TODO implement all the other functions and operations
