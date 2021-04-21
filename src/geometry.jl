@@ -149,4 +149,3 @@ function scaling(v::AbstractVector)
     
     scaling(v...)
 end
-# TODO implement all the other functions and operations
