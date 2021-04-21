@@ -89,12 +89,12 @@ Transformation(m::Matrix{T}, invm::Matrix{T2}) where {T, T2} = Transformation(SM
 eltype(::Transformation{T}) where {T} = T
 eltype(::Type{Transformation{T}}) where {T} = T
 
-function show(io::IO, ::MIME"text/plain", a::Transformation)
-    println(io, "4x4 $(typeof(a)):")
-    println(io, "Matrix:");
-    print_matrix(io, a.m);
-    println(io, "\nInverse matrix:");
-    print_matrix(io, a.invm);
+function show(io::IO, ::MIME"text/plain", t::Transformation)
+    println(io, "4x4 $(typeof(t)):")
+    println(io, "Matrix of type ", typeof(t.m), ":");
+    print_matrix(io, t.m);
+    println(io, "\nInverse matrix of type ", typeof(t.invm), ":");
+    print_matrix(io, t.invm);
 end
 
 isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
