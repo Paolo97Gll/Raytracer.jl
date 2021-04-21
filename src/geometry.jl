@@ -139,4 +139,14 @@ function translation(v::AbstractVector)
     Transformation(mat, mat⁻¹)
 end
 translation(x::Real, y::Real, z::Real) = translation(Vec(x,y,z)) 
+function scaling(x::Real, y::Real, z::Real)
+    Transformation(Diagonal(        [x, y, z, true]), 
+                   Diagonal(true ./ [x, y, z, true])) # NOTE: the use of true is to avoid unwanted promotions
+end
+scaling(s::Real) = scaling(s, s, s)
+function scaling(v::AbstractVector) 
+    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'scaling' requires an argument of size = (3,)"))
+    
+    scaling(v...)
+end
 # TODO implement all the other functions and operations
