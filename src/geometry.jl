@@ -86,8 +86,8 @@ struct Transformation{V}
 end
 
 Transformation(m::AbstractMatrix{T}) where {T} = Transformation{T}(m)
-Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix{T}) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
-Transformation(m::Matrix{T}, invm::Matrix{T}) where {T} = Transformation(SMatrix{4, 4, T}(m), SMatrix{4, 4, T}(invm))
+Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
+Transformation(m::Matrix{T}, invm::Matrix{T2}) where {T, T2} = Transformation(SMatrix{4, 4, T}(m), SMatrix{4, 4, T2}(invm))
 
 eltype(::Transformation{T}) where {T} = T
 eltype(::Type{Transformation{T}}) where {T} = T
