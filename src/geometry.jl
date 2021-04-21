@@ -12,25 +12,25 @@
 #####################################################################
 
 
-for T ∈ (:Vec, :Normal)
+for V ∈ (:Vec, :Normal)
     quote
-        struct $T{V} <: FieldVector{3, V}
-            x::V
-            y::V
-            z::V
+        struct $V{T} <: FieldVector{3, T}
+            x::T
+            y::T
+            z::T
         end
 
         # Show in compact mode (i.e. inside a container)
-        function show(io::IO, a::$T)
+        function show(io::IO, a::$V)
             print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
         end
 
         # Human-readable show (more extended)
-        function show(io::IO, ::MIME"text/plain", a::$T)
-            print(io, $T, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+        function show(io::IO, ::MIME"text/plain", a::$V)
+            print(io, $V, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
         end
 
-        norm²(v::$T) = sum(el -> el^2, v)
+        norm²(v::$V) = sum(el -> el^2, v)
     end |> eval
 end
 
