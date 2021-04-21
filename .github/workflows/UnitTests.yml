@@ -15,8 +15,6 @@ jobs:
           - '1.6'
         os:
           - ubuntu-latest
-          - windows-latest
-          - macOS-latest
         arch:
           - x64
 
