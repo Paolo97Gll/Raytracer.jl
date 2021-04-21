@@ -105,4 +105,5 @@ isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
 (*)(t ::Transformation, n ::Normal)         = transpose(@view(t.invm[1:3,1:3])) * n
 (*)(t ::Transformation, p ::Point)          = t.m * SVector(p.v..., one(eltype(p))) 
 
+inverse(t::Transformation) = Transformation(t.invm, t.m)
 # TODO implement all the other functions and operations
