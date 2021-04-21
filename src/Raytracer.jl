@@ -31,16 +31,13 @@ import FileIO:
 import ImagePFM:
     _read
 import StaticArrays:
-    SVector
+    SVector, SMatrix, FieldVector
 import LinearAlgebra:
     (⋅), (×), 
-    norm, normalize
-import TypedDelegation:
-    @delegate_onefield, @delegate_onefield_astype, 
-    @delegate_onefield_twovars, @delegate_onefield_twovars_astype
+    norm, normalize, inv, I, Diagonal
 
 export
-    RGB, HdrImage, Vec, Point,
+    RGB, HdrImage, Vec, Point, Normal, Transformation,
     normalize_image, clamp_image, γ_correction,
     save, load
 
