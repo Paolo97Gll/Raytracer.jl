@@ -158,7 +158,7 @@ end
 
 # Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
-    println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
+    println(io, "$(join(map(string, size(image)), "x")) $(typeof(image)):")
     print_matrix(io, image.pixel_matrix)
 end
 
