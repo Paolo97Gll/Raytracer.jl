@@ -52,9 +52,6 @@ end
 eltype(::Point{T}) where {T} = T
 eltype(::Type{Point{T}}) where {T} = T
 
-# Convenience constructor
-Point(p::AbstractArray{T}) where {T} = Point(SVector{size(p)...}(p))
-
 # Show in compact mode (i.e. inside a container)
 function show(io::IO, a::Point)
     print(io, typeof(a), "(", join((string(el) for el ∈ a.v), ", "), ")")
