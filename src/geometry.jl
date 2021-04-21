@@ -42,6 +42,13 @@ struct Point{T}
     v::SVector{3, T}
 end
 
+Point(x::Real, y::Real, z::Real) = Point(SVector(x,y,z))
+function Point(p::AbstractVector)
+    size(p) == (3,) || throw(ArgumentError("argument 'p' has size = $(size(p)) but 'Point' requires an argument of size = (3,)"))
+
+    Point(SVector{3}(p))
+end
+
 eltype(::Point{T}) where {T} = T
 eltype(::Type{Point{T}}) where {T} = T
 
