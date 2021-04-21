@@ -31,15 +31,19 @@ import FileIO:
 import ImagePFM:
     _read
 import StaticArrays:
-    SVector, SMatrix, FieldVector
+    SVector, SMatrix, FieldVector,
+    @SMatrix
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
 
 export
-    RGB, HdrImage, Vec, Point, Normal, Transformation,
+    RGB, HdrImage, 
     normalize_image, clamp_image, γ_correction,
-    save, load
+    save, load,
+    Vec, Point, Normal, Transformation,
+    rotationX, rotationY, rotationZ,
+    translation, scaling, isconsistent
 
 include("color.jl")
 include("hdr_image.jl")
