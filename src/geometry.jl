@@ -106,4 +106,27 @@ isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
 (*)(t ::Transformation, p ::Point)          = t.m * SVector(p.v..., one(eltype(p))) 
 
 inverse(t::Transformation) = Transformation(t.invm, t.m)
+
+let rotation_matrices = Dict(
+        :X => θ -> @SMatrix([   1       0      0    0;
+                                0     cos(θ) sin(θ) 0;
+                                0    -sin(θ) cos(θ) 0;
+                                0       0      0    1]),
+        :Y => θ -> @SMatrix([ cos(θ)    0   -sin(θ) 0;
+                                0       1      0    0;
+                              sin(θ)    0    cos(θ) 0;
+                                0       0      0    1]),
+        :Z => θ -> @SMatrix([ cos(θ) sin(θ)    0    0;
+                             -sin(θ) cos(θ)    0    0;
+                                0      0       1    0;
+                                0      0       0    1])
+    )
+
+    for ax ∈ keys(rotation_matrices)
+        quote
+            $(Symbol(:rotation, ax))(θ::Real) = Transformation(rotation_matrices[$ax](θ),
+                                                             rotation_matrices[$ax](-θ))
+        end |> eval
+    end
+end
 # TODO implement all the other functions and operations
