@@ -26,8 +26,9 @@ sv3 = SVector{size(vv3)...}(vv3)
     v1, v2, v3 = (sv1, vv2, vv3) .|> Vec
 
     @testset "constructor" begin
-        @test v1.v == sv1
-        @test v2.v == sv2
+        @test v1 == sv1
+        @test v2 == sv2
+        @test Vec(vv1...) == sv1
     end
 
     @testset "operations" begin
@@ -47,6 +48,32 @@ sv3 = SVector{size(vv3)...}(vv3)
     end
 end
 
+@testset "Normal" begin
+    v1, v2, v3 = (sv1, vv2, vv3) .|> Normal 
+    
+    @testset "constructor" begin
+        @test v1 == sv1
+        @test v2 == sv2
+        @test Normal(vv1...) == sv1
+    end
+
+    @testset "operations" begin
+        @test norm(v1) == norm(sv1)
+        @test normalize(v1) == Normal(normalize(sv1))
+        @test norm²(v1) ≈ norm(sv1)^2
+
+        @test v1 ⋅ v2 == sv1 ⋅ sv2
+
+        @test v1 + v2 == Normal(sv1 + sv2)
+        @test v1 - v2 == Normal(sv1 - sv2)
+        @test v1 × v2 == Normal(sv1 × sv2)
+
+        @test s * v1 == v1 * s == Normal(s * sv1)
+
+        @test Normal([15, 30, 45]) ≈ v2 * 10
+    end
+end
+
 
 @testset "Point" begin
     p1, p2 = (sv1, vv2) .|> Point
@@ -55,10 +82,11 @@ end
     @testset "constructor" begin
         @test p1.v == sv1
         @test p2.v == sv2
+        @test_throws ArgumentError Point(ones(4))
     end
 
     @testset "operations" begin
-        @test p1 ≈ 
+        @test p1 ≈ Point(vv3 ./ 10)  
 
         @test p1 - p2 == Vec(sv1 - sv2)
 
