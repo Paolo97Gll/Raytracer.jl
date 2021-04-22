@@ -31,7 +31,7 @@ import FileIO:
 import ImagePFM:
     _read
 import StaticArrays:
-    SVector, SMatrix, FieldVector,
+    SVector, MMatrix, FieldVector,
     @SMatrix
 import LinearAlgebra:
     (⋅), (×), 
@@ -43,7 +43,8 @@ export
     save, load,
     Vec, Point, Normal, Transformation,
     rotationX, rotationY, rotationZ,
-    translation, scaling, isconsistent
+    translation, scaling, 
+    isconsistent, inverse
 
 include("color.jl")
 include("hdr_image.jl")
