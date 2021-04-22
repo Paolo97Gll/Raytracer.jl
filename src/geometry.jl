@@ -129,7 +129,7 @@ Return `true` if `t.m * t.invm` is similar to the identity matrix.
 Mainly used for testing and to verify matrices haven't been mutated.
 """
 isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
-
+(≈)(t1::Transformation, t2::Transformation) = t1.m ≈ t2.m && t1.invm ≈ t2.invm
 
 (*)(t1::Transformation, t2::Transformation) = Transformation(t1.m * t2.m, t2.invm * t1.invm)
 (*)(t ::Transformation, v ::Vec)            = @view(t.m[1:3,1:3]) * v
