@@ -143,37 +143,62 @@ Returns a `Transformation` which has the `m` and `invm` fields swapped.
 Note that the returned `Transformation` may have a different eltype with respect of the given one.
 
 #Examples
-```jldoctest
+```jldoctest; setup = :(using LinearAlgebra: Diagonal) 
 julia> t = Transformation(Diagonal([1, 2, 3, 1]))
+4x4 Transformation{Int64}:
+Matrix of type Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  3  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅                   ⋅ 
+  ⋅   0.5   ⋅                   ⋅ 
+  ⋅    ⋅   0.3333333333333333   ⋅ 
+  ⋅    ⋅    ⋅                  1.0
+
 julia> inverse(t)
-```
+4x4 Transformation{Float64}:
+Matrix of type Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅                   ⋅ 
+  ⋅   0.5   ⋅                   ⋅ 
+  ⋅    ⋅   0.3333333333333333   ⋅ 
+  ⋅    ⋅    ⋅                  1.0
+Inverse matrix of type Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  3  ⋅
+ ⋅  ⋅  ⋅  1
+ ```
 """
 inverse(t::Transformation) = Transformation(t.invm, t.m)
 
 let rotation_matrices = Dict(
-        :X => θ -> @SMatrix([   1       0      0    0;
-                                0     cos(θ) sin(θ) 0;
-                                0    -sin(θ) cos(θ) 0;
-                                0       0      0    1]),
-        :Y => θ -> @SMatrix([ cos(θ)    0   -sin(θ) 0;
-                                0       1      0    0;
-                              sin(θ)    0    cos(θ) 0;
-                                0       0      0    1]),
-        :Z => θ -> @SMatrix([ cos(θ) sin(θ)    0    0;
-                             -sin(θ) cos(θ)    0    0;
-                                0      0       1    0;
-                                0      0       0    1])
+        :X => :(@SMatrix([   1       0      0    0;
+                             0     cos(θ) sin(θ) 0;
+                             0    -sin(θ) cos(θ) 0;
+                             0       0      0    1])),
+        :Y => :(@SMatrix([ cos(θ)    0   -sin(θ) 0;
+                             0       1      0    0;
+                           sin(θ)    0    cos(θ) 0;
+                             0       0      0    1])),
+        :Z => :(@SMatrix([ cos(θ) sin(θ)    0    0;
+                          -sin(θ) cos(θ)    0    0;
+                             0      0       1    0;
+                             0      0       0    1]))
     )
 
-    for ax ∈ keys(rotation_matrices)
+    for (ax, mat) ∈ pairs(rotation_matrices)
         quote
-            $(Symbol(:rotation, ax))(θ::Real) = Transformation(rotation_matrices[$ax](θ),
-                                                             rotation_matrices[$ax](-θ))
+            function $(Symbol(:rotation, ax))(θ::Real) 
+                m = $mat
+                Transformation(m, transpose(m))
+            end
         end |> eval
     end
 
     # docstrings
-    let docmsg = ax -> """
+    let docmsg = (ax, mat) -> """
             rotation$ax(θ)
 
         Return a `Transformation` that rotates a 3D vector field of the given angle around the $ax-axis.
@@ -182,17 +207,13 @@ let rotation_matrices = Dict(
         
         #Examples
         ```jldoctest
-        julia> rotation$ax(1, 2, 3)
-        
+        julia> rotation$ax(π/4)
+        $(replace(repr(MIME("text/plain"), mat), "Raytracer." => "" ))
         ```            
-        
-        ```jldoctest
-        julia> rotation$ax([1, 2, 3])
-        ```
         """
-        @doc docmsg(:X) rotationX
-        @doc docmsg(:Y) rotationY
-        @doc docmsg(:Z) rotationZ
+        @doc docmsg(:X, rotationX(π/4)) rotationX
+        @doc docmsg(:Y, rotationY(π/4)) rotationY
+        @doc docmsg(:Z, rotationZ(π/4)) rotationZ
     end
 end
 
@@ -207,22 +228,44 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 #Examples
 ```jldoctest
 julia> translation(1, 2, 3)
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  1  0  0
+ 0  0  1  0
+ 1  2  3  1
+Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
+  1   0   0  0
+  0   1   0  0
+  0   0   1  0
+ -1  -2  -3  1
 ```
 
 ```jldoctest
 julia> translation([1, 2, 3])
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  1  0  0
+ 0  0  1  0
+ 1  2  3  1
+Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
+  1   0   0  0
+  0   1   0  0
+  0   0   1  0
+ -1  -2  -3  1
 ```
 """
 function translation(v::AbstractVector)
     size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'translate' requires an argument of size = (3,)")) 
 
-    mat = Diagonal(ones(eltype(v), 4)) |> SMatrix{4, 4}
+    mat = Diagonal(ones(eltype(v), 4)) |> MMatrix{4, 4}
     mat⁻¹ = copy(mat)
     mat[end, 1:3]   =  v
     mat⁻¹[end, 1:3] = -v
     Transformation(mat, mat⁻¹)
 end
-translation(x::Real, y::Real, z::Real) = translation(Vec(x,y,z)) 
+translation(x::Real, y::Real, z::Real) = translation([x,y,z]) 
 
 """
     scaling(x, y, z)
@@ -237,14 +280,47 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 #Examples
 ```jldoctest
 julia> scaling(1, 2, 3)
+4x4 Transformation{Int64}:
+Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  3  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅                   ⋅ 
+  ⋅   0.5   ⋅                   ⋅ 
+  ⋅    ⋅   0.3333333333333333   ⋅ 
+  ⋅    ⋅    ⋅                  1.0
 ```
 
 ```jldoctest
 julia> scaling(2)
+4x4 Transformation{Int64}:
+Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
+ 2  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  2  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 0.5   ⋅    ⋅    ⋅ 
+  ⋅   0.5   ⋅    ⋅ 
+  ⋅    ⋅   0.5   ⋅ 
+  ⋅    ⋅    ⋅   1.0
 ```
 
 ```jldoctest
 julia> scaling([1, 2, 3])
+4x4 Transformation{Int64}:
+Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  3  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅                   ⋅ 
+  ⋅   0.5   ⋅                   ⋅ 
+  ⋅    ⋅   0.3333333333333333   ⋅ 
+  ⋅    ⋅    ⋅                  1.0
 ```
 """
 function scaling(x::Real, y::Real, z::Real)
