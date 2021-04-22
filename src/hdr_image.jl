@@ -27,7 +27,7 @@ Construct an `HdrImage` wrapping a zero-initialized matrix of size `(img_width, 
 # Examples
 ```jldoctest
 julia> a = HdrImage(RGB{Float64}, 3, 2)
-3x2 HdrImage{RGB{Float64}}
+3x2 HdrImage{RGB{Float64}}:
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
@@ -49,7 +49,7 @@ Construct an `HdrImage{RGB{Float32}}` wrapping a zero-initialized matrix of size
 # Examples
 ```jldoctest
 julia> a = HdrImage(3, 2)
-3x2 HdrImage{RGB{Float32}}
+3x2 HdrImage{RGB{Float32}}:
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
@@ -71,7 +71,7 @@ julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
 julia> a = HdrImage(arr, 3, 2)
-3x2 HdrImage{RGB{Float64}}
+3x2 HdrImage{RGB{Float64}}:
  (1.0 2.0 3.0)  (10.0 11.0 12.0)
  (4.0 5.0 6.0)  (13.0 14.0 15.0)
  (7.0 8.0 9.0)  (16.0 17.0 18.0)
