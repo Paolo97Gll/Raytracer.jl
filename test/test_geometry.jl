@@ -152,6 +152,8 @@ end
         @test prod * v == prod.m[1:3,1:3] * v
         @test prod * n == transpose(prod.invm[1:3,1:3]) * v
         @test prod * p == prod.m * [v..., 1.]
+
+        @test t1 ≈ t1
     end
 
     @testset "methods" begin
