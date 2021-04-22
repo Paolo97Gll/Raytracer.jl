@@ -32,7 +32,7 @@ import ImagePFM:
     _read
 import StaticArrays:
     SVector, MMatrix, FieldVector,
-    @SMatrix
+    SMatrix, @SMatrix
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
