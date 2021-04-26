@@ -133,9 +133,14 @@ isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
 (≈)(t1::Transformation, t2::Transformation) = t1.m ≈ t2.m && t1.invm ≈ t2.invm
 
 (*)(t1::Transformation, t2::Transformation) = Transformation(t1.m * t2.m, t2.invm * t1.invm)
-(*)(t ::Transformation, v ::Vec)            = @view(t.m[1:3,1:3]) * v
-(*)(t ::Transformation, n ::Normal)         = transpose(@view(t.invm[1:3,1:3])) * n
-(*)(t ::Transformation, p ::Point)          = t.m * SVector(p.v..., one(eltype(p))) 
+(*)(t ::Transformation, v ::Vec)            = Vec(@view(t.m[1:3,1:3]) * v)
+(*)(t ::Transformation, n ::Normal)         = Normal(transpose(@view(t.invm[1:3,1:3])) * n)
+
+function (*)(t ::Transformation, p ::Point)
+    res = t.m * SVector(p.v..., one(eltype(p)))
+    res = res[end] == 1 ? res : res/res[end]
+    Point(@view(res[1:3]))
+end
 
 """
     inverse(t)
@@ -177,18 +182,18 @@ Inverse matrix of type Diagonal{Int64, Vector{Int64}}:
 inverse(t::Transformation) = Transformation(t.invm, t.m)
 
 let rotation_matrices = Dict(
-        :X => :(@SMatrix([   1       0      0    0;
-                             0     cos(θ) sin(θ) 0;
-                             0    -sin(θ) cos(θ) 0;
-                             0       0      0    1])),
-        :Y => :(@SMatrix([ cos(θ)    0   -sin(θ) 0;
+        :X => :(@SMatrix([   1       0      0     0;
+                             0     cos(θ) -sin(θ) 0;
+                             0     sin(θ)  cos(θ) 0;
+                             0       0      0     1])),
+        :Y => :(@SMatrix([ cos(θ)    0    sin(θ) 0;
                              0       1      0    0;
-                           sin(θ)    0    cos(θ) 0;
+                           -sin(θ)   0    cos(θ) 0;
                              0       0      0    1])),
-        :Z => :(@SMatrix([ cos(θ) sin(θ)    0    0;
-                          -sin(θ) cos(θ)    0    0;
-                             0      0       1    0;
-                             0      0       0    1]))
+        :Z => :(@SMatrix([ cos(θ) -sin(θ)    0    0;
+                           sin(θ) cos(θ)     0    0;
+                             0      0        1    0;
+                             0      0        0    1]))
     )
 
     for (ax, mat) ∈ pairs(rotation_matrices)
@@ -264,8 +269,8 @@ function translation(v::AbstractVector)
 
     mat = Diagonal(ones(eltype(v), 4)) |> MMatrix{4, 4}
     mat⁻¹ = copy(mat)
-    mat[end, 1:3]   =  v
-    mat⁻¹[end, 1:3] = -v
+    mat[1:3, end]   =  v
+    mat⁻¹[1:3, end] = -v
     Transformation(mat, mat⁻¹)
 end
 translation(x::Real, y::Real, z::Real) = translation([x,y,z]) 
@@ -336,3 +341,7 @@ function scaling(v::AbstractVector)
     
     scaling(v...)
 end
+
+VEC_X = Vec(1.0, 0.0, 0.0)
+VEC_Y = Vec(0.0, 1.0, 0.0)
+VEC_Z = Vec(0.0, 0.0, 1.0)
