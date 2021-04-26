@@ -238,30 +238,30 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 julia> translation(1, 2, 3)
 4x4 Transformation{Int64}:
 Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  1  0  0
- 0  0  1  0
- 1  2  3  1
+ 1  0  0  1
+ 0  1  0  2
+ 0  0  1  3
+ 0  0  0  1
 Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
-  1   0   0  0
-  0   1   0  0
-  0   0   1  0
- -1  -2  -3  1
+ 1  0  0  -1
+ 0  1  0  -2
+ 0  0  1  -3
+ 0  0  0   1
 ```
 
 ```jldoctest
 julia> translation([1, 2, 3])
 4x4 Transformation{Int64}:
 Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  1  0  0
- 0  0  1  0
- 1  2  3  1
+ 1  0  0  1
+ 0  1  0  2
+ 0  0  1  3
+ 0  0  0  1
 Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
-  1   0   0  0
-  0   1   0  0
-  0   0   1  0
- -1  -2  -3  1
+ 1  0  0  -1
+ 0  1  0  -2
+ 0  0  1  -3
+ 0  0  0   1
 ```
 """
 function translation(v::AbstractVector)
