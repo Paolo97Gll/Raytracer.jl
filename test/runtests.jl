@@ -13,7 +13,7 @@ using StaticArrays, LinearAlgebra
 using Test, Documenter
 import Raytracer:
     _clamp, luminosity, average_luminosity, _γ_correction,
-    norm²
+    norm², VEC_X, VEC_Y, VEC_Z
 
 DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
 
