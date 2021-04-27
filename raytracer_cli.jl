@@ -1,5 +1,15 @@
 #!/usr/bin/env julia
 
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   raytracer_cli.jl
+# description:
+#   CLI tool for to manage through Raytracer.jl package
+#   the generation and rendering of photorealistic images.
+
 
 using Pkg
 Pkg.activate(normpath(@__DIR__))

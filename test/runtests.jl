@@ -1,6 +1,19 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   runtests.jl
+# description:
+#   Main package test file.
+
+
 using Raytracer
+using StaticArrays, LinearAlgebra
 using Test, Documenter
-import Raytracer: _clamp, luminosity, average_luminosity, _γ_correction
+import Raytracer:
+    _clamp, luminosity, average_luminosity, _γ_correction,
+    norm², VEC_X, VEC_Y, VEC_Z
 
 DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
 
@@ -12,6 +25,10 @@ end
     include("test_hdr_image.jl")
 end
 
-@testset "doctest" begin
-    doctest(Raytracer, manual = false)
+@testset "Geometry" begin
+    include("test_geometry.jl")
+end
+
+@testset "Docs" begin
+    doctest(Raytracer, manual=false)
 end

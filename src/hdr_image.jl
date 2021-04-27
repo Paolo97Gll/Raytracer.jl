@@ -1,19 +1,11 @@
-# This file implement the structure HdrImage, which is used to represent an HDR image
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
 #
-# Current implementation info:
-# - ITERATIONS. Since an HdrImage type is a wrapper struct around a Matrix, iterating
-#   on an image means iterating on the underlying Matrix, and in this way we'll implement.
-# - BROADCASTING. Same consideration made for the iterations.
-# - IO. Utilities for various IO operations, such as printing or writing into
-#   a stream.
-# - OTHER. Other usefull utilities.
-#
-# More informations are reported above the single implementation.
-
-
-##################
-# MAIN STRUCTURE #
-##################
+# file:
+#   hdr_image.jl
+# description:
+#   This file implement the structure HdrImage, which is used to represent an HDR image.
 
 
 """
@@ -35,7 +27,7 @@ Construct an `HdrImage` wrapping a zero-initialized matrix of size `(img_width, 
 # Examples
 ```jldoctest
 julia> a = HdrImage(RGB{Float64}, 3, 2)
-3x2 HdrImage{RGB{Float64}}
+3x2 HdrImage{RGB{Float64}}:
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
@@ -57,7 +49,7 @@ Construct an `HdrImage{RGB{Float32}}` wrapping a zero-initialized matrix of size
 # Examples
 ```jldoctest
 julia> a = HdrImage(3, 2)
-3x2 HdrImage{RGB{Float32}}
+3x2 HdrImage{RGB{Float32}}:
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
  (0.0 0.0 0.0)  (0.0 0.0 0.0)
@@ -79,7 +71,7 @@ julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
 julia> a = HdrImage(arr, 3, 2)
-3x2 HdrImage{RGB{Float64}}
+3x2 HdrImage{RGB{Float64}}:
  (1.0 2.0 3.0)  (10.0 11.0 12.0)
  (4.0 5.0 6.0)  (13.0 14.0 15.0)
  (7.0 8.0 9.0)  (16.0 17.0 18.0)
@@ -166,7 +158,7 @@ end
 
 # Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", image::HdrImage{T}) where {T}
-    println(io, "$(join(map(string, size(image)), "x")) $(typeof(image))")
+    println(io, "$(join(map(string, size(image)), "x")) $(typeof(image)):")
     print_matrix(io, image.pixel_matrix)
 end
 
