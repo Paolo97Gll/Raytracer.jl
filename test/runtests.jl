@@ -29,6 +29,12 @@ end
     include("test_geometry.jl")
 end
 
+@testset "Ray" begin
+    include("test_ray.jl")
+end
+
+# TODO implement tests for `cameras.jl` and `image_tracer.jl`
+
 @testset "Docs" begin
     doctest(Raytracer, manual=false)
 end
