@@ -82,15 +82,15 @@ function fire_ray(camera::OrthogonalCamera, u, v, T::Type{<:AbstractFloat} = Flo
     0 <= u <= 1 || throw(ArgumentError("argument `u` must be bound to the range [0, 1]: got $u"))
     0 <= v <= 1 || throw(ArgumentError("argument `v` must be bound to the range [0, 1]: got $v"))
     origin = Point(-1.0, (1.0 - 2 * u) * camera.aspect_ratio, 2 * v - 1)
-    camera.transformation * Ray{T}(origin, VEC_X, tmin = 1)
+    camera.transformation * Ray{T}(origin, VEC_X, tmin = convert(T, 1))
 end
 
 function fire_ray(camera::PerspectiveCamera, u, v, T::Type{<:AbstractFloat} = Float32)
     0 <= u <= 1 || throw(ArgumentError("argument `u` must be bound to the range [0, 1]: got $u"))
     0 <= v <= 1 || throw(ArgumentError("argument `v` must be bound to the range [0, 1]: got $v"))
-    origin = Point(-camera.distance, 0, 0)
-    direction = Vec(camera.distance, (1.0 - 2 * u) * camera.aspect_ratio, 2 * v - 1)
-    camera.transformation * Ray{T}(origin, direction, tmin = 1)
+    origin = Point(-camera.screen_distance, 0, 0)
+    direction = Vec(camera.screen_distance, (1.0 - 2 * u) * camera.aspect_ratio, 2 * v - 1)
+    camera.transformation * Ray{T}(origin, direction, tmin = convert(T, 1))
 end
 
 
