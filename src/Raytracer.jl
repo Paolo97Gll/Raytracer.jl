@@ -39,15 +39,20 @@ import LinearAlgebra:
 
 export
     RGB, HdrImage, 
-    normalize_image, clamp_image, γ_correction,
+    normalize_image, clamp_image, γ_correction, norm²,
     save, load,
     Vec, Point, Normal, Transformation,
     rotationX, rotationY, rotationZ,
     translation, scaling, 
-    isconsistent, inverse
+    isconsistent, inverse,
+    Ray, OrthogonalCamera, PerspectiveCamera,
+    fire_ray, aperture_deg
 
 include("color.jl")
 include("hdr_image.jl")
 include("geometry.jl")
+include("ray.jl")
+include("cameras.jl")
+include("image_tracer.jl")
 
 end # module Raytracer
