@@ -32,7 +32,7 @@ you can use julia rational like `16//9`.
 struct OrthogonalCamera <: Camera
     aspect_ratio::Real
     transformation::Transformation
-    OrthogonalCamera(aspect_ratio::Real = 1, transformation = Transformation()) = new(aspect_ratio, transformation)
+    OrthogonalCamera(aspect_ratio::Real = 1, transformation = Transformation{Bool}()) = new(aspect_ratio, transformation)
 end
 
 
@@ -54,7 +54,7 @@ struct PerspectiveCamera <: Camera
     screen_distance::Real
     aspect_ratio::Real
     transformation::Transformation
-    PerspectiveCamera(screen_distance::Real = 1, aspect_ratio::Real = 1, transformation = Transformation()) = new(screen_distance, aspect_ratio, transformation)
+    PerspectiveCamera(screen_distance::Real = 1, aspect_ratio::Real = 1, transformation = Transformation{Bool}()) = new(screen_distance, aspect_ratio, transformation)
 end
 
 
