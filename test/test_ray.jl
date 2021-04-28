@@ -35,3 +35,12 @@ end
                         0.0 0.0 0.0 1.0])
     @test m * ray ≈ Ray{Float64}(Point(18.0, 46.0, 58.0), Vec(14.0, 38.0, 51.0))
 end
+
+@testset "transform" begin
+    ray = Ray{Float64}(Point(1.0, 2.0, 3.0), Vec(6.0, 5.0, 4.0))
+    transformation = translation(Vec(10.0, 11.0, 12.0)) * rotationX(π/2)
+    transformed = transformation * ray
+
+    @test transformed.origin ≈ Point(11.0, 8.0, 14.0)
+    @test transformed.dir ≈ Vec(6.0, -4.0, 5.0)
+end
