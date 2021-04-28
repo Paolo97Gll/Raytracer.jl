@@ -20,6 +20,8 @@ for V ∈ (:Vec, :Normal)
             z::T
         end
 
+        $V(x, y, z) = $V(promote(x, y, z)...)
+
         # Show in compact mode (i.e. inside a container)
         function show(io::IO, a::$V)
             print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
