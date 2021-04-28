@@ -33,6 +33,10 @@ end
     include("test_ray.jl")
 end
 
+@testset "Camera" begin
+    include("test_camera.jl")
+end
+
 # TODO implement tests for `cameras.jl` and `image_tracer.jl`
 
 @testset "Docs" begin
