@@ -342,6 +342,6 @@ function scaling(v::AbstractVector)
     scaling(v...)
 end
 
-VEC_X = Vec(1.0, 0.0, 0.0)
-VEC_Y = Vec(0.0, 1.0, 0.0)
-VEC_Z = Vec(0.0, 0.0, 1.0)
+const VEC_X = Vec(1.0, 0.0, 0.0)
+const VEC_Y = Vec(0.0, 1.0, 0.0)
+const VEC_Z = Vec(0.0, 0.0, 1.0)
