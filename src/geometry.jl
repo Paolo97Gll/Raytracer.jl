@@ -226,7 +226,7 @@ end
 """
     inverse(t)
 
-Return the inverse `Transformation`.
+Return the inverse [`Transformation`](@ref).
 
 Returns a `Transformation` which has the `m` and `invm` fields swapped. 
 Note that the returned `Transformation` may have a different eltype with respect of the given one.
@@ -290,7 +290,7 @@ let rotation_matrices = Dict(
     let docmsg = (ax, mat) -> """
             rotation$ax(θ)
 
-        Return a `Transformation` that rotates a 3D vector field of the given angle around the $ax-axis.
+        Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
         
         If an `AbstractVector` is provided as argument it must have a size = (3,)
         
@@ -310,7 +310,7 @@ end
     translation(x, y, z)
     translation(v)
 
-Return a `Transformation` that translates a 3D vector field of the given coordinates.
+Return a [`Transformation`](@ref) that translates a 3D vector field of the given coordinates.
 
 If an `AbstractVector` is provided as argument it must have a size = (3,)
 
@@ -361,7 +361,7 @@ translation(x::Real, y::Real, z::Real) = translation([x,y,z])
     scaling(s::Real)
     scaling(v::AbstractVector)
 
-Return a `Transformation` that scales a 3D vector field of a given factor for each axis.
+Return a [`Transformation`](@ref) that scales a 3D vector field of a given factor for each axis.
 
 If a single `Real` is provided as argument then the scaling is considered uniform.
 If an `AbstractVector` is provided as argument it must have a size = (3,)
