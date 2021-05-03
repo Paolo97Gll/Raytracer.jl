@@ -63,6 +63,18 @@ end
 Construct a `Point` with given coordinates.
 
 If an `AbstractVector` is provided as argument it must have a size = (3,)
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3)
+Point with eltype Int64
+x = 1, y = 2, z = 3
+
+julia> Point([1, 2, 3])
+Point with eltype Int64
+x = 1, y = 2, z = 3
+```
 """
 Point(x::Real, y::Real, z::Real) = Point(SVector(x,y,z))
 function Point(p::AbstractVector)
