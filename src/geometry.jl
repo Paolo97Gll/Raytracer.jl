@@ -94,8 +94,8 @@ end
 #####################################################################
 
 
-struct Transformation{V}
-    m::AbstractMatrix{V}
+struct Transformation{T}
+    m::AbstractMatrix{T}
     invm::AbstractMatrix 
 
     function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = inv(m)) where {T}
