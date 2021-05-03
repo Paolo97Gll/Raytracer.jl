@@ -94,6 +94,35 @@ end
 #####################################################################
 
 
+"""
+    Transformation{T}
+
+A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
+
+A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation 
+significantly increases performance at the cost of memory space.
+
+Members:
+- `m` ([`AbstractMatrix{T}`](@ref)): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
+- `invm` ([`AbstractMatrix`](@ref)): the homogeneous matrix representation of the inverse transformation. 
+  Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
+
+# Examples
+```jldoctest
+julia> Transformation{Float64}()
+4x4 Transformation{Float64}:
+Matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅    ⋅ 
+  ⋅   1.0   ⋅    ⋅ 
+  ⋅    ⋅   1.0   ⋅ 
+  ⋅    ⋅    ⋅   1.0
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅    ⋅ 
+  ⋅   1.0   ⋅    ⋅ 
+  ⋅    ⋅   1.0   ⋅ 
+  ⋅    ⋅    ⋅   1.0
+```
+"""
 struct Transformation{T}
     m::AbstractMatrix{T}
     invm::AbstractMatrix 
@@ -104,6 +133,58 @@ struct Transformation{T}
     end
 end
 
+"""
+    Transformation(m)
+    Transformation(m, invm)
+
+Construct a `Transformation{T}` instance where `T = eltype(m)`
+
+If any argument is a [`Matrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
+
+# Examples
+```jldoctest; setup = :(import StaticArrays)
+julia> Transformation(StaticArrays.SMatrix{4,4}([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1]))
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  2  0  0
+ 0  0  4  0
+ 0  0  0  1
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
+ 1.0  0.0  0.0   0.0
+ 0.0  0.5  0.0   0.0
+ 0.0  0.0  0.25  0.0
+ 0.0  0.0  0.0   1.0
+
+julia> Transformation([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1])
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  2  0  0
+ 0  0  4  0
+ 0  0  0  1
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
+ 1.0  0.0  0.0   0.0
+ 0.0  0.5  0.0   0.0
+ 0.0  0.0  0.25  0.0
+ 0.0  0.0  0.0   1.0
+```
+
+```jldoctest; setup = :(import LinearAlgebra)
+julia> Transformation(LinearAlgebra.Diagonal([1,2,4,1]))
+4x4 Transformation{Int64}:
+Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  4  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅     ⋅ 
+  ⋅   0.5   ⋅     ⋅ 
+  ⋅    ⋅   0.25   ⋅ 
+  ⋅    ⋅    ⋅    1.0
+```
+"""
 Transformation(m::AbstractMatrix{T}) where {T} = Transformation{T}(m)
 Transformation(m::Matrix{T}) where {T} = Transformation(SMatrix{4,4}(m))
 Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
