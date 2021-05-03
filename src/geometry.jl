@@ -49,7 +49,7 @@ end
 """
     Point{T}
 
-A point in a 3D space. Implemented as a wrapper struct around an `SVector{3, T}`.
+A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, T}`.
 """
 struct Point{T}
     v::SVector{3, T}
