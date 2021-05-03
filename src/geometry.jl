@@ -36,9 +36,11 @@ end
 
 # docstrings
 let docmsg = V ->"""
-        $V{T} <: FieldVector{3, T}
+        $V{T} <: StaticArrays.FieldVector{3, T}
     
-    A $(V == :Normal ? "pseudo-" : "")vector in 3D space.
+    A $(V == :Normal ? "pseudo-" : "")vector in 3D space. 
+    
+    For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
     """
     @doc docmsg(:Vec)    Vec
     @doc docmsg(:Normal) Normal
