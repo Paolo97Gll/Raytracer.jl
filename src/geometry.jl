@@ -20,6 +20,8 @@ for V ∈ (:Vec, :Normal)
             z::T
         end
 
+        $V(x, y, z) = $V(promote(x, y, z)...)
+
         # Show in compact mode (i.e. inside a container)
         function show(io::IO, a::$V)
             print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
@@ -36,9 +38,11 @@ end
 
 # docstrings
 let docmsg = V ->"""
-        $V{T} <: FieldVector{3, T}
+        $V{T} <: StaticArrays.FieldVector{3, T}
     
-    A $(V == :Normal ? "pseudo-" : "")vector in 3D space.
+    A $(V == :Normal ? "pseudo-" : "")vector in 3D space. 
+    
+    For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
     """
     @doc docmsg(:Vec)    Vec
     @doc docmsg(:Normal) Normal
@@ -49,7 +53,7 @@ end
 """
     Point{T}
 
-A point in a 3D space. Implemented as a wrapper struct around an `SVector{3, T}`.
+A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, T}`.
 """
 struct Point{T}
     v::SVector{3, T}
@@ -63,6 +67,18 @@ end
 Construct a `Point` with given coordinates.
 
 If an `AbstractVector` is provided as argument it must have a size = (3,)
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3)
+Point with eltype Int64
+x = 1, y = 2, z = 3
+
+julia> Point([1, 2, 3])
+Point with eltype Int64
+x = 1, y = 2, z = 3
+```
 """
 Point(x::Real, y::Real, z::Real) = Point(SVector(x,y,z))
 function Point(p::AbstractVector)
@@ -94,8 +110,37 @@ end
 #####################################################################
 
 
-struct Transformation{V}
-    m::AbstractMatrix{V}
+"""
+    Transformation{T}
+
+A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
+
+A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation 
+significantly increases performance at the cost of memory space.
+
+Members:
+- `m` ([`AbstractMatrix{T}`](@ref)): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
+- `invm` ([`AbstractMatrix`](@ref)): the homogeneous matrix representation of the inverse transformation. 
+  Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
+
+# Examples
+```jldoctest
+julia> Transformation{Float64}()
+4x4 Transformation{Float64}:
+Matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅    ⋅ 
+  ⋅   1.0   ⋅    ⋅ 
+  ⋅    ⋅   1.0   ⋅ 
+  ⋅    ⋅    ⋅   1.0
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅    ⋅ 
+  ⋅   1.0   ⋅    ⋅ 
+  ⋅    ⋅   1.0   ⋅ 
+  ⋅    ⋅    ⋅   1.0
+```
+"""
+struct Transformation{T}
+    m::AbstractMatrix{T}
     invm::AbstractMatrix 
 
     function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = inv(m)) where {T}
@@ -104,9 +149,61 @@ struct Transformation{V}
     end
 end
 
+"""
+    Transformation(m)
+    Transformation(m, invm)
+
+Construct a `Transformation{T}` instance where `T = eltype(m)`
+
+If any argument is a [`Matrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
+
+# Examples
+```jldoctest; setup = :(import StaticArrays)
+julia> Transformation(StaticArrays.SMatrix{4,4}([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1]))
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  2  0  0
+ 0  0  4  0
+ 0  0  0  1
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
+ 1.0  0.0  0.0   0.0
+ 0.0  0.5  0.0   0.0
+ 0.0  0.0  0.25  0.0
+ 0.0  0.0  0.0   1.0
+
+julia> Transformation([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1])
+4x4 Transformation{Int64}:
+Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
+ 1  0  0  0
+ 0  2  0  0
+ 0  0  4  0
+ 0  0  0  1
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
+ 1.0  0.0  0.0   0.0
+ 0.0  0.5  0.0   0.0
+ 0.0  0.0  0.25  0.0
+ 0.0  0.0  0.0   1.0
+```
+
+```jldoctest; setup = :(import LinearAlgebra)
+julia> Transformation(LinearAlgebra.Diagonal([1,2,4,1]))
+4x4 Transformation{Int64}:
+Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
+ 1  ⋅  ⋅  ⋅
+ ⋅  2  ⋅  ⋅
+ ⋅  ⋅  4  ⋅
+ ⋅  ⋅  ⋅  1
+Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
+ 1.0   ⋅    ⋅     ⋅ 
+  ⋅   0.5   ⋅     ⋅ 
+  ⋅    ⋅   0.25   ⋅ 
+  ⋅    ⋅    ⋅    1.0
+```
+"""
 Transformation(m::AbstractMatrix{T}) where {T} = Transformation{T}(m)
-Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
 Transformation(m::Matrix{T}) where {T} = Transformation(SMatrix{4,4}(m))
+Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
 Transformation(m::Matrix{T}, invm::AbstractMatrix) where {T} = Transformation(SMatrix{4, 4, T}(m), invm)
 Transformation(m::AbstractMatrix, invm::Matrix{T}) where {T} = Transformation(m, SMatrix{4, 4, T}(invm))
 Transformation(m::Matrix{T}, invm::Matrix{T2}) where {T, T2} = Transformation(SMatrix{4, 4, T}(m), SMatrix{4, 4, T2}(invm))
@@ -145,7 +242,7 @@ end
 """
     inverse(t)
 
-Return the inverse `Transformation`.
+Return the inverse [`Transformation`](@ref).
 
 Returns a `Transformation` which has the `m` and `invm` fields swapped. 
 Note that the returned `Transformation` may have a different eltype with respect of the given one.
@@ -209,7 +306,7 @@ let rotation_matrices = Dict(
     let docmsg = (ax, mat) -> """
             rotation$ax(θ)
 
-        Return a `Transformation` that rotates a 3D vector field of the given angle around the $ax-axis.
+        Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
         
         If an `AbstractVector` is provided as argument it must have a size = (3,)
         
@@ -229,7 +326,7 @@ end
     translation(x, y, z)
     translation(v)
 
-Return a `Transformation` that translates a 3D vector field of the given coordinates.
+Return a [`Transformation`](@ref) that translates a 3D vector field of the given coordinates.
 
 If an `AbstractVector` is provided as argument it must have a size = (3,)
 
@@ -280,7 +377,7 @@ translation(x::Real, y::Real, z::Real) = translation([x,y,z])
     scaling(s::Real)
     scaling(v::AbstractVector)
 
-Return a `Transformation` that scales a 3D vector field of a given factor for each axis.
+Return a [`Transformation`](@ref) that scales a 3D vector field of a given factor for each axis.
 
 If a single `Real` is provided as argument then the scaling is considered uniform.
 If an `AbstractVector` is provided as argument it must have a size = (3,)
