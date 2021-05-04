@@ -37,7 +37,9 @@ end
     include("test_camera.jl")
 end
 
-# TODO implement tests for `cameras.jl` and `image_tracer.jl`
+@testset "ImageTracer" begin
+    include("test_image_tracer.jl")
+end
 
 @testset "Docs" begin
     doctest(Raytracer, manual=false)
