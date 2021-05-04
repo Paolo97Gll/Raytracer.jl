@@ -29,6 +29,18 @@ end
     include("test_geometry.jl")
 end
 
+@testset "Ray" begin
+    include("test_ray.jl")
+end
+
+@testset "Camera" begin
+    include("test_camera.jl")
+end
+
+@testset "ImageTracer" begin
+    include("test_image_tracer.jl")
+end
+
 @testset "Docs" begin
     doctest(Raytracer, manual=false)
 end
