@@ -46,7 +46,8 @@ export
     translation, scaling, 
     isconsistent, inverse,
     Ray, OrthogonalCamera, PerspectiveCamera,
-    fire_ray, aperture_deg
+    fire_ray, aperture_deg,
+    ImageTracer, fire_all_rays
 
 include("color.jl")
 include("hdr_image.jl")
