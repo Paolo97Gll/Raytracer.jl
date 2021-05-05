@@ -35,8 +35,8 @@ function fire_ray(tracer::ImageTracer,
                   col::Integer, row::Integer; 
                   u_pixel::AbstractFloat = 0.5, 
                   v_pixel::AbstractFloat = 0.5)
-    u = (col + u_pixel) / (size(tracer.image)[1] - 1)
-    v = (row + v_pixel) / (size(tracer.image)[2] - 1)
+    u = ((col-1) + u_pixel) / size(tracer.image)[1]
+    v = 1.0 - ((row-1) + v_pixel) / size(tracer.image)[2]
     fire_ray(tracer.camera, u, v)
 end
 
