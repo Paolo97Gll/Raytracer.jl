@@ -59,8 +59,8 @@ const World = Vector{Shape}
 
 An abstract type representing a shape.
 """
-struct Sphere <: Shape
-    transformation::Transformation
+Base.@kwdef struct Sphere <: Shape
+    transformation::Transformation = Transformation{Bool}()
 end
 
 function ray_intersection(s::Sphere, ray::Ray)
