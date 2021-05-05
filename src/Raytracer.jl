@@ -32,7 +32,8 @@ import ImagePFM:
     _read
 import StaticArrays:
     SVector, MMatrix, FieldVector,
-    SMatrix, @SMatrix
+    SMatrix, @SMatrix,
+    similar_type, Size
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
@@ -55,5 +56,6 @@ include("geometry.jl")
 include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
+include("shape.jl")
 
 end # module Raytracer
