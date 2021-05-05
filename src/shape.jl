@@ -40,11 +40,13 @@ function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
 end
 
 function (≈)(hr1::HitRecord, hr2::HitRecord)
-    hr1.world_point   ≈ hr2.world_point &&
-    hr1.normal        ≈ hr2.normal &&
-    hr1.surface_point ≈ hr2.surface_point &&
-    hr1.t             ≈ hr2.t &&
-    hr1.ray           ≈ hr2.ray
+    sp1, sp2 = hr1.surface_point, hr2.surface_point
+    hr1.world_point     ≈  hr2.world_point     &&
+    hr1.normal          ≈  hr2.normal          &&
+    findall(isnan, sp1) == findall(isnan, sp2) &&
+    filter(!isnan, sp1) ≈  filter(!isnan, sp2) &&
+    hr1.t               ≈  hr2.t               &&
+    hr1.ray             ≈  hr2.ray
 end
 
 const World = Vector{Shape}
