@@ -5,6 +5,16 @@ An abstract type representing a shape.
 """
 abstract type Shape end
 
+function show(io::IO, ::MIME"text/plain", s::T) where {T <: Shape}
+    print(io, T)
+    fns = fieldnames(T)
+    n = maximum(fns .|> String .|> length)
+    for fieldname ∈ fns
+        println(io)
+        print(io, "  ", rpad(fieldname, n), " = ", getfield(s, fieldname))
+    end
+end
+
 """
     HitRecord
 
@@ -17,6 +27,16 @@ struct HitRecord
     surface_point::Vec2D
     t::Real
     ray::Ray
+end
+
+function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
+    print(io, T)
+    fns = fieldnames(T)
+    n = maximum(fns .|> String .|> length)
+    for fieldname ∈ fns
+        println(io)
+        print(io, "  ", rpad(fieldname, n), " = ", getfield(hr, fieldname))
+    end
 end
 
 function (≈)(hr1::HitRecord, hr2::HitRecord)
