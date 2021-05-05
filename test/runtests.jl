@@ -41,6 +41,10 @@ end
     include("test_image_tracer.jl")
 end
 
+@testset "Shape" begin
+    include("test_shape.jl")
+end
+
 @testset "Docs" begin
     doctest(Raytracer, manual=false)
 end
