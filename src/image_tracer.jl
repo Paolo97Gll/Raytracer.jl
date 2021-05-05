@@ -36,8 +36,8 @@ function fire_ray(tracer::ImageTracer,
                   u_pixel::AbstractFloat = 0.5, 
                   v_pixel::AbstractFloat = 0.5)
     # BUG fix the two lines below!!! issue #7 and issue #8
-    u = (col + u_pixel) / (size(tracer.image)[1] - 1)
-    v = (row + v_pixel) / (size(tracer.image)[2] - 1)
+    u = (col + u_pixel) / size(tracer.image)[1]
+    v = 1.0 - (row + v_pixel) / size(tracer.image)[2]
     fire_ray(tracer.camera, u, v)
 end
 
