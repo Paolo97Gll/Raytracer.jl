@@ -34,7 +34,7 @@ end
 end
 
 @testset "Camera" begin
-    include("test_camera.jl")
+    include("test_cameras.jl")
 end
 
 @testset "ImageTracer" begin
