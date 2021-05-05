@@ -64,14 +64,15 @@ Base.@kwdef struct Sphere <: Shape
 end
 
 function ray_intersection(s::Sphere, ray::Ray)
-    inv_ray = ray * inverse(s.transformation)
-    O = inv_ray.origin - ORIGIN
-    # delta/4
-    δ = (O * inv_ray.dir)^2 - norm²(inv_ray.dir) * (norm²(O) - 1)
-    δ < 0 && return nothing
+    inv_ray = inverse(s.transformation) * ray
+    O⃗ = inv_ray.origin - ORIGIN
+    scalprod = O⃗ ⋅ inv_ray.dir
+    # Δ/4 where Δ is the discriminant of the intersection system solution
+    Δ = (scalprod)^2 - norm²(inv_ray.dir) * (norm²(O⃗) - 1)
+    Δ < 0 && return nothing
     # intersection ray-sphere
-    t_1 = (-O * inv_ray.dir - δ) / norm²(inv_ray.dir)
-    t_2 = (-O * inv_ray.dir + δ) / norm²(inv_ray.dir)
+    t_1 = (-scalprod - Δ) / norm²(inv_ray.dir)
+    t_2 = (-scalprod + Δ) / norm²(inv_ray.dir)
     # nearest point 
     if t_1 > inv_ray.tmin && t_1 < inv_ray.tmax
         hit_t = t_1
