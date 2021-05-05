@@ -42,13 +42,16 @@ export
     RGB, HdrImage, 
     normalize_image, clamp_image, γ_correction, norm²,
     save, load,
-    Vec, Point, Normal, Transformation,
+    Vec, Point, Normal, Transformation, Vec2D,
     rotationX, rotationY, rotationZ,
     translation, scaling, 
     isconsistent, inverse,
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
-    ImageTracer, fire_all_rays
+    ImageTracer, fire_all_rays,
+    Shape, Sphere,
+    HitRecord, World,
+    ray_intersection
 
 include("color.jl")
 include("hdr_image.jl")
