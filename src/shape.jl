@@ -19,6 +19,13 @@ struct HitRecord
     ray::Ray
 end
 
+function (≈)(hr1::HitRecord, hr2::HitRecord)
+    hr1.world_point   ≈ hr2.world_point &&
+    hr1.normal        ≈ hr2.normal &&
+    hr1.surface_point ≈ hr2.surface_point &&
+    hr1.t             ≈ hr2.t &&
+    hr1.ray           ≈ hr2.ray
+end
 
 #####################################################################
 
