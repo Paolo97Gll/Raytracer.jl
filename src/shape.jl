@@ -27,6 +27,8 @@ function (≈)(hr1::HitRecord, hr2::HitRecord)
     hr1.ray           ≈ hr2.ray
 end
 
+const World = Vector{Shape}
+
 #####################################################################
 
 
