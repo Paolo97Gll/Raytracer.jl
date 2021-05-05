@@ -33,6 +33,16 @@ struct Ray{T<:AbstractFloat}
     end
 end
 
+function show(io::IO, ::MIME"text/plain", ray::T) where {T <: Ray}
+    print(io, T)
+    fns = fieldnames(T)
+    n = maximum(fns .|> String .|> length)
+    for fieldname ∈ fns
+        println(io)
+        print(io, "  ", rpad(fieldname, n), " = ", getfield(ray, fieldname))
+    end
+end
+
 """
     Ray{T}(origin, dir; tmin = 1e-5, tmax = typemax(T), depth = 0)
 
