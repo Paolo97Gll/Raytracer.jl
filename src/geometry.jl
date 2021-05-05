@@ -148,7 +148,7 @@ struct Transformation{T}
     m::AbstractMatrix{T}
     invm::AbstractMatrix 
 
-    function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = inv(m)) where {T}
+    function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = T != Bool ? inv(m) : m) where {T}
         @assert(size(m)==size(invm)==(4,4))
         new{T}(m, invm)
     end
