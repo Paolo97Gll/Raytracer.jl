@@ -39,7 +39,7 @@ function show(io::IO, ::MIME"text/plain", ray::T) where {T <: Ray}
     n = maximum(fns .|> String .|> length)
     for fieldname ∈ fns
         println(io)
-        print(io, "  ", rpad(fieldname, n), " = ", getfield(ray, fieldname))
+        print(io, " ↳ ", rpad(fieldname, n), " = ", getfield(ray, fieldname))
     end
 end
 

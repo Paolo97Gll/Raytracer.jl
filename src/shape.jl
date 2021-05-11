@@ -11,7 +11,7 @@ function show(io::IO, ::MIME"text/plain", s::T) where {T <: Shape}
     n = maximum(fns .|> String .|> length)
     for fieldname ∈ fns
         println(io)
-        print(io, "  ", rpad(fieldname, n), " = ", getfield(s, fieldname))
+        print(io, " ↳ ", rpad(fieldname, n), " = ", getfield(s, fieldname))
     end
 end
 
@@ -35,7 +35,7 @@ function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
     n = maximum(fns .|> String .|> length)
     for fieldname ∈ fns
         println(io)
-        print(io, "  ", rpad(fieldname, n), " = ", getfield(hr, fieldname))
+        print(io, " ↳ ", rpad(fieldname, n), " = ", getfield(hr, fieldname))
     end
 end
 
