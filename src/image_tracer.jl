@@ -50,10 +50,10 @@ pass it to the function `func`, which must accept a `Ray` as its only parameter 
 instance containing the color to assign to that pixel in the image.
 """
 function fire_all_rays(tracer::ImageTracer{T}, func::Function) where {T}
-    rangerow, rangecol = axes(tracer.image)
-    for row ∈ rangerow, col ∈ rangecol
-        ray = fire_ray(tracer, col, row)
+    # rangerow, rangecol = axes(tracer.image)
+    for ind ∈ CartesianIndices(tracer.image.pixel_matrix) #row ∈ rangerow, col ∈ rangecol
+        ray = fire_ray(tracer, Tuple(ind)...)
         color::T = func(ray)
-        tracer.image[row, col] = color
+        tracer.image.pixel_matrix[ind] = color
     end
 end
