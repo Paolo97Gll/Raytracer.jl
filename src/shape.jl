@@ -93,6 +93,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     world_point = s.transformation * hit_point
     normal = Normal(hit_point.v)
     normal = s.transformation * (normal ⋅ ray.dir < 0. ? normal : -normal)
-    surface_point = Vec2D{eltype(ray)}(atan(hit_point.v[2]/hit_point.v[1])/2π, acos(hit_point.v[3])/π)
+    v = normalize(hit_point.v)
+    surface_point = Vec2D{eltype(ray)}(atan(v[2]/v[1])/2π, acos(v[3])/π)
     HitRecord(world_point, normal, surface_point, hit_t, ray)
 end
