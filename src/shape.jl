@@ -63,7 +63,7 @@ Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation{Bool}()
 end
 
-function ray_intersection(s::Sphere, ray::Ray)
+function ray_intersection(ray::Ray, s::Sphere)
     inv_ray = inverse(s.transformation) * ray
     O⃗ = inv_ray.origin - ORIGIN
     scalprod = O⃗ ⋅ inv_ray.dir
