@@ -63,6 +63,13 @@ Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation{Bool}()
 end
 
+@doc """
+    ray_intersection(ray, s)
+
+Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
+if none exists, return `nothing`.
+""" ray_intersection
+
 function ray_intersection(ray::Ray, s::Sphere)
     inv_ray = inverse(s.transformation) * ray
     O⃗ = inv_ray.origin - ORIGIN
