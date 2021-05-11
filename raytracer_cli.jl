@@ -41,6 +41,9 @@ function parse_commandline()
         "tonemapping"
             action = :command
             help = "apply tone mapping to a pfm image and save it to file"
+        "demo"
+            action = :command
+            help = "show a demo of Raytracer.jl"
     end
 
     # s["generate"].description = "Generate photorealistic image from input file."
@@ -95,6 +98,24 @@ function main()
         println("Saving final image to '$(parsed_args["output_file"])'...")
         save(parsed_args["output_file"], image.pixel_matrix)
         println("Done!")
+        return
+    end
+
+    if parsed_command == "demo"
+        world = World(undef, 10)
+        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
+            world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
+        end
+        world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
+        # display(getfield.(world, :transformation) .* Ref(Point(0,0,0)))
+        # img = HdrImage(1920, 1080)
+        img = HdrImage(1080÷2, 1080÷2)
+        image_tracer = ImageTracer(img, PerspectiveCamera(//(size(img)...), translation(-1.5, 0, 0), 1.5))
+        println("Tracing Image")
+        @time fire_all_rays(image_tracer, ray -> any(shape -> ray_intersection(ray, shape) !== nothing, world) ? RGB(1.,1.,1.) : RGB(0.,0.,0.))
+        save("demo.jpg", permutedims(img.pixel_matrix))
+        println("Done!")
+        return
     end
 end
 
