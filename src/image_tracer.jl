@@ -21,6 +21,8 @@ struct ImageTracer{T}
     camera::Camera
 end
 
+eltype(::ImageTracer{T}) where {T} = T
+
 """
     fire_ray(tracer, col, row; u_pixel= 0.5, v_pixel = 0.5)
 
@@ -49,11 +51,10 @@ For each pixel in the image contained into `tracer` (instance of [`ImageTracer`]
 pass it to the function `func`, which must accept a `Ray` as its only parameter and must return a `[RGB](@ref)`
 instance containing the color to assign to that pixel in the image.
 """
-function fire_all_rays(tracer::ImageTracer{T}, func::Function) where {T}
+function fire_all_rays(tracer::ImageTracer, func::Function)
     # rangerow, rangecol = axes(tracer.image)
     for ind ∈ CartesianIndices(tracer.image.pixel_matrix) #row ∈ rangerow, col ∈ rangecol
         ray = fire_ray(tracer, Tuple(ind)...)
-        color::T = func(ray)
-        tracer.image.pixel_matrix[ind] = color
+        tracer.image.pixel_matrix[ind] = func(ray)
     end
 end
