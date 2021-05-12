@@ -21,12 +21,12 @@ end
 A struct representing the result of an intersection between
 a [`Ray`](@ref) and a [`Shape`](@ref).
 """
-struct HitRecord
+struct HitRecord{T}
     world_point::Point
     normal::Normal
     surface_point::Vec2D
-    t::Real
-    ray::Ray
+    t::T
+    ray::Ray{T}
 end
 
 function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
