@@ -70,8 +70,105 @@ function parse_commandline()
             help = "output file name"
             required = true
     end
+
+    s["demo"].description = "Show a demo of Raytracer.jl."
+    add_arg_group!(s["demo"], "generation");
+    @add_arg_table! s["demo"] begin
+        "--camera_type", "-t"
+            help = "choose camera type ('perspective' or 'orthogonal')"
+            arg_type = String
+            default = "perspective"
+            range_tester = input -> (input ∈ ["perspective", "orthogonal"])
+        "--camera_position", "-p"
+            help = "camera position in the scene"
+            arg_type = String
+            default = "-1,0,0"
+            range_tester = input -> (length(split(input, ",")) == 3)
+        "--camera_orientation", "-o"
+            help = "camera orientation"
+            arg_type = String
+            default = "0,0,0"
+            range_tester = input -> (length(split(input, ",")) == 3)
+        "--screen_distance", "-d"
+            help = "only for 'perspective' camera: distance between camera and screen"
+            arg_type = Float64
+            default = 1.
+    end
+    add_arg_group!(s["demo"], "rendering");
+    @add_arg_table! s["demo"] begin
+        "--image_resolution", "-r"
+            help = "resolution of the rendered image"
+            arg_type = String
+            default = "540:540"
+    end
+    add_arg_group!(s["demo"], "tonemapping");
+    @add_arg_table! s["demo"] begin
+        "--alpha", "-a"
+            help = "scaling factor for the normalization process"
+            arg_type = Float64
+            default = 1.
+        "--gamma", "-g"
+            help = "gamma value for the tone mapping process"
+            arg_type = Float64
+            default = 1.
+    end
+    add_arg_group!(s["demo"], "files");
+    @add_arg_table! s["demo"] begin
+        "--output_file"
+            help = "output file name"
+            arg_type = String
+            default = "demo.jpg"
+    end
     
     parse_args(s)
+end
+
+
+function tonemapping(options)
+    println("\n--------------------")
+    println("TONE MAPPING PROCESS\n")
+    println("Loading input file '$(options["input_file"])'...")
+    image = load(options["input_file"]) |> HdrImage
+    println("Applying tone mapping...")
+    image = normalize_image(image, options["alpha"]) |> clamp_image
+    image = γ_correction(image, options["gamma"])
+    println("Saving final image to '$(options["output_file"])'...")
+    save(options["output_file"], image.pixel_matrix)
+    println("Done!")
+end
+    
+function demo(options)
+    println("\n--------------------")
+    println("RAYTRACER DEMO\n")
+    println("--------------------")
+    println("RENDERING\n")
+    println("Loading ambient...")
+    world = World(undef, 10)
+    for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
+        world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
+    end
+    world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
+    # display(getfield.(world, :transformation) .* Ref(Point(0,0,0)))
+    # img = HdrImage(1920, 1080)
+    println("Generating image...")
+    img_size = parse.(Int64, split(options["image_resolution"], ":"))
+    img = HdrImage(img_size...)
+    camera_position = "["*options["camera_position"]*"]" |> Meta.parse |> eval
+    # camera_orientation = "["*options["camera_orientation"]*"]" |> Meta.parse |> eval
+    angx, angy, angz = deg2rad.(parse.(Float64, split(options["camera_orientation"], ",")))
+    rot = rotationX(angx)*rotationY(angy)*rotationZ(angz)
+    if options["camera_type"] == "perspective"
+        camera = PerspectiveCamera(//(img_size...), translation(camera_position)*rot, options["screen_distance"])
+    else
+        camera = OrthogonalCamera(//(img_size...), translation(camera_position)*rot)
+    end
+    image_tracer = ImageTracer(img, camera)
+    @time fire_all_rays(image_tracer, ray -> any(shape -> ray_intersection(ray, shape) !== nothing, world) ? RGB(1.,1.,1.) : RGB(0.,0.,0.))
+    println("Saving pfm image...")
+    options["input_file"] = join([split(options["output_file"], ".")[begin:end-1]..., "pfm"], ".")
+    save(options["input_file"], permutedims(img.pixel_matrix))
+    println("Done!")
+    tonemapping(options)
 end
 
 
@@ -79,44 +176,7 @@ function main()
     parsed_args = parse_commandline()
     parsed_command = parsed_args["%COMMAND%"]
     parsed_args = parsed_args[parsed_command]
-    
-    # # generate
-    # if parsed_command == "generate"
-    #     println("\n-----------------------------")
-    #     println("GENERATE PHOTOREALISTIC IMAGE\n")
-    #     println("Not yet implemented.")
-
-    # tonemapping
-    if parsed_command == "tonemapping"
-        println("\n--------------------")
-        println("TONE MAPPING PROCESS\n")
-        println("Loading input file '$(parsed_args["input_file"])'...")
-        image = load(parsed_args["input_file"]) |> HdrImage
-        println("Applying tone mapping...")
-        image = normalize_image(image, parsed_args["alpha"]) |> clamp_image
-        image = γ_correction(image, parsed_args["gamma"])
-        println("Saving final image to '$(parsed_args["output_file"])'...")
-        save(parsed_args["output_file"], image.pixel_matrix)
-        println("Done!")
-        return
-    end
-
-    if parsed_command == "demo"
-        world = World(undef, 10)
-        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-            world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
-        end
-        world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
-        # display(getfield.(world, :transformation) .* Ref(Point(0,0,0)))
-        # img = HdrImage(1920, 1080)
-        img = HdrImage(1080÷2, 1080÷2)
-        image_tracer = ImageTracer(img, PerspectiveCamera(//(size(img)...), translation(-1.5, 0, 0), 1.5))
-        println("Tracing Image")
-        @time fire_all_rays(image_tracer, ray -> any(shape -> ray_intersection(ray, shape) !== nothing, world) ? RGB(1.,1.,1.) : RGB(0.,0.,0.))
-        save("demo.jpg", permutedims(img.pixel_matrix))
-        println("Done!")
-        return
-    end
+    (Symbol(parsed_command) |> eval)(parsed_args)
 end
 
 
