@@ -39,7 +39,7 @@ function fire_ray(tracer::ImageTracer,
                   v_pixel::AbstractFloat = 0.5)
     u = ((col-1) + u_pixel) / size(tracer.image)[1]
     v = 1.0 - ((row-1) + v_pixel) / size(tracer.image)[2]
-    fire_ray(tracer.camera, u, v)
+    fire_ray(tracer.camera, u, v, eltype(eltype(tracer)))
 end
 
 """

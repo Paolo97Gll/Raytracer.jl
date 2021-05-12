@@ -152,7 +152,7 @@ function demo(options)
     # img = HdrImage(1920, 1080)
     println("Generating image...")
     img_size = parse.(Int64, split(options["image_resolution"], ":"))
-    img = HdrImage(img_size...)
+    img = HdrImage{RGB{Float64}}(img_size...)
     camera_position = "["*options["camera_position"]*"]" |> Meta.parse |> eval
     # camera_orientation = "["*options["camera_orientation"]*"]" |> Meta.parse |> eval
     angx, angy, angz = deg2rad.(parse.(Float64, split(options["camera_orientation"], ",")))
