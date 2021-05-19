@@ -79,20 +79,17 @@ Pkg.instantiate()
 #### `raytracer_cli.jl`
 
 ```text
-usage: raytracer_cli.jl [-h] {generate|tonemapping}
+usage: raytracer_cli.jl [-h] {tonemapping|demo}
 
 Raytracing for the generation of photorealistic images in Julia.
 
 commands:
   tonemapping  apply tone mapping to a pfm image and save it to file
+  demo         show a demo of Raytracer.jl
 
 optional arguments:
   -h, --help   show this help message and exit
 ```
-
-<!-- #### `raytracer_cli.jl generate`
-
-Coming soon! -->
 
 #### `raytracer_cli.jl tonemapping`
 
@@ -126,24 +123,72 @@ We support as output image type all the formats supported by the packages [Image
 - gif
 - ...
 
+#### `raytracer_cli.jl demo`
+
+```text
+usage: raytracer_cli.jl demo [-t CAMERA_TYPE] [-p CAMERA_POSITION]
+                        [-o CAMERA_ORIENTATION] [-d SCREEN_DISTANCE]
+                        [-r IMAGE_RESOLUTION] [-a ALPHA] [-g GAMMA]
+                        [--output_file OUTPUT_FILE] [-h]
+
+Show a demo of Raytracer.jl.
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+generation:
+  -t, --camera_type CAMERA_TYPE
+                        choose camera type ('perspective' or
+                        'orthogonal') (default: "perspective")
+  -p, --camera_position CAMERA_POSITION
+                        camera position in the scene as 'X,Y,Z'
+                        (default: "-1,0,0")
+  -o, --camera_orientation CAMERA_ORIENTATION
+                        camera orientation as 'angX,angY,angZ'
+                        (default: "0,0,0")
+  -d, --screen_distance SCREEN_DISTANCE
+                        only for 'perspective' camera: distance
+                        between camera and screen (type: Float64,
+                        default: 1.0)
+
+rendering:
+  -r, --image_resolution IMAGE_RESOLUTION
+                        resolution of the rendered image (default:
+                        "540:540")
+
+tonemapping:
+  -a, --alpha ALPHA     scaling factor for the normalization process
+                        (type: Float64, default: 1.0)
+  -g, --gamma GAMMA     gamma value for the tone mapping process
+                        (type: Float64, default: 1.0)
+
+files:
+  --output_file OUTPUT_FILE
+                        output file name (default: "demo.jpg")
+```
+
 ### Examples
-
-<!-- #### Generation of a photorealistic image
-
-Coming soon! -->
 
 #### Tone mapping
 
 You can use the `tonemapping` command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
 
 ```shell
-julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
+./raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
 ```
 
 You can also change the default values of `alpha` and/or `gamma` to obtain a better tone mapping, according to your source image:
 
 ```shell
-julia raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
+./raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
+```
+
+#### Demo
+
+You can use the `demo` command to render a demo image:
+
+```shell
+./raytracer_cli.jl demo
 ```
 
 ## Contributing
