@@ -5,7 +5,7 @@
 # file:
 #   test_geometry.jl
 # description:
-#   Unit test for geometry.jl
+#   Unit tests for geometry.jl
 
 
 s = 3
@@ -308,6 +308,10 @@ end
     @testset "translations" begin
         tr1 = translation(Vec(1.0, 2.0, 3.0))
         @test isconsistent(tr1)
+
+        tr1_2 = translation(Vec(1.0, 2.0, 3.0)...)
+        @test isconsistent(tr1_2)
+        @test tr1 ≈ tr1_2
 
         tr2 = translation(Vec(4.0, 6.0, 8.0))
         @test isconsistent(tr1)

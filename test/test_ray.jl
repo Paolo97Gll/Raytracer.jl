@@ -5,7 +5,7 @@
 # file:
 #   test_ray.jl
 # description:
-#   Unit test for ray.jl
+#   Unit tests for ray.jl
 
 
 @testset "constructor" begin

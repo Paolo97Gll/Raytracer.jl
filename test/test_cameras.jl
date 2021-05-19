@@ -5,7 +5,7 @@
 # file:
 #   test_ray.jl
 # description:
-#   Unit test for camera.jl
+#   Unit tests for camera.jl
 
 
 @testset "OrthogonalCamera" begin

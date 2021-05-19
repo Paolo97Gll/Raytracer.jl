@@ -1,3 +1,13 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   test_shape.jl
+# description:
+#   Unit tests for shape.jl
+
+
 @testset "Sphere" begin
     @testset "from_above" begin
         ray = Ray{Float64}(Point(0,0,2), -VEC_Z)
