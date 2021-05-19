@@ -19,6 +19,9 @@ using Raytracer
 import FileIO: File, @format_str, query
 
 
+#####################################################
+
+
 function parse_commandline_error_handler(settings::ArgParseSettings, err, err_code::Int = 1)
     if occursin("out of range input for input_file:", err.text)
         println(stderr, "input_file is not a PFM file")
@@ -28,6 +31,7 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
     println(stderr, usage_string(settings))
     exit(err_code)
 end
+
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -80,12 +84,12 @@ function parse_commandline()
             default = "perspective"
             range_tester = input -> (input ∈ ["perspective", "orthogonal"])
         "--camera_position", "-p"
-            help = "camera position in the scene"
+            help = "camera position in the scene as 'X,Y,Z'"
             arg_type = String
             default = "-1,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--camera_orientation", "-o"
-            help = "camera orientation"
+            help = "camera orientation as 'angX,angY,angZ'"
             arg_type = String
             default = "0,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
@@ -124,52 +128,7 @@ function parse_commandline()
 end
 
 
-function tonemapping(options)
-    println("\n--------------------")
-    println("TONE MAPPING PROCESS\n")
-    println("Loading input file '$(options["input_file"])'...")
-    image = load(options["input_file"]) |> HdrImage
-    println("Applying tone mapping...")
-    image = normalize_image(image, options["alpha"]) |> clamp_image
-    image = γ_correction(image, options["gamma"])
-    println("Saving final image to '$(options["output_file"])'...")
-    save(options["output_file"], image.pixel_matrix)
-    println("Done!")
-end
-    
-function demo(options)
-    println("\n--------------------")
-    println("RAYTRACER DEMO\n")
-    println("--------------------")
-    println("RENDERING\n")
-    println("Loading ambient...")
-    world = World(undef, 10)
-    for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-        world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
-    end
-    world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
-    # display(getfield.(world, :transformation) .* Ref(Point(0,0,0)))
-    # img = HdrImage(1920, 1080)
-    println("Generating image...")
-    img_size = parse.(Int64, split(options["image_resolution"], ":"))
-    img = HdrImage{RGB{Float64}}(img_size...)
-    camera_position = "["*options["camera_position"]*"]" |> Meta.parse |> eval
-    # camera_orientation = "["*options["camera_orientation"]*"]" |> Meta.parse |> eval
-    angx, angy, angz = deg2rad.(parse.(Float64, split(options["camera_orientation"], ",")))
-    rot = rotationX(angx)*rotationY(angy)*rotationZ(angz)
-    if options["camera_type"] == "perspective"
-        camera = PerspectiveCamera(//(img_size...), translation(camera_position)*rot, options["screen_distance"])
-    else
-        camera = OrthogonalCamera(//(img_size...), translation(camera_position)*rot)
-    end
-    image_tracer = ImageTracer(img, camera)
-    @time fire_all_rays(image_tracer, ray -> any(shape -> ray_intersection(ray, shape) !== nothing, world) ? RGB(1.,1.,1.) : RGB(0.,0.,0.))
-    println("Saving pfm image...")
-    options["input_file"] = join([split(options["output_file"], ".")[begin:end-1]..., "pfm"], ".")
-    save(options["input_file"], permutedims(img.pixel_matrix))
-    println("Done!")
-    tonemapping(options)
-end
+#####################################################
 
 
 function main()
