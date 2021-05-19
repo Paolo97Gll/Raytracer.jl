@@ -47,7 +47,7 @@ function demo(options)
     print("Saving pfm image...")
     options["input_file"] = join([split(options["output_file"], ".")[begin:end-1]..., "pfm"], ".")
     # save("test.jpg", permutedims(img.pixel_matrix))
-    save(options["input_file"], permutedims(img.pixel_matrix))
+    save(options["input_file"], permutedims(img.pixel_matrix) |> Matrix{RGB{Float32}})
     println(" done!")
     tonemapping(options)
 end
