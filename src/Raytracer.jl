@@ -37,6 +37,7 @@ import StaticArrays:
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
+using ProgressMeter
 
 export
     RGB, HdrImage, 
@@ -51,7 +52,8 @@ export
     ImageTracer, fire_all_rays,
     Shape, Sphere,
     HitRecord, World,
-    ray_intersection
+    ray_intersection,
+    tonemapping, demo
 
 include("color.jl")
 include("hdr_image.jl")
@@ -60,5 +62,6 @@ include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
 include("shape.jl")
+include("user_utils.jl")
 
 end # module Raytracer
