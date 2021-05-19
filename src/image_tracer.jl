@@ -62,7 +62,7 @@ function fire_all_rays(tracer::ImageTracer, func::Function)
     # rangerow, rangecol = axes(tracer.image)
     indices = CartesianIndices(tracer.image.pixel_matrix)
     p = Progress(length(indices), color=:white)
-    Threads.@threads for ind ∈ indices
+    for ind ∈ indices
         ray = fire_ray(tracer, Tuple(ind)...)
         tracer.image.pixel_matrix[ind] = func(ray)
         next!(p)
