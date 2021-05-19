@@ -5,7 +5,10 @@
 # file:
 #   hdr_image.jl
 # description:
-#   This file implement the structure HdrImage, which is used to represent an HDR image.
+#   This file implement the structure HdrImage, which is used to
+#   represent an HDR image.
+
+# TODO check docstrings
 
 
 """

@@ -5,7 +5,9 @@
 # file:
 #   ray.jl
 # description:
-#   This file implement the Ray structure and its methods
+#   Implementation of Ray structure and its methods
+
+# TODO check docstrings
 
 
 """

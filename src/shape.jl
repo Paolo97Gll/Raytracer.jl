@@ -1,3 +1,16 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   shape.jl
+# description:
+#   Implementation of the abstract type Shape and the derivative
+#   concrete types, such as Sphere
+
+# TODO check docstrings
+
+
 """
     Shape
 
@@ -97,3 +110,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     surface_point = Vec2D{eltype(ray)}(atan(v[2]/v[1])/2π, acos(v[3])/π)
     HitRecord(world_point, normal, surface_point, hit_t, ray)
 end
+
+# TODO add plane
+
+# TODO add cude

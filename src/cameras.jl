@@ -5,8 +5,10 @@
 # file:
 #   cameras.jl
 # description:
-#   This file implement the Camera abstract type and the two derivating
+#   Implementation of the Camera abstract type and the two derivating
 #   concrete types, OrthogonalCamera and PerspectiveCamera
+
+# TODO check docstrings
 
 
 """

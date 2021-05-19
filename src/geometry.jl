@@ -8,6 +8,8 @@
 #   Implementation of the geometry required for the generation
 #   and manipulation of a 3D scene.
 
+# TODO check docstrings
+
 
 #####################################################################
 
