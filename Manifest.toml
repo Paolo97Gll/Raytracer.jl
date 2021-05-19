@@ -183,11 +183,11 @@ version = "3.3.9+7"
 
 [[FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "a44072a82a3a2e4c7a5e81e4c2736af37de1d3b6"
+git-tree-sha1 = "358cabeb5a507d6a0f3dabdaea7c61fd0936f99b"
 repo-rev = "master"
 repo-url = "https://github.com/Samuele-Colombo/FileIO.jl"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.6.5"
+version = "1.9.0"
 
 [[FixedPointNumbers]]
 deps = ["Statistics"]
@@ -280,7 +280,7 @@ version = "0.2.11"
 
 [[ImagePFM]]
 deps = ["ColorTypes", "FileIO", "Test"]
-git-tree-sha1 = "5720a9b57582190e73b209b8ad15837a5a6d7d0d"
+git-tree-sha1 = "62550a7ba855cd7f923ccc278fc79a4e489e4c35"
 repo-rev = "master"
 repo-url = "https://github.com/Samuele-Colombo/ImagePFM.jl"
 uuid = "de255290-5529-4d77-9c46-251ebffccf2e"
@@ -395,9 +395,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[LogExpFunctions]]
 deps = ["DocStringExtensions", "LinearAlgebra"]
-git-tree-sha1 = "ed26854d7c2c867d143f0e07c198fc9e8b721d10"
+git-tree-sha1 = "1ba664552f1ef15325e68dc4c05c3ef8c2d5d885"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.2.3"
+version = "0.2.4"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"

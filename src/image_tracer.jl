@@ -53,7 +53,7 @@ instance containing the color to assign to that pixel in the image.
 """
 function fire_all_rays(tracer::ImageTracer, func::Function)
     # rangerow, rangecol = axes(tracer.image)
-    for ind ∈ CartesianIndices(tracer.image.pixel_matrix) #row ∈ rangerow, col ∈ rangecol
+    @showprogress for ind ∈ CartesianIndices(tracer.image.pixel_matrix) #row ∈ rangerow, col ∈ rangecol
         ray = fire_ray(tracer, Tuple(ind)...)
         tracer.image.pixel_matrix[ind] = func(ray)
     end
