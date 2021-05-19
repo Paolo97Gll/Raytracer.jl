@@ -32,6 +32,7 @@ for V ∈ (:Vec, :Normal)
             print(io, $V, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
         end
 
+        similar_type(::Type{<:$V}, ::Type{T}, s::Size{(3,)}) where {T} = $V{T}
         norm²(v::$V) = sum(el -> el^2, v)
     end |> eval
 end
@@ -47,6 +48,10 @@ let docmsg = V ->"""
     @doc docmsg(:Vec)    Vec
     @doc docmsg(:Normal) Normal
 end
+
+#####################################################################
+
+const Vec2D{T} = SVector{2, T}
 
 #####################################################################
 
@@ -143,7 +148,7 @@ struct Transformation{T}
     m::AbstractMatrix{T}
     invm::AbstractMatrix 
 
-    function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = inv(m)) where {T}
+    function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = T != Bool ? inv(m) : m) where {T}
         @assert(size(m)==size(invm)==(4,4))
         new{T}(m, invm)
     end
@@ -439,6 +444,12 @@ function scaling(v::AbstractVector)
     scaling(v...)
 end
 
-const VEC_X = Vec(1.0, 0.0, 0.0)
-const VEC_Y = Vec(0.0, 1.0, 0.0)
-const VEC_Z = Vec(0.0, 0.0, 1.0)
+
+#####################################################################
+
+
+const VEC_X = Vec(1., 0., 0.)
+const VEC_Y = Vec(0., 1., 0.)
+const VEC_Z = Vec(0., 0., 1.)
+
+const ORIGIN = Point(0., 0., 0.)

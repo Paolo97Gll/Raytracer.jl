@@ -32,7 +32,8 @@ import ImagePFM:
     _read
 import StaticArrays:
     SVector, MMatrix, FieldVector,
-    SMatrix, @SMatrix
+    SMatrix, @SMatrix,
+    similar_type, Size
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
@@ -41,13 +42,16 @@ export
     RGB, HdrImage, 
     normalize_image, clamp_image, γ_correction, norm²,
     save, load,
-    Vec, Point, Normal, Transformation,
+    Vec, Point, Normal, Transformation, Vec2D,
     rotationX, rotationY, rotationZ,
     translation, scaling, 
     isconsistent, inverse,
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
-    ImageTracer, fire_all_rays
+    ImageTracer, fire_all_rays,
+    Shape, Sphere,
+    HitRecord, World,
+    ray_intersection
 
 include("color.jl")
 include("hdr_image.jl")
@@ -55,5 +59,6 @@ include("geometry.jl")
 include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
+include("shape.jl")
 
 end # module Raytracer

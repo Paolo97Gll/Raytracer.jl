@@ -31,17 +31,17 @@ sv3 = SVector{size(vv3)...}(vv3)
     @testset "operations" begin
         @test -v1 ≈ -sv1
 
-        @test norm(v1) == norm(sv1)
-        @test normalize(v1) == Vec(normalize(sv1))
+        @test norm(v1) === norm(sv1)
+        @test normalize(v1) === Vec(normalize(sv1))
         @test norm²(v1) ≈ norm(sv1)^2
 
-        @test v1 ⋅ v2 == sv1 ⋅ sv2
+        @test v1 ⋅ v2 === sv1 ⋅ sv2
 
-        @test v1 + v2 == Vec(sv1 + sv2)
-        @test v1 - v2 == Vec(sv1 - sv2)
-        @test v1 × v2 == Vec(sv1 × sv2)
+        @test v1 + v2 === Vec(sv1 + sv2)
+        @test v1 - v2 === Vec(sv1 - sv2)
+        @test v1 × v2 === Vec(sv1 × sv2)
 
-        @test s * v1 == v1 * s == Vec(s * sv1)
+        @test s * v1 === v1 * s === Vec(s * sv1)
 
         @test Vec([15, 30, 45]) ≈ v2 * 10
     end
@@ -58,17 +58,17 @@ end
     end
 
     @testset "operations" begin
-        @test norm(v1) == norm(sv1)
-        @test normalize(v1) == Normal(normalize(sv1))
+        @test norm(v1) === norm(sv1)
+        @test normalize(v1) === Normal(normalize(sv1))
         @test norm²(v1) ≈ norm(sv1)^2
 
-        @test v1 ⋅ v2 == sv1 ⋅ sv2
+        @test v1 ⋅ v2 === sv1 ⋅ sv2
 
-        @test v1 + v2 == Normal(sv1 + sv2)
-        @test v1 - v2 == Normal(sv1 - sv2)
-        @test v1 × v2 == Normal(sv1 × sv2)
+        @test v1 + v2 === Normal(sv1 + sv2)
+        @test v1 - v2 === Normal(sv1 - sv2)
+        @test v1 × v2 === Normal(sv1 × sv2)
 
-        @test s * v1 == v1 * s == Normal(s * sv1)
+        @test s * v1 === v1 * s === Normal(s * sv1)
 
         @test Normal([15, 30, 45]) ≈ v2 * 10
     end

@@ -34,11 +34,15 @@ end
 end
 
 @testset "Camera" begin
-    include("test_camera.jl")
+    include("test_cameras.jl")
 end
 
 @testset "ImageTracer" begin
     include("test_image_tracer.jl")
+end
+
+@testset "Shape" begin
+    include("test_shape.jl")
 end
 
 @testset "Docs" begin
