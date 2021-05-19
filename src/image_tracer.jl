@@ -25,6 +25,11 @@ end
 
 eltype(::ImageTracer{T}) where {T} = T
 
+function show(io::IO, ::MIME"text/plain", t::ImageTracer)
+    println(io, typeof(t), " with camera of type ", typeof(t.camera))
+    print(io, "image of size ", join(size(t.image), "x"), " and of type ", typeof(t.image));
+end
+
 """
     fire_ray(tracer, col, row; u_pixel= 0.5, v_pixel = 0.5)
 
