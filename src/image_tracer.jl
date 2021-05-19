@@ -5,7 +5,9 @@
 # file:
 #   image_tracer.jl
 # description:
-#   TODO fill
+#   Implementation of ImageTracer and its methods
+
+# TODO check docstrings
 
 """
     ImageTracer{T}
@@ -53,8 +55,11 @@ instance containing the color to assign to that pixel in the image.
 """
 function fire_all_rays(tracer::ImageTracer, func::Function)
     # rangerow, rangecol = axes(tracer.image)
-    @showprogress for ind ∈ CartesianIndices(tracer.image.pixel_matrix) #row ∈ rangerow, col ∈ rangecol
+    indices = CartesianIndices(tracer.image.pixel_matrix)
+    p = Progress(length(indices), color=:white)
+    Threads.@threads for ind ∈ indices
         ray = fire_ray(tracer, Tuple(ind)...)
         tracer.image.pixel_matrix[ind] = func(ray)
+        next!(p)
     end
 end
