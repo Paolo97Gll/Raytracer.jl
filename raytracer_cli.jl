@@ -15,7 +15,7 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 
 using ArgParse
-using Raytracer
+import Raytracer: tonemapping, demo
 import FileIO: File, @format_str, query
 
 
@@ -119,12 +119,32 @@ function parse_commandline()
     add_arg_group!(s["demo"], "files");
     @add_arg_table! s["demo"] begin
         "--output_file"
-            help = "output file name"
+            help = "output LDR file name (the HDR file will have the same name, but with 'pfm' extension)"
             arg_type = String
             default = "demo.jpg"
     end
     
     parse_args(s)
+end
+
+
+#####################################################
+
+
+function tonemapping(options::AbstractDict{String, Any})
+    tonemapping(options["input_file"], options["output_file"], options["alpha"], options["gamma"])
+end
+
+
+function demo(options::AbstractDict{String, Any})
+    demo(options["output_file"],
+         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+         options["camera_type"],
+         Tuple(parse.(Float64, split(options["camera_position"], ","))),
+         Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
+         options["screen_distance"],
+         options["alpha"],
+         options["gamma"])
 end
 
 
