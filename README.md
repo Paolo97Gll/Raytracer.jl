@@ -25,8 +25,10 @@ Julia version required: ≥1.6
     - [Usage](#usage-1)
       - [`raytracer_cli.jl`](#raytracer_clijl)
       - [`raytracer_cli.jl tonemapping`](#raytracer_clijl-tonemapping)
+      - [`raytracer_cli.jl demo`](#raytracer_clijl-demo)
     - [Examples](#examples-1)
       - [Tone mapping](#tone-mapping)
+      - [Demo](#demo)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -66,7 +68,7 @@ git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then open julia and type the following commands to update your environment:
+Then, open julia and type the following commands to update your environment:
 
 ```julia
 import Pkg
@@ -164,7 +166,9 @@ tonemapping:
 
 files:
   --output_file OUTPUT_FILE
-                        output file name (default: "demo.jpg")
+                        output LDR file name (the HDR file will have
+                        the same name, but with 'pfm' extension)
+                        (default: "demo.jpg")
 ```
 
 ### Examples
@@ -190,6 +194,8 @@ You can use the `demo` command to render a demo image:
 ```shell
 ./raytracer_cli.jl demo
 ```
+
+It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image). You can change the output file name, the LDR extension and other rendering parameters using the command options.
 
 ## Contributing
 
