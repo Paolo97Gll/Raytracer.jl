@@ -111,7 +111,6 @@ function ray_intersection(ray::Ray, s::Sphere)
     HitRecord(world_point, normal, surface_point, hit_t, ray)
 end
 
-# TODO add plane
 """
     Plane
 
@@ -132,4 +131,25 @@ function ray_intersection(ray::Ray, s::Plane)
     surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
     HitRecord(world_point, normal, surface_point, t, ray)
 end
-# TODO add cube
+
+"""
+    AABB
+
+A type representing an Axis-Aligned Bounding Box
+"""
+Base.@kwdef struct AABB{T}
+    p_M::Point{T} = Point( one(T),  one(T),  one(T)) 
+    p_m::Point{T} = Point(zero(T), zero(T), zero(T))
+end
+
+function ray_intersection(ray::Ray, s::AABB)
+    dir = ray.dir
+    intervals = map(t -> Interval(t...), zip(-s.p_m.v ./ dir, -s.p_M.v ./ dir))
+    overlap = reduce(intersect, intervals) 
+    isempty(overlap) && return nothing
+    t = overlap.first
+    world_point = ray(t)
+    normal = (m = minimum(norm, [s.p_m.v, s.p_M.v]); -sign.(m) * (world_point .== m)) |> Normal
+    surface_point = world_point.v[1:2] - floor.(world_point.v[1:2]) |> Vec2D
+    HitRecord(world_point, normal, surface_point, t, ray)
+end

@@ -37,7 +37,7 @@ import StaticArrays:
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
-using ProgressMeter
+using ProgressMeter, Intervals
 
 export
     RGB, HdrImage, 
