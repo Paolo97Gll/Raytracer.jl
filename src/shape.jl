@@ -112,5 +112,24 @@ function ray_intersection(ray::Ray, s::Sphere)
 end
 
 # TODO add plane
+"""
+    Plane
 
+A type representing an infinite plane.
+"""
+Base.@kwdef struct Plane <: Shape
+    transformation::Transformation = Transformation{Bool}()
+end
+
+function ray_intersection(ray::Ray, s::Plane)
+    inv_ray = inverse(s.transformation) * ray
+    dz = inv_ray.dir.z
+    t = -inv_ray.origin.v[3]/dz
+    inv_ray.tmin < t < inv_ray.tmax || return nothing
+    hit_point = inv_ray(t)
+    world_point = s.transformation * hit_point
+    normal = -sign(dz) * Normal(eltype(ray) .|> (zero, zero, one))
+    surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
+    HitRecord(world_point, normal, surface_point, t, ray)
+end
 # TODO add cube

@@ -50,7 +50,7 @@ export
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
     ImageTracer, fire_all_rays,
-    Shape, Sphere,
+    Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
     tonemapping, demo
