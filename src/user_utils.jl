@@ -48,7 +48,7 @@ function demo(output_file::AbstractString,
     print("Loading tracing informations...")
     image = HdrImage{RGB{Float64}}(image_resolution...)
     angx, angy, angz = deg2rad.(camera_orientation)
-    transformation = translation(camera_position...) * (rotationX(angx) * rotationY(angy) * rotationZ(angz))
+    transformation = (rotationX(angx) * rotationY(angy) * rotationZ(angz)) * translation(camera_position...)
     if camera_type == "perspective"
         camera = PerspectiveCamera(//(image_resolution...), transformation, screen_distance)
     elseif camera_type == "orthogonal"
