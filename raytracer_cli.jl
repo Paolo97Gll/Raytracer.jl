@@ -15,8 +15,11 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 
 using ArgParse
-using Raytracer
+import Raytracer: tonemapping, demo
 import FileIO: File, @format_str, query
+
+
+#####################################################
 
 
 function parse_commandline_error_handler(settings::ArgParseSettings, err, err_code::Int = 1)
@@ -28,6 +31,7 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
     println(stderr, usage_string(settings))
     exit(err_code)
 end
+
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -41,6 +45,9 @@ function parse_commandline()
         "tonemapping"
             action = :command
             help = "apply tone mapping to a pfm image and save it to file"
+        "demo"
+            action = :command
+            help = "show a demo of Raytracer.jl"
     end
 
     # s["generate"].description = "Generate photorealistic image from input file."
@@ -67,35 +74,88 @@ function parse_commandline()
             help = "output file name"
             required = true
     end
+
+    s["demo"].description = "Show a demo of Raytracer.jl."
+    add_arg_group!(s["demo"], "generation");
+    @add_arg_table! s["demo"] begin
+        "--camera_type", "-t"
+            help = "choose camera type ('perspective' or 'orthogonal')"
+            arg_type = String
+            default = "perspective"
+            range_tester = input -> (input ∈ ["perspective", "orthogonal"])
+        "--camera_position", "-p"
+            help = "camera position in the scene as 'X,Y,Z'"
+            arg_type = String
+            default = "-1,0,0"
+            range_tester = input -> (length(split(input, ",")) == 3)
+        "--camera_orientation", "-o"
+            help = "camera orientation as 'angX,angY,angZ'"
+            arg_type = String
+            default = "0,0,0"
+            range_tester = input -> (length(split(input, ",")) == 3)
+        "--screen_distance", "-d"
+            help = "only for 'perspective' camera: distance between camera and screen"
+            arg_type = Float64
+            default = 1.
+    end
+    add_arg_group!(s["demo"], "rendering");
+    @add_arg_table! s["demo"] begin
+        "--image_resolution", "-r"
+            help = "resolution of the rendered image"
+            arg_type = String
+            default = "540:540"
+    end
+    add_arg_group!(s["demo"], "tonemapping");
+    @add_arg_table! s["demo"] begin
+        "--alpha", "-a"
+            help = "scaling factor for the normalization process"
+            arg_type = Float64
+            default = 1.
+        "--gamma", "-g"
+            help = "gamma value for the tone mapping process"
+            arg_type = Float64
+            default = 1.
+    end
+    add_arg_group!(s["demo"], "files");
+    @add_arg_table! s["demo"] begin
+        "--output_file"
+            help = "output LDR file name (the HDR file will have the same name, but with 'pfm' extension)"
+            arg_type = String
+            default = "demo.jpg"
+    end
     
     parse_args(s)
 end
+
+
+#####################################################
+
+
+function tonemapping(options::AbstractDict{String, Any})
+    tonemapping(options["input_file"], options["output_file"], options["alpha"], options["gamma"])
+end
+
+
+function demo(options::AbstractDict{String, Any})
+    demo(options["output_file"],
+         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+         options["camera_type"],
+         Tuple(parse.(Float64, split(options["camera_position"], ","))),
+         Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
+         options["screen_distance"],
+         options["alpha"],
+         options["gamma"])
+end
+
+
+#####################################################
 
 
 function main()
     parsed_args = parse_commandline()
     parsed_command = parsed_args["%COMMAND%"]
     parsed_args = parsed_args[parsed_command]
-    
-    # # generate
-    # if parsed_command == "generate"
-    #     println("\n-----------------------------")
-    #     println("GENERATE PHOTOREALISTIC IMAGE\n")
-    #     println("Not yet implemented.")
-
-    # tonemapping
-    if parsed_command == "tonemapping"
-        println("\n--------------------")
-        println("TONE MAPPING PROCESS\n")
-        println("Loading input file '$(parsed_args["input_file"])'...")
-        image = load(parsed_args["input_file"]) |> HdrImage
-        println("Applying tone mapping...")
-        image = normalize_image(image, parsed_args["alpha"]) |> clamp_image
-        image = γ_correction(image, parsed_args["gamma"])
-        println("Saving final image to '$(parsed_args["output_file"])'...")
-        save(parsed_args["output_file"], image.pixel_matrix)
-        println("Done!")
-    end
+    (Symbol(parsed_command) |> eval)(parsed_args)
 end
 
 

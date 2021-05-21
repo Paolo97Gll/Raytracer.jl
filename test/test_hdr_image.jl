@@ -5,7 +5,7 @@
 # file:
 #   test_hdr_image.jl
 # description:
-#   Unit test for hdr_image.jl
+#   Unit tests for hdr_image.jl
 
 
 # testset variables

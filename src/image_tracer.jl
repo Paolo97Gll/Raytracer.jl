@@ -5,7 +5,9 @@
 # file:
 #   image_tracer.jl
 # description:
-#   TODO fill
+#   Implementation of ImageTracer and its methods
+
+# TODO check docstrings
 
 """
     ImageTracer{T}
@@ -20,6 +22,8 @@ struct ImageTracer{T}
     image::HdrImage{T}
     camera::Camera
 end
+
+eltype(::ImageTracer{T}) where {T} = T
 
 function show(io::IO, ::MIME"text/plain", t::ImageTracer)
     println(io, typeof(t), " with camera of type ", typeof(t.camera))
@@ -42,7 +46,7 @@ function fire_ray(tracer::ImageTracer,
                   v_pixel::AbstractFloat = 0.5)
     u = ((col-1) + u_pixel) / size(tracer.image)[1]
     v = 1.0 - ((row-1) + v_pixel) / size(tracer.image)[2]
-    fire_ray(tracer.camera, u, v)
+    fire_ray(tracer.camera, u, v, eltype(eltype(tracer)))
 end
 
 """
@@ -54,11 +58,13 @@ For each pixel in the image contained into `tracer` (instance of [`ImageTracer`]
 pass it to the function `func`, which must accept a `Ray` as its only parameter and must return a `[RGB](@ref)`
 instance containing the color to assign to that pixel in the image.
 """
-function fire_all_rays(tracer::ImageTracer{T}, func::Function) where {T}
-    rangerow, rangecol = axes(tracer.image)
-    for row ∈ rangerow, col ∈ rangecol
-        ray = fire_ray(tracer, col, row)
-        color::T = func(ray)
-        tracer.image[row, col] = color
+function fire_all_rays(tracer::ImageTracer, func::Function)
+    # rangerow, rangecol = axes(tracer.image)
+    indices = CartesianIndices(tracer.image.pixel_matrix)
+    p = Progress(length(indices), color=:white)
+    for ind ∈ indices
+        ray = fire_ray(tracer, Tuple(ind)...)
+        tracer.image.pixel_matrix[ind] = func(ray)
+        next!(p)
     end
 end

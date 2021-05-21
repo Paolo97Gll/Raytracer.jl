@@ -5,8 +5,10 @@
 # file:
 #   color.jl
 # description:
-#   This file include all the extensions to the type ColorTypes.RGB,
-#   such as operations, iterations, broadcasting and others.
+#   Extensions to the type ColorTypes.RGB, such as operations,
+#   iterations, broadcasting and others.
+
+# TODO write docstrings
 
 
 ##############

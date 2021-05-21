@@ -5,7 +5,7 @@
 # file:
 #   test_color.jl
 # description:
-#   Unit test for color.jl
+#   Unit tests for color.jl
 
 
 @testset "Operations" begin

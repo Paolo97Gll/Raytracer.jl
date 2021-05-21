@@ -1,3 +1,16 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# (C) 2021 Samuele Colombo, Paolo Galli
+#
+# file:
+#   shape.jl
+# description:
+#   Implementation of the abstract type Shape and the derivative
+#   concrete types, such as Sphere
+
+# TODO check docstrings
+
+
 """
     Shape
 
@@ -21,12 +34,12 @@ end
 A struct representing the result of an intersection between
 a [`Ray`](@ref) and a [`Shape`](@ref).
 """
-struct HitRecord
+struct HitRecord{T}
     world_point::Point
     normal::Normal
     surface_point::Vec2D
-    t::Real
-    ray::Ray
+    t::T
+    ray::Ray{T}
 end
 
 function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
@@ -55,9 +68,9 @@ const World = Vector{Shape}
 
 
 """
-    Sphere
+    Sphere <: Shape
 
-An abstract type representing a shape.
+A type representing a sphere.
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation{Bool}()
@@ -93,6 +106,50 @@ function ray_intersection(ray::Ray, s::Sphere)
     world_point = s.transformation * hit_point
     normal = Normal(hit_point.v)
     normal = s.transformation * (normal ⋅ ray.dir < 0. ? normal : -normal)
-    surface_point = Vec2D{eltype(ray)}(atan(hit_point.v[2]/hit_point.v[1])/2π, acos(hit_point.v[3])/π)
+    v = normalize(hit_point.v)
+    surface_point = Vec2D{eltype(ray)}(atan(v[2]/v[1])/2π, acos(v[3])/π)
     HitRecord(world_point, normal, surface_point, hit_t, ray)
+end
+
+"""
+    Plane <: Shape
+
+A type representing an infinite plane.
+"""
+Base.@kwdef struct Plane <: Shape
+    transformation::Transformation = Transformation{Bool}()
+end
+
+function ray_intersection(ray::Ray, s::Plane)
+    inv_ray = inverse(s.transformation) * ray
+    dz = inv_ray.dir.z
+    t = -inv_ray.origin.v[3]/dz
+    inv_ray.tmin < t < inv_ray.tmax || return nothing
+    hit_point = inv_ray(t)
+    world_point = s.transformation * hit_point
+    normal = -sign(dz) * Normal(eltype(ray) .|> (zero, zero, one))
+    surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
+    HitRecord(world_point, normal, surface_point, t, ray)
+end
+
+"""
+    AABB
+
+A type representing an Axis-Aligned Bounding Box
+"""
+Base.@kwdef struct AABB{T}
+    p_M::Point{T} = Point( one(T),  one(T),  one(T)) 
+    p_m::Point{T} = Point(zero(T), zero(T), zero(T))
+end
+
+"""
+    ray_intersection(ray, aabb)
+
+Return the parameter `t` at which `ray` first hits the bounding box. If no hit exists, return `typemax(eltype(ray))`.
+"""
+function ray_intersection(ray::Ray, aabb::AABB)
+    dir = ray.dir
+    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir))) 
+    isempty(overlap) && return typemax(eltype(ray))
+    t = overlap.first
 end

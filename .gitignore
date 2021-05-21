@@ -1,5 +1,8 @@
 .vscode/
 
+# PFM
+*.pfm
+
 # JPEG
 *.jpg
 *.jpeg
