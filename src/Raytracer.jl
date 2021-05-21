@@ -53,6 +53,7 @@ export
     Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
+    Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     tonemapping, demo
 
 include("color.jl")
@@ -62,6 +63,7 @@ include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
 include("shape.jl")
+include("pigments.jl")
 include("user_utils.jl")
 
 end # module Raytracer
