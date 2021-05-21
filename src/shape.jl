@@ -142,14 +142,14 @@ Base.@kwdef struct AABB{T}
     p_m::Point{T} = Point(zero(T), zero(T), zero(T))
 end
 
-function ray_intersection(ray::Ray, s::AABB)
+"""
+    ray_intersection(ray, aabb)
+
+Return the parameter `t` at which `ray` first hits the bounding box. If no hit exists, return `typemax(eltype(ray))`.
+"""
+function ray_intersection(ray::Ray, aabb::AABB)
     dir = ray.dir
-    intervals = map(t -> Interval(t...), zip(-s.p_m.v ./ dir, -s.p_M.v ./ dir))
-    overlap = reduce(intersect, intervals) 
-    isempty(overlap) && return nothing
+    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir))) 
+    isempty(overlap) && return typemax(eltype(ray))
     t = overlap.first
-    world_point = ray(t)
-    normal = (m = minimum(norm, [s.p_m.v, s.p_M.v]); -sign.(m) * (world_point .== m)) |> Normal
-    surface_point = world_point.v[1:2] - floor.(world_point.v[1:2]) |> Vec2D
-    HitRecord(world_point, normal, surface_point, t, ray)
 end
