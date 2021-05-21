@@ -68,9 +68,9 @@ const World = Vector{Shape}
 
 
 """
-    Sphere
+    Sphere <: Shape
 
-An abstract type representing a shape.
+A type representing a sphere.
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation{Bool}()
@@ -112,7 +112,7 @@ function ray_intersection(ray::Ray, s::Sphere)
 end
 
 """
-    Plane
+    Plane <: Shape
 
 A type representing an infinite plane.
 """
