@@ -52,3 +52,8 @@ end
 function at(brdf::DiffuseBRDF, #=normal=#::Normal, #=in_dir=#::Vec, #=out_dir=#::Vec, uv::Vec2D)
     brdf.pigment(uv) * brdf.reflectance/π
 end
+
+Base.@kwdef struct Material{T}
+    brdf::BRDF{T} = DiffuseBRDF{T}()
+    emitted_radiance::Pigment = UniformPigment(zero(RGB{T})) 
+end
