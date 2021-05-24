@@ -30,7 +30,7 @@ struct ImagePigment{T <: HdrImage}
 end
 
 function (ip::ImagePigment)(u::Real, v::Real)
-    row, col = (u, v) .* size(ip.image) .|> ceil .|> Int
+    row, col = (u, v) .* size(ip.image) .|> ceil .|> Int .|> (x -> x == 0 ? x + 1 : x)
     ip.image[row, col]
 end
 
