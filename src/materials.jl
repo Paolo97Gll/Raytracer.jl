@@ -1,5 +1,9 @@
 abstract type Pigment end
 
+function (p::Pigment)(uv::Vec2D)
+    p(uv...)
+end
+
 Base.@kwdef struct UniformPigment{T <: RGB}
     color::T = one(T)
 end
