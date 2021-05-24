@@ -63,7 +63,7 @@ include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
 include("shape.jl")
-include("pigments.jl")
+include("materials.jl")
 include("user_utils.jl")
 
 end # module Raytracer
