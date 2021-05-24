@@ -15,6 +15,14 @@ end
 Base.@kwdef struct CheckeredPigment{N, T <: RGB}
     color_on::T  = one(T)
     color_off::T = zero(T)
+    function CheckeredPigment{N, T}(color_on::T, color_off::T) where {N, T}
+        @assert isa(N, Integer)
+        new{N,T}(color_on, color_off)
+    end
+end
+
+function CheckeredPigment{N}(color_on::T, color_off::T) where {N,T <: RGB}
+    CheckeredPigment{N, T}(color_on, color_off)
 end
 
 function CheckeredPigment(color_on::RGB, color_off::RGB)
