@@ -4,7 +4,7 @@ function (p::Pigment)(uv::Vec2D)
     p(uv...)
 end
 
-Base.@kwdef struct UniformPigment{T <: RGB}
+Base.@kwdef struct UniformPigment{T <: RGB} <: Pigment
     color::T = one(T)
 end
 
@@ -12,7 +12,7 @@ function (up::UniformPigment)(::Real, ::Real)
     up.color
 end
 
-Base.@kwdef struct CheckeredPigment{N, T <: RGB}
+Base.@kwdef struct CheckeredPigment{N, T <: RGB} <: Pigment
     color_on::T  = one(T)
     color_off::T = zero(T)
     function CheckeredPigment{N, T}(color_on::T, color_off::T) where {N, T}
@@ -33,7 +33,7 @@ function (cp::CheckeredPigment{N})(u::Real, v::Real) where {N}
     ceil(u*N)%2 == ceil(v*N)%2 ? cp.color_on : cp.color_off
 end
 
-struct ImagePigment{T <: HdrImage} 
+struct ImagePigment{T <: HdrImage} <: Pigment
     image::T
 end
 
