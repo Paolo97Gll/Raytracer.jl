@@ -45,7 +45,7 @@ end
 abstract type BRDF end
 
 Base.@kwdef struct DiffuseBRDF{T <: AbstractFloat} <: BRDF
-    pigment::Pigment = UniformPigment()
+    pigment::Pigment = UniformPigment{RGB{T}}()
     reflectance::T = one(T)
 end
 
