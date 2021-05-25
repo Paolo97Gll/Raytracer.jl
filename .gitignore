@@ -3,6 +3,9 @@
 # PFM
 *.pfm
 
+# MP4
+*.mp4
+
 # JPEG
 *.jpg
 *.jpeg
