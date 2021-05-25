@@ -25,9 +25,9 @@ function CheckeredPigment{N}(; color_on::T = one(T), color_off::T = zero(T)) whe
     CheckeredPigment{N, T}(color_on, color_off)
 end
 
-# function CheckeredPigment{N}(color_on::T, color_off::T) where {N,T <: RGB}
-#     CheckeredPigment{N, T}(color_on, color_off)
-# end
+function CheckeredPigment{N}(color_on::T, color_off::T) where {N,T <: RGB}
+    CheckeredPigment{N, T}(color_on, color_off)
+end
 
 function CheckeredPigment(color_on::RGB, color_off::RGB)
     CheckeredPigment{2}(color_on, color_off)
