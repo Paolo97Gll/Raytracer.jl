@@ -40,6 +40,7 @@ struct HitRecord{T}
     surface_point::Vec2D
     t::T
     ray::Ray{T}
+    material::Material
 end
 
 function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
@@ -74,6 +75,7 @@ A type representing a sphere.
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation{Bool}()
+    material::Material = Material()
 end
 
 @doc """
@@ -108,7 +110,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     normal = s.transformation * (normal ⋅ ray.dir < 0. ? normal : -normal)
     v = normalize(hit_point.v)
     surface_point = Vec2D{eltype(ray)}(atan(v[2]/v[1])/2π, acos(v[3])/π)
-    HitRecord(world_point, normal, surface_point, hit_t, ray)
+    HitRecord(world_point, normal, surface_point, hit_t, ray, s.material)
 end
 
 """
@@ -118,6 +120,7 @@ A type representing an infinite plane.
 """
 Base.@kwdef struct Plane <: Shape
     transformation::Transformation = Transformation{Bool}()
+    material::Material = Material()
 end
 
 function ray_intersection(ray::Ray, s::Plane)
@@ -129,7 +132,7 @@ function ray_intersection(ray::Ray, s::Plane)
     world_point = s.transformation * hit_point
     normal = -sign(dz) * Normal(eltype(ray) .|> (zero, zero, one))
     surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
-    HitRecord(world_point, normal, surface_point, t, ray)
+    HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
 
 """
