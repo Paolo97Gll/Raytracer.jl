@@ -20,14 +20,7 @@ struct Vec{T} <: FieldVector{3, T}
     z::T
 end
 
-function Vec(x, y, z)
-    Vec{promotetype(x, y, z)}(promote(x, y, z)...)
-end
-
-function Vec{T}(x, y, z) where {T}
-    Vec{T}(convert(T, x), convert(T, y), convert(T, z))
-end
-
+Vec(x, y, z) = Vec(promote(x, y, z)...)
 
 struct Normal{T, V} <: FieldVector{3, T}
     x::T
@@ -36,16 +29,16 @@ struct Normal{T, V} <: FieldVector{3, T}
 end
 
 function Normal(x, y, z)
-    Normal{promotetype(x,y,z), false}(promote(x, y, z)...)
+    prom = promote(x, y, z)
+    Normal{eltype(prom), false}(prom...)
 end
 
 function Normal{T}(x, y, z) where {T}
     Normal{T, false}(convert(T, x), convert(T, y), convert(T, z))
 end
 
-function normalize(n::Normal{T, V}) where {T, V}
-    V ? n : Normal{T, true}(normalize(SVector{3}(n)))
-end
+normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
+normalize(n::Normal{T, true }) where {T} = n
 
 for V ∈ (:Vec, :Normal)
     quote
@@ -489,10 +482,10 @@ function create_onb_from_z(input_normal::Normal{T, V}) where {T, V}
     normal = normalize(input_normal)
     sign = copysign(1., normal.z)
 
-    a = -1.0 / (sign + normal.z)
+    a = -1. / (sign + normal.z)
     b = normal.x * normal.y * a
 
-    e1 = Vec(1.0 + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e1 = Vec(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
     e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
 
     (e1, e2, Vec(normal.x, normal.y, normal.z))

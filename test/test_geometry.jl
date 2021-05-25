@@ -59,7 +59,7 @@ end
 
     @testset "operations" begin
         @test norm(v1) === norm(sv1)
-        @test normalize(v1) === Normal(normalize(sv1))
+        @test normalize(v1) === Normal{eltype(sv1), true}(normalize(sv1))
         @test norm²(v1) ≈ norm(sv1)^2
 
         @test v1 ⋅ v2 === sv1 ⋅ sv2
