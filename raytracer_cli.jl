@@ -16,6 +16,8 @@ Pkg.activate(normpath(@__DIR__))
 
 using ArgParse
 using Raytracer
+using ProgressMeter
+using FileIO, ImageIO, ImageMagick, ImagePFM
 using FileIO: File, @format_str, query
 
 
@@ -39,9 +41,6 @@ function parse_commandline()
     s.exc_handler = parse_commandline_error_handler
     s.version = @project_version
     @add_arg_table! s begin
-        # "generate"
-        #     action = :command
-        #     help = "generate photorealistic image from input file"
         "tonemapping"
             action = :command
             help = "apply tone mapping to a pfm image and save it to file"
@@ -49,8 +48,6 @@ function parse_commandline()
             action = :command
             help = "show a demo of Raytracer.jl"
     end
-
-    # s["generate"].description = "Generate photorealistic image from input file."
 
     s["tonemapping"].description = "Apply tone mapping to a pfm image and save it to file."
     add_arg_group!(s["tonemapping"], "tonemapping settings");
@@ -76,8 +73,18 @@ function parse_commandline()
     end
 
     s["demo"].description = "Show a demo of Raytracer.jl."
-    add_arg_group!(s["demo"], "generation");
     @add_arg_table! s["demo"] begin
+        "image"
+            action = :command
+            help = "render a demo image of Raytracer.jl"
+        "animation"
+            action = :command
+            help = "create a demo animation of Raytracer.jl (require ffmpeg)"
+    end
+
+    s["demo"]["image"].description = "Render a demo image of Raytracer.jl."
+    add_arg_group!(s["demo"]["image"], "generation");
+    @add_arg_table! s["demo"]["image"] begin
         "--camera_type", "-t"
             help = "choose camera type ('perspective' or 'orthogonal')"
             arg_type = String
@@ -96,22 +103,22 @@ function parse_commandline()
         "--screen_distance", "-d"
             help = "only for 'perspective' camera: distance between camera and screen"
             arg_type = Float64
-            default = 1.
+            default = 2.
     end
-    add_arg_group!(s["demo"], "rendering");
-    @add_arg_table! s["demo"] begin
+    add_arg_group!(s["demo"]["image"], "rendering");
+    @add_arg_table! s["demo"]["image"] begin
         "--image_resolution", "-r"
             help = "resolution of the rendered image"
             arg_type = String
             default = "540:540"
-        "--renderer"
+        "--renderer", "-R"
             help = "type of renderer to use (`OnOff` or `Flat`)"
             arg_type = String
             default = "OnOff"
             range_tester = input -> (input ∈ ["OnOff", "Flat"])
     end
-    add_arg_group!(s["demo"], "tonemapping");
-    @add_arg_table! s["demo"] begin
+    add_arg_group!(s["demo"]["image"], "tonemapping");
+    @add_arg_table! s["demo"]["image"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
             arg_type = Float64
@@ -121,12 +128,78 @@ function parse_commandline()
             arg_type = Float64
             default = 1.
     end
-    add_arg_group!(s["demo"], "files");
-    @add_arg_table! s["demo"] begin
-        "--output_file"
+    add_arg_group!(s["demo"]["image"], "files");
+    @add_arg_table! s["demo"]["image"] begin
+        "--output_file", "-O"
             help = "output LDR file name (the HDR file will have the same name, but with 'pfm' extension)"
             arg_type = String
             default = "demo.jpg"
+    end
+
+    s["demo"]["animation"].description =
+        "Create a demo animation of Raytracer.jl, by generating n images with different camera " *
+        "orientation and merging them into an mp4 video. Require ffmpeg installed on local machine."
+    add_arg_group!(s["demo"]["animation"], "frame generation");
+    @add_arg_table! s["demo"]["animation"] begin
+        "--camera_type", "-t"
+            help = "choose camera type ('perspective' or 'orthogonal')"
+            arg_type = String
+            default = "perspective"
+            range_tester = input -> (input ∈ ["perspective", "orthogonal"])
+        "--camera_position", "-p"
+            help = "camera position in the scene as 'X,Y,Z'"
+            arg_type = String
+            default = "-1,0,0"
+            range_tester = input -> (length(split(input, ",")) == 3)
+        "--screen_distance", "-d"
+            help = "only for 'perspective' camera: distance between camera and screen"
+            arg_type = Float64
+            default = 2.
+    end
+    add_arg_group!(s["demo"]["animation"], "frame rendering");
+    @add_arg_table! s["demo"]["animation"] begin
+        "--image_resolution", "-r"
+            help = "resolution of the rendered image"
+            arg_type = String
+            default = "540:540"
+        "--renderer", "-R"
+            help = "type of renderer to use (`OnOff` or `Flat`)"
+            arg_type = String
+            default = "OnOff"
+            range_tester = input -> (input ∈ ["OnOff", "Flat"])
+    end
+    add_arg_group!(s["demo"]["animation"], "frame tonemapping");
+    @add_arg_table! s["demo"]["animation"] begin
+        "--alpha", "-a"
+            help = "scaling factor for the normalization process"
+            arg_type = Float64
+            default = 1.
+        "--gamma", "-g"
+            help = "gamma value for the tone mapping process"
+            arg_type = Float64
+            default = 1.
+    end
+    add_arg_group!(s["demo"]["animation"], "animation parameter");
+    @add_arg_table! s["demo"]["animation"] begin
+        "--delta_theta", "-D"
+            help = "Δθ in camera orientation (around z axis) between each frame; the number of frames generated is [360/Δθ]"
+            arg_type = Int64
+            default = 10
+        "--fps", "-f"
+            help = "FPS (frame-per-second) of the output video"
+            arg_type = Int64
+            default = 15
+    end
+    add_arg_group!(s["demo"]["animation"], "files");
+    @add_arg_table! s["demo"]["animation"] begin
+        "--output_dir", "-F"
+            help = "output directory"
+            arg_type = String
+            default = "demo_animation"
+        "--output_file", "-O"
+            help = "name of output frames and animation without extension"
+            arg_type = String
+            default = "demo"
     end
     
     parse_args(s)
@@ -136,8 +209,8 @@ end
 #####################################################
 
 
-function tonemapping(options::AbstractDict{String, Any})
-    tonemapping(
+function tonemapping(options::Dict{String, Any})
+    Raytracer.tonemapping(
         options["input_file"],
         options["output_file"],
         options["alpha"],
@@ -146,8 +219,7 @@ function tonemapping(options::AbstractDict{String, Any})
 end
 
 
-function demo(options::AbstractDict{String, Any})
-    renderer_type = Symbol(options["renderer"], "Renderer") |> eval
+function demoimage(options::Dict{String, Any})
     Raytracer.demo(
         options["output_file"],
         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
@@ -155,10 +227,53 @@ function demo(options::AbstractDict{String, Any})
         Tuple(parse.(Float64, split(options["camera_position"], ","))),
         Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
         options["screen_distance"],
-        renderer_type,
+        Symbol(options["renderer"], "Renderer") |> eval,
         options["alpha"],
         options["gamma"]
     )
+end
+
+
+function demoanimation(options::Dict{String, Any})
+    println("\n-------------------------------")
+    println("| Raytracer.jl animation demo |")
+    println("-------------------------------")
+    println("Threads number: $(Threads.nthreads())\n")
+
+    print("Creating directory $(options["output_dir"])...")
+    curdir = pwd()
+    demodir = options["output_dir"]
+    isdir(joinpath(curdir, demodir)) || mkdir(demodir)
+    cd(demodir)
+    println(" done!")
+
+    println("Generating frames...")
+    θ_list = (0:options["delta_theta"]:360)[begin:end-1]
+    p = Progress(length(θ_list), dt=1)
+    Threads.@threads for elem in collect(enumerate(θ_list))
+        index, θ = elem
+        filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(length(θ_list)))+1, '0'))"
+        Raytracer.demo(
+            filename * ".jpg",
+            Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+            options["camera_type"],
+            Tuple(parse.(Float64, split(options["camera_position"], ","))),
+            (0, 0, θ),
+            options["screen_distance"],
+            Symbol(options["renderer"], "Renderer") |> eval,
+            options["alpha"],
+            options["gamma"],
+            disable_output=true
+        )
+        rm(filename * ".pfm")
+        next!(p)
+    end
+    
+    print("Generating animation...")
+    run(pipeline(`ffmpeg -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`, devnull))
+    println(" done!")
+
+    cd(curdir)
 end
 
 
@@ -167,8 +282,16 @@ end
 
 function main()
     parsed_args = parse_commandline()
+
     parsed_command = parsed_args["%COMMAND%"]
     parsed_args = parsed_args[parsed_command]
+
+    if parsed_command == "demo"
+        parsed_subcommand = parsed_args["%COMMAND%"]
+        parsed_command *= parsed_subcommand
+        parsed_args = parsed_args[parsed_subcommand]
+    end
+
     (Symbol(parsed_command) |> eval)(parsed_args)
 end
 
