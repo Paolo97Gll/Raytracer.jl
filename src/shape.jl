@@ -65,6 +65,21 @@ end
 
 const World = Vector{Shape}
 
+function ray_intersection(ray::Ray, world::World)
+    hit = nothing
+    for shape ∈ world
+        last_hit = ray_intersection(ray, shape)
+        last_hit === nothing && continue
+        if hit === nothing 
+            hit = last_hit
+        else
+            last_hit.t >= hit.t && continue
+            hit = last_hit
+        end
+    end
+    hit
+end
+
 #####################################################################
 
 
