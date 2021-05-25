@@ -41,9 +41,9 @@ function demo(output_file::AbstractString,
     print("Loading ambient...")
     world = World(undef, 10)
     for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-        world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
+        world[i] = Sphere(transformation = translation(coords * 0.5) * scaling(1/10))
     end
-    world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
+    world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10)), Sphere(transformation = translation([0, 0.5, 0]) * scaling(1/10))]
     println(" done!")
     print("Loading tracing informations...")
     image = HdrImage{RGB{Float64}}(image_resolution...)
