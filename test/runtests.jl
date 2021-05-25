@@ -49,6 +49,10 @@ end
     include("test_shape.jl")
 end
 
+@testset "renderers" begin
+    include("test_renderers.jl")
+end
+
 @testset "Docs" begin
     doctest(Raytracer, manual=false)
 end
