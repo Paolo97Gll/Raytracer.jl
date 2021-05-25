@@ -20,7 +20,8 @@ import Base:
     size, zero, one, fill!, eltype,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
-    readline, read
+    readline, read,
+    rand
 import Base.Broadcast:
     BroadcastStyle, Style, Broadcasted, combine_eltypes,
     broadcastable, copy, similar
@@ -55,6 +56,7 @@ export
     ray_intersection,
     tonemapping, demo
 
+include("pcg.jl")
 include("color.jl")
 include("hdr_image.jl")
 include("geometry.jl")
