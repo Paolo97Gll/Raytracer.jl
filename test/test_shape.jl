@@ -20,14 +20,14 @@
         ray = Ray{Float64}(Point(3,0,0), -VEC_X)
         shape = Sphere()
         intersect = ray_intersection(ray, shape) 
-        @test intersect ≈ HitRecord(Point(1, 0, 0), VEC_X |> Normal, Vec2D(0, 0.5), 2., ray, Material())
+        @test intersect ≈ HitRecord(Point(1, 0, 0), VEC_X |> Normal, Vec2D(0.5, 0.5), 2., ray, Material())
     end
 
     @testset "from_within" begin
         ray = Ray{Float64}(Point(0,0,0), VEC_X)
         shape = Sphere()
         intersect = ray_intersection(ray, shape) 
-        @test intersect ≈ HitRecord(Point(1, 0, 0), -VEC_X |> Normal, Vec2D(0, 0.5), 1., ray, Material())
+        @test intersect ≈ HitRecord(Point(1, 0, 0), -VEC_X |> Normal, Vec2D(0.5, 0.5), 1., ray, Material())
     end
 
     @testset "transposed_from_above" begin
@@ -41,7 +41,7 @@
         ray = Ray{Float64}(Point(13,0,0), -VEC_X)
         shape = Sphere(transformation = translation(Vec(10,0,0)))
         intersect = ray_intersection(ray, shape) 
-        @test intersect ≈ HitRecord(Point(11, 0, 0), VEC_X |> Normal, Vec2D(0, 0.5), 2., ray, Material())
+        @test intersect ≈ HitRecord(Point(11, 0, 0), VEC_X |> Normal, Vec2D(0.5, 0.5), 2., ray, Material())
     end
     
     @testset "miss_transposed_from_above" begin
