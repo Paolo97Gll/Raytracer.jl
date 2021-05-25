@@ -23,11 +23,6 @@ Julia version required: ≥1.6
   - [Command line tool](#command-line-tool)
     - [Installation](#installation-1)
     - [Usage](#usage-1)
-      - [`raytracer_cli.jl`](#raytracer_clijl)
-      - [`raytracer_cli.jl tonemapping`](#raytracer_clijl-tonemapping)
-      - [`raytracer_cli.jl demo`](#raytracer_clijl-demo)
-      - [`raytracer_cli.jl demo image`](#raytracer_clijl-demo-image)
-      - [`raytracer_cli.jl demo animation`](#raytracer_clijl-demo-animation)
     - [Examples](#examples-1)
       - [Tone mapping](#tone-mapping)
       - [Demo](#demo)
@@ -80,7 +75,19 @@ Pkg.instantiate()
 
 ### Usage
 
-#### `raytracer_cli.jl`
+The menu tree is:
+
+```text
+raytracer_cli.jl
+├── tonemapping
+└── demo
+    ├── image
+    └── animation
+```
+
+**`raytracer_cli.jl`**
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl [-h] {tonemapping|demo}
@@ -95,7 +102,13 @@ optional arguments:
   -h, --help   show this help message and exit
 ```
 
-#### `raytracer_cli.jl tonemapping`
+</details>
+
+**`raytracer_cli.jl tonemapping`**
+
+We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
@@ -117,17 +130,11 @@ files:
   output_file        output file name
 ```
 
-We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including:
+</details>
 
-- jpg, jpeg
-- png
-- tif, tiff
-- ppm
-- bmp
-- gif
-- ...
+**`raytracer_cli.jl demo`**
 
-#### `raytracer_cli.jl demo`
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl demo [-h] {image|animation}
@@ -142,7 +149,11 @@ optional arguments:
   -h, --help  show this help message and exit
 ```
 
-#### `raytracer_cli.jl demo image`
+</details>
+
+**`raytracer_cli.jl demo image`**
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl demo image [-t CAMERA_TYPE]
@@ -192,7 +203,11 @@ files:
                         (default: "demo.jpg")
 ```
 
-#### `raytracer_cli.jl demo animation`
+</details>
+
+**`raytracer_cli.jl demo animation`**
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl demo animation [-t CAMERA_TYPE]
@@ -250,6 +265,8 @@ files:
                         name of output frames and animation without
                         extension (default: "demo")
 ```
+
+</details>
 
 ### Examples
 
