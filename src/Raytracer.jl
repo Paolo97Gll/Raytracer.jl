@@ -54,6 +54,7 @@ export
     HitRecord, World,
     ray_intersection,
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
+    BRDF, DiffuseBRDF, Material,
     tonemapping, demo
 
 include("color.jl")
