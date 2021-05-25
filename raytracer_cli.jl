@@ -15,8 +15,8 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 
 using ArgParse
-import Raytracer: tonemapping, demo
-import FileIO: File, @format_str, query
+using Raytracer
+using FileIO: File, @format_str, query
 
 
 #####################################################
@@ -104,6 +104,11 @@ function parse_commandline()
             help = "resolution of the rendered image"
             arg_type = String
             default = "540:540"
+        "--renderer"
+            help = "type of renderer to use (`OnOff` or `Flat`)"
+            arg_type = String
+            default = "OnOff"
+            range_tester = input -> (input ∈ ["OnOff", "Flat"])
     end
     add_arg_group!(s["demo"], "tonemapping");
     @add_arg_table! s["demo"] begin
@@ -137,14 +142,16 @@ end
 
 
 function demo(options::AbstractDict{String, Any})
-    demo(options["output_file"],
-         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
-         options["camera_type"],
-         Tuple(parse.(Float64, split(options["camera_position"], ","))),
-         Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
-         options["screen_distance"],
-         options["alpha"],
-         options["gamma"])
+    renderer_type = Symbol(options["renderer"], "Renderer") |> eval
+    Raytracer.demo(options["output_file"],
+                   Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+                   options["camera_type"],
+                   Tuple(parse.(Float64, split(options["camera_position"], ","))),
+                   Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
+                   options["screen_distance"],
+                   renderer_type,
+                   options["alpha"],
+                   options["gamma"])
 end
 
 
