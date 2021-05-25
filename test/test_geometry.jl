@@ -164,7 +164,7 @@ end
 
     @testset "methods" begin
         t = t1 * t2 
-        invt = inverse(t)
+        invt = inv(t)
         @test t.m == invt.invm && t.invm == invt.m
 
         θ = π/4
@@ -287,7 +287,7 @@ end
         @test expected_n ≈ (m * Normal(3.0, 2.0, 4.0))
     end
 
-    @testset "inverse" begin
+    @testset "inv" begin
         m1 = Transformation([1.0 2.0 3.0 4.0;
                              5.0 6.0 7.0 8.0;
                              9.0 9.0 8.0 7.0;
@@ -297,7 +297,7 @@ end
                              0.5 0.5 -1.0 1.0;
                              -1.375 0.875 0.0 -0.5])
 
-        m2 = inverse(m1)
+        m2 = inv(m1)
         @test isconsistent(m1)
 
         prod = m1 * m2

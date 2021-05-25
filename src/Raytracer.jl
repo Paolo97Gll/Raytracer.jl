@@ -20,7 +20,8 @@ import Base:
     size, zero, one, fill!, eltype,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
-    readline, read
+    readline, read,
+    inv
 import Base.Broadcast:
     BroadcastStyle, Style, Broadcasted, combine_eltypes,
     broadcastable, copy, similar
@@ -46,7 +47,7 @@ export
     Vec, Point, Normal, Transformation, Vec2D,
     rotationX, rotationY, rotationZ,
     translation, scaling, 
-    isconsistent, inverse,
+    isconsistent,
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
     ImageTracer, fire_all_rays,

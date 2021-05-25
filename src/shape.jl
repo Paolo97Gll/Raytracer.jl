@@ -86,7 +86,7 @@ if none exists, return `nothing`.
 """ ray_intersection
 
 function ray_intersection(ray::Ray, s::Sphere)
-    inv_ray = inverse(s.transformation) * ray
+    inv_ray = inv(s.transformation) * ray
     O⃗ = inv_ray.origin - ORIGIN
     scalprod = O⃗ ⋅ inv_ray.dir
     # Δ/4 where Δ is the discriminant of the intersection system solution
@@ -124,7 +124,7 @@ Base.@kwdef struct Plane <: Shape
 end
 
 function ray_intersection(ray::Ray, s::Plane)
-    inv_ray = inverse(s.transformation) * ray
+    inv_ray = inv(s.transformation) * ray
     dz = inv_ray.dir.z
     t = -inv_ray.origin.v[3]/dz
     inv_ray.tmin < t < inv_ray.tmax || return nothing
