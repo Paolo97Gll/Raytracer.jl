@@ -50,12 +50,13 @@ export
     isconsistent,
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
-    ImageTracer, fire_all_rays,
+    ImageTracer, fire_all_rays!,
     Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     BRDF, DiffuseBRDF, Material,
+    Renderer, OnOffRenderer, FlatRenderer,
     tonemapping, demo
 
 include("color.jl")
@@ -66,6 +67,7 @@ include("cameras.jl")
 include("image_tracer.jl")
 include("materials.jl")
 include("shape.jl")
+include("renderers.jl")
 include("user_utils.jl")
 
 end # module Raytracer
