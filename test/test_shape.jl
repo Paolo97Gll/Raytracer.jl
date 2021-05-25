@@ -7,6 +7,29 @@
 # description:
 #   Unit tests for shape.jl
 
+@testset "World" begin
+    @testset "RayIntersection" begin
+        world = World()
+
+        sphere1 = Sphere(transformation=translation(VEC_X * 2))
+        sphere2 = Sphere(transformation=translation(VEC_X * 8))
+        push!(world, sphere1)
+        push!(world, sphere2)
+
+        intersection1 = ray_intersection(Ray(
+            Point(0.0, 0.0, 0.0), VEC_X
+        ), world)
+        @test intersection1 !== nothing
+        @test intersection1.world_point ≈ Point(1.0, 0.0, 0.0)
+
+        intersection2 = ray_intersection(Ray(
+            Point(10.0, 0.0, 0.0), -VEC_X
+        ), world)
+
+        @test intersection2 !== nothing
+        @test intersection2.world_point ≈ Point(9.0, 0.0, 0.0)
+    end
+end
 
 @testset "Sphere" begin
     @testset "from_above" begin
