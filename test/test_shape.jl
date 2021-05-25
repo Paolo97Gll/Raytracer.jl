@@ -36,7 +36,7 @@ end
         ray = Ray{Float64}(Point(0,0,2), -VEC_Z)
         shape = Sphere()
         intersect = ray_intersection(ray, shape) 
-        @test intersect ≈ HitRecord(Point(0, 0, 1), VEC_Z |> Normal, Vec2D(NaN,0), 1., ray, Material())
+        @test intersect ≈ HitRecord(Point(0, 0, 1), VEC_Z |> Normal, Vec2D(0,0), 1., ray, Material())
     end
 
     @testset "from_behind" begin
@@ -57,7 +57,7 @@ end
         ray = Ray{Float64}(Point(10,0,2), -VEC_Z)
         shape = Sphere(transformation = translation(Vec(10,0,0)))
         intersect = ray_intersection(ray, shape) 
-        @test intersect ≈ HitRecord(Point(10, 0, 1), VEC_Z |> Normal, Vec2D(NaN, 0), 1., ray, Material())
+        @test intersect ≈ HitRecord(Point(10, 0, 1), VEC_Z |> Normal, Vec2D(0, 0), 1., ray, Material())
     end
 
     @testset "transposed_from_behind" begin
