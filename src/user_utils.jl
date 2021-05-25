@@ -14,24 +14,28 @@
 function tonemapping(input_file::AbstractString,
                      output_file::AbstractString,
                      alpha::Real,
-                     gamma::Real)
-    println("\n-> TONE MAPPING PROCESS")
-    print("Loading input file '$(input_file)'...")
+                     gamma::Real;
+                     disable_output::Bool = false)
+    io = disable_output ? devnull : stdout
+    println(io, "\n-> TONE MAPPING PROCESS")
+    print(io, "Loading input file '$(input_file)'...")
     image = load(input_file) |> HdrImage
-    print(" done!\nApplying tone mapping... ")
+    print(io, " done!\nApplying tone mapping... ")
     image = normalize_image(image, alpha) |> clamp_image
     image = γ_correction(image, gamma)
-    print(" done!\nSaving final image to '$(output_file)'...")
+    print(io, " done!\nSaving final image to '$(output_file)'...")
     save(output_file, image.pixel_matrix)
-    println(" done!")
+    println(io, " done!")
 end
 
 function load_tracer(image_resolution::Tuple{Integer, Integer}, 
                      camera_type::AbstractString, 
                      camera_position::Tuple{Real, Real, Real}, 
                      camera_orientation::Tuple{Real, Real, Real},
-                     screen_distance::Real)
-    print("Loading tracing informations...")
+                     screen_distance::Real;
+                     disable_output::Bool = false)
+    io = disable_output ? devnull : stdout
+    print(io, "Loading tracing informations...")
     image = HdrImage{RGB{Float64}}(image_resolution...)
     angx, angy, angz = deg2rad.(camera_orientation)
     transformation = (rotationX(angx) * rotationY(angy) * rotationZ(angz)) * translation(camera_position...)
@@ -42,13 +46,14 @@ function load_tracer(image_resolution::Tuple{Integer, Integer},
     else
         # TODO throw error
     end
-    println(" done!")
+    println(io, " done!")
     ImageTracer(image, camera)
 end
 
-function rendering!(image_tracer::ImageTracer, renderer::Renderer)
-    println("Rendering image...")
-    fire_all_rays!(image_tracer, renderer) # 
+function rendering!(image_tracer::ImageTracer, renderer::Renderer; disable_output::Bool = false)
+    io = disable_output ? devnull : stdout
+    println(io, "Rendering image...")
+    fire_all_rays!(image_tracer, renderer, enable_progress_bar=!disable_output)
 end
 
 function demo(output_file::AbstractString,
@@ -59,12 +64,14 @@ function demo(output_file::AbstractString,
               screen_distance::Real,
               renderer_type::Type{<:Renderer},
               alpha::Real,
-              gamma::Real)
-    println("---------------------")
-    println("| Raytracer.jl demo |")
-    println("---------------------")
-    println("\n-> RENDERING")
-    print("Loading scene...")
+              gamma::Real;
+              disable_output::Bool = false)
+    io = disable_output ? devnull : stdout
+    println(io, "\n---------------------")
+    println(io, "| Raytracer.jl demo |")
+    println(io, "---------------------")
+    println(io, "\n-> RENDERING")
+    print(io, "Loading scene...")
     if renderer_type <: OnOffRenderer
         world = World(undef, 10)
         for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
@@ -104,12 +111,12 @@ function demo(output_file::AbstractString,
     else
         # TODO throw error
     end
-    println(" done!")
-    image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance)
-    rendering!(image_tracer, renderer)
-    print("Saving pfm image...")
+    println(io, " done!")
+    image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance, disable_output=disable_output)
+    rendering!(image_tracer, renderer, disable_output=disable_output)
+    print(io, "Saving pfm image...")
     input_file = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
     save(input_file, permutedims(image_tracer.image.pixel_matrix) |> Matrix{RGB{Float32}})
-    println(" done!")
-    tonemapping(input_file, output_file, alpha, gamma)
+    println(io, " done!")
+    tonemapping(input_file, output_file, alpha, gamma, disable_output=disable_output)
 end

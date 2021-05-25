@@ -58,10 +58,10 @@ For each pixel in the image contained into `tracer` (instance of [`ImageTracer`]
 pass it to the function `func`, which must accept a `Ray` as its only parameter and must return a `[RGB](@ref)`
 instance containing the color to assign to that pixel in the image.
 """
-function fire_all_rays!(tracer::ImageTracer, func::Function)
+function fire_all_rays!(tracer::ImageTracer, func::Function; enable_progress_bar::Bool = true)
     # rangerow, rangecol = axes(tracer.image)
     indices = CartesianIndices(tracer.image.pixel_matrix)
-    p = Progress(length(indices), color=:white)
+    p = Progress(length(indices), color=:white, enabled=enable_progress_bar)
     for ind ∈ indices
         ray = fire_ray(tracer, Tuple(ind)...)
         tracer.image.pixel_matrix[ind] = func(ray)
