@@ -20,7 +20,7 @@ import Base:
     size, zero, one, fill!, eltype,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
-    readline, read, rand,
+    readline, read, rand
 import Base.Broadcast:
     BroadcastStyle, Style, Broadcasted, combine_eltypes,
     broadcastable, copy, similar
