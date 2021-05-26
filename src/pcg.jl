@@ -17,7 +17,7 @@ end
 function rand(r::PCG, ::Type{UInt32})
     oldstate = r.state
     r.state = UInt64(oldstate * UInt64(6364136223846793005) + r.inc)
-    xorshifted = UInt32(((oldstate >> UInt64(18)) ⊻ oldstate) >> UInt64(27) % typemax(UInt32))
+    xorshifted = UInt32(((oldstate >> UInt64(18)) ⊻ oldstate) >> UInt64(27) & typemax(UInt32))
     rot = oldstate >> UInt64(59)
     UInt32((xorshifted >> rot) | (xorshifted << ((-rot) & UInt32(31))))
 end
