@@ -17,6 +17,10 @@ import Raytracer:
 
 DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
 
+@testset "PCG" begin
+    include("test_pcg.jl")
+end
+
 @testset "Color" begin
     include("test_color.jl")
 end

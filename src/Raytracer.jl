@@ -20,8 +20,7 @@ import Base:
     size, zero, one, fill!, eltype,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
-    readline, read,
-    inv
+    readline, read, rand
 import Base.Broadcast:
     BroadcastStyle, Style, Broadcasted, combine_eltypes,
     broadcastable, copy, similar
@@ -38,7 +37,7 @@ import StaticArrays:
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
-using ProgressMeter, Intervals
+using ProgressMeter, Intervals, Random
 
 export
     RGB, HdrImage, 
@@ -54,11 +53,13 @@ export
     Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
+    PCG,
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     BRDF, DiffuseBRDF, Material,
     Renderer, OnOffRenderer, FlatRenderer,
     tonemapping, demo
 
+include("pcg.jl")
 include("color.jl")
 include("hdr_image.jl")
 include("geometry.jl")
