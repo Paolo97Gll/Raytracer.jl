@@ -247,8 +247,8 @@ function demoanimation(options::Dict{String, Any})
 
     curdir = pwd()
     demodir = options["output_dir"]
-    if !options["force"] && isdir(joinpath(curdir, demodir))
-        print("Directory ./$(demodir)/ existing: overwrite content? [y|n] ")
+    if !options["force"] && isdir(demodir)
+        print("Directory ./$(demodir) existing: overwrite content? [y|n] ")
         if readline() != "y"
             println("Aborting.")
             return 1
@@ -256,13 +256,14 @@ function demoanimation(options::Dict{String, Any})
         println()
     end
 
-    print("Creating directory ./$(options["output_dir"])/...")
-    isdir(joinpath(curdir, demodir)) || mkdir(demodir)
-    cd(demodir)
+    print("Creating directory ./$(options["output_dir"])...")
+    rm(demodir, force=true, recursive=true)
+    mkdir(demodir)
     println(" done!")
 
     θ_list = (0:options["delta_theta"]:360)[begin:end-1]
     println("Generating $(length(θ_list)) frames...")
+    cd(demodir)
     p = Progress(length(θ_list), dt=1)
     Threads.@threads for elem in collect(enumerate(θ_list))
         index, θ = elem
