@@ -53,6 +53,7 @@ export
     Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
+    PCG, rand,
     tonemapping, demo
 
 include("pcg.jl")
