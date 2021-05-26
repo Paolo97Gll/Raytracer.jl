@@ -30,10 +30,10 @@ end
 
 
 struct Normal{T, V} <: FieldVector{3, T}
-            x::T
-            y::T
-            z::T
-        end
+    x::T
+    y::T
+    z::T
+end
 
 function Normal(x, y, z)
     Normal{promotetype(x,y,z), false}(promote(x, y, z)...)
@@ -480,3 +480,20 @@ const VEC_Y = Vec(0., 1., 0.)
 const VEC_Z = Vec(0., 0., 1.)
 
 const ORIGIN = Point(0., 0., 0.)
+
+
+#######################################################
+
+
+function create_onb_from_z(input_normal::Normal{T, V}) where {T, V}
+    normal = normalize(input_normal)
+    sign = copysign(1., normal.z)
+
+    a = -1.0 / (sign + normal.z)
+    b = normal.x * normal.y * a
+
+    e1 = Vec(1.0 + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
+
+    (e1, e2, Vec(normal.x, normal.y, normal.z))
+end
