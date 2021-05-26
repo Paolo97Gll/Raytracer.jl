@@ -488,5 +488,5 @@ function create_onb_from_z(input_normal::Normal{T, V}) where {T, V}
     e1 = Vec(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
     e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
 
-    (e1, e2, Vec(normal.x, normal.y, normal.z))
+    (e1, e2, Vec(normal))
 end
