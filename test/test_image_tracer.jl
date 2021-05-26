@@ -21,7 +21,7 @@ end
 
 
 @testset "image_coverage" begin
-    fire_all_rays(tracer, ray -> RGB(1.0, 2.0, 3.0))
+    fire_all_rays!(tracer, ray -> RGB(1.0, 2.0, 3.0))
     rangerow, rangecol = axes(tracer.image)
     for row ∈ rangerow, col ∈ rangecol
         @test image[row, col] == RGB(1.0, 2.0, 3.0)

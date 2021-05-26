@@ -8,6 +8,7 @@
 #   High-level utilities
 
 # TODO write docstrings
+# TODO implement flag for disable print
 
 
 function tonemapping(input_file::AbstractString,
@@ -25,26 +26,11 @@ function tonemapping(input_file::AbstractString,
     println(" done!")
 end
 
-
-function demo(output_file::AbstractString,
-              image_resolution::Tuple{Integer, Integer},
-              camera_type::AbstractString,
-              camera_position::Tuple{Real, Real, Real},
-              camera_orientation::Tuple{Real, Real, Real},
-              screen_distance::Real,
-              alpha::Real,
-              gamma::Real)
-    println("---------------------")
-    println("| Raytracer.jl demo |")
-    println("---------------------")
-    println("\n-> RENDERING")
-    print("Loading ambient...")
-    world = World(undef, 10)
-    for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-        world[i] = Sphere(translation(coords * 0.5) * scaling(1/10))
-    end
-    world[end-1:end] = [Sphere(translation([0, 0, -0.5]) * scaling(1/10)), Sphere(translation([0, 0.5, 0]) * scaling(1/10))]
-    println(" done!")
+function load_tracer(image_resolution::Tuple{Integer, Integer}, 
+                     camera_type::AbstractString, 
+                     camera_position::Tuple{Real, Real, Real}, 
+                     camera_orientation::Tuple{Real, Real, Real},
+                     screen_distance::Real)
     print("Loading tracing informations...")
     image = HdrImage{RGB{Float64}}(image_resolution...)
     angx, angy, angz = deg2rad.(camera_orientation)
@@ -56,10 +42,71 @@ function demo(output_file::AbstractString,
     else
         # TODO throw error
     end
-    image_tracer = ImageTracer(image, camera)
     println(" done!")
-    println("Starting image rendering.")
-    fire_all_rays(image_tracer, ray -> any(shape -> ray_intersection(ray, shape) !== nothing, world) ? RGB(1.,1.,1.) : RGB(0.,0.,0.))
+    ImageTracer(image, camera)
+end
+
+function rendering!(image_tracer::ImageTracer, renderer::Renderer)
+    println("Rendering image...")
+    fire_all_rays!(image_tracer, renderer) # 
+end
+
+function demo(output_file::AbstractString,
+              image_resolution::Tuple{Integer, Integer},
+              camera_type::AbstractString,
+              camera_position::Tuple{Real, Real, Real},
+              camera_orientation::Tuple{Real, Real, Real},
+              screen_distance::Real,
+              renderer_type::Type{<:Renderer},
+              alpha::Real,
+              gamma::Real)
+    println("---------------------")
+    println("| Raytracer.jl demo |")
+    println("---------------------")
+    println("\n-> RENDERING")
+    print("Loading scene...")
+    if renderer_type <: OnOffRenderer
+        world = World(undef, 10)
+        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
+            world[i] = Sphere(transformation = translation(coords * 0.5) * scaling(1/10))
+        end
+        world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10)), Sphere(transformation = translation([0, 0.5, 0]) * scaling(1/10))]
+        renderer = renderer_type(world, one(RGB{Float64}), zero(RGB{Float64}))
+    elseif renderer_type <: FlatRenderer
+        world = World(undef, 11)
+        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
+            world[i] = Sphere(transformation = translation(coords * 0.5) * scaling(1/10), 
+                              material = Material(brdf = 
+                                DiffuseBRDF{Float64}(pigment = 
+                                    UniformPigment(RGB(0., 1., 0.))
+                                )
+                              )
+                             )
+        end
+        world[end-2] = Plane(transformation = translation([0,0,-1]), material = Material(brdf = DiffuseBRDF{Float64}(pigment = ImagePigment(HdrImage([RGB(1., 0., 0.) RGB(0., 1., 0.) RGB(0., 0., 1.) RGB(1., 0., 1.)]))))) #)CheckeredPigment{4, RGB{Float64}}())))
+        world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10),
+                                   material = Material(brdf = 
+                                        DiffuseBRDF{Float64}(pigment = 
+                                            CheckeredPigment{4}(color_on  = RGB(1., 0., 1.), 
+                                                                color_off = RGB(0., 1., 0.)
+                                                               )
+                                        )
+                                   )
+                                  ), 
+                            Sphere(transformation = translation([0, 0.5, 0]) * scaling(1/10),
+                                   material = Material(brdf = 
+                                        DiffuseBRDF{Float64}(pigment = 
+                                            ImagePigment(HdrImage([RGB(1., 0., 0.) RGB(0., 1., 0.) RGB(0., 0., 1.) RGB(1., 0., 1.)]))
+                                        )
+                                   )
+                                  )] 
+        renderer = renderer_type(world, zero(RGB{Float64}))
+    else
+        # TODO throw error
+    end
+    println(" done!")
+    image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance)
+    rendering!(image_tracer, renderer)
     print("Saving pfm image...")
     input_file = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
     save(input_file, permutedims(image_tracer.image.pixel_matrix) |> Matrix{RGB{Float32}})

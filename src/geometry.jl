@@ -247,7 +247,7 @@ function (*)(t ::Transformation, p ::Point)
 end
 
 """
-    inverse(t)
+    inv(t)
 
 Return the inverse [`Transformation`](@ref).
 
@@ -269,7 +269,7 @@ Inverse matrix of type Diagonal{Float64, Vector{Float64}}:
   ⋅    ⋅   0.3333333333333333   ⋅ 
   ⋅    ⋅    ⋅                  1.0
 
-julia> inverse(t)
+julia> inv(t)
 4x4 Transformation{Float64}:
 Matrix of type Diagonal{Float64, Vector{Float64}}:
  1.0   ⋅    ⋅                   ⋅ 
@@ -283,7 +283,7 @@ Inverse matrix of type Diagonal{Int64, Vector{Int64}}:
  ⋅  ⋅  ⋅  1
  ```
 """
-inverse(t::Transformation) = Transformation(t.invm, t.m)
+inv(t::Transformation) = Transformation(t.invm, t.m)
 
 let rotation_matrices = Dict(
         :X => :(@SMatrix([   1       0      0     0;

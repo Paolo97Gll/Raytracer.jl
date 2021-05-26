@@ -20,7 +20,7 @@ import Base:
     size, zero, one, fill!, eltype,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
-    readline, read, rand
+    readline, read, rand,
 import Base.Broadcast:
     BroadcastStyle, Style, Broadcasted, combine_eltypes,
     broadcastable, copy, similar
@@ -46,14 +46,17 @@ export
     Vec, Point, Normal, Transformation, Vec2D,
     rotationX, rotationY, rotationZ,
     translation, scaling, 
-    isconsistent, inverse,
+    isconsistent,
     Ray, OrthogonalCamera, PerspectiveCamera,
     fire_ray, aperture_deg,
-    ImageTracer, fire_all_rays,
+    ImageTracer, fire_all_rays!,
     Shape, Sphere, Plane,
     HitRecord, World,
     ray_intersection,
-    PCG, #rand,
+    PCG,
+    Pigment, UniformPigment, CheckeredPigment, ImagePigment,
+    BRDF, DiffuseBRDF, Material,
+    Renderer, OnOffRenderer, FlatRenderer,
     tonemapping, demo
 
 include("pcg.jl")
@@ -63,7 +66,9 @@ include("geometry.jl")
 include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
+include("materials.jl")
 include("shape.jl")
+include("renderers.jl")
 include("user_utils.jl")
 
 end # module Raytracer
