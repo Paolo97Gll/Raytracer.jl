@@ -14,16 +14,41 @@
 #####################################################################
 
 
-for V ∈ (:Vec, :Normal)
-    quote
-        struct $V{T} <: FieldVector{3, T}
+struct Vec{T} <: FieldVector{3, T}
+    x::T
+    y::T
+    z::T
+end
+
+function Vec(x, y, z)
+    Vec{promotetype(x, y, z)}(promote(x, y, z)...)
+end
+
+function Vec{T}(x, y, z) where {T}
+    Vec{T}(convert(T, x), convert(T, y), convert(T, z))
+end
+
+
+struct Normal{T, V} <: FieldVector{3, T}
             x::T
             y::T
             z::T
         end
 
-        $V(x, y, z) = $V(promote(x, y, z)...)
+function Normal(x, y, z)
+    Normal{promotetype(x,y,z), false}(promote(x, y, z)...)
+end
 
+function Normal{T}(x, y, z) where {T}
+    Normal{T, false}(convert(T, x), convert(T, y), convert(T, z))
+end
+
+function normalize(n::Normal{T, V}) where {T, V}
+    V ? n : Normal{T, true}(normalize(SVector{3}(n)))
+end
+
+for V ∈ (:Vec, :Normal)
+    quote
         # Show in compact mode (i.e. inside a container)
         function show(io::IO, a::$V)
             print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
