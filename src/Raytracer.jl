@@ -57,6 +57,7 @@ export
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     BRDF, DiffuseBRDF, Material,
     Renderer, OnOffRenderer, FlatRenderer,
+    create_onb_from_z,
     tonemapping, demo
 
 include("pcg.jl")
