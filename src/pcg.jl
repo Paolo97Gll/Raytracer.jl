@@ -1,4 +1,4 @@
-mutable struct PCG
+mutable struct PCG <: AbstractRNG
     state::UInt64
     inc::UInt64
     function PCG(state::UInt64 = UInt64(42), inc::UInt64 = UInt64(54))
@@ -10,11 +10,11 @@ mutable struct PCG
     end
 end
 
-function rand(r::PCG)
+function Base.rand(r::PCG)
     rand(r, UInt32)
 end
 
-function rand(r::PCG, ::Type{UInt32})
+function Base.rand(r::PCG, ::Type{UInt32})
     oldstate = r.state
     r.state = UInt64(oldstate * UInt64(6364136223846793005) + r.inc)
     xorshifted = UInt32(((oldstate >> UInt64(18)) ⊻ oldstate) >> UInt64(27) & typemax(UInt32))
@@ -22,14 +22,14 @@ function rand(r::PCG, ::Type{UInt32})
     UInt32((xorshifted >> rot) | (xorshifted << ((-rot) & UInt32(31))))
 end
 
-function rand(r::PCG, ::Type{Float64})
+function Base.rand(r::PCG, ::Type{Float64})
     rand(r, UInt32) / typemax(UInt32)
 end
 
-function rand(r::PCG, ::Type{T}) where {T <: Integer}
+function Base.rand(r::PCG, ::Type{T}) where {T <: Integer}
     convert(T, rand(r, UInt32) % typemax(T))
 end
 
-function rand(r::PCG, ::Type{T}) where {T <: AbstractFloat}
+function Base.rand(r::PCG, ::Type{T}) where {T <: AbstractFloat}
     convert(T, rand(r, Float64))
 end
