@@ -139,6 +139,11 @@ function parse_commandline()
     s["demo"]["animation"].description =
         "Create a demo animation of Raytracer.jl, by generating n images with different camera " *
         "orientation and merging them into an mp4 video. Require ffmpeg installed on local machine."
+    @add_arg_table! s["demo"]["animation"] begin
+        "--force"
+            help = "force overwrite"
+            action = :store_true
+    end
     add_arg_group!(s["demo"]["animation"], "frame generation");
     @add_arg_table! s["demo"]["animation"] begin
         "--camera_type", "-t"
@@ -240,15 +245,24 @@ function demoanimation(options::Dict{String, Any})
     println("-------------------------------")
     println("Threads number: $(Threads.nthreads())\n")
 
-    print("Creating directory $(options["output_dir"])...")
     curdir = pwd()
     demodir = options["output_dir"]
+    if !options["force"] && isdir(joinpath(curdir, demodir))
+        print("Directory ./$(demodir)/ existing: overwrite content? [y|n] ")
+        if readline() != "y"
+            println("Aborting.")
+            return 1
+        end
+        println()
+    end
+
+    print("Creating directory ./$(options["output_dir"])/...")
     isdir(joinpath(curdir, demodir)) || mkdir(demodir)
     cd(demodir)
     println(" done!")
 
-    println("Generating frames...")
     θ_list = (0:options["delta_theta"]:360)[begin:end-1]
+    println("Generating $(length(θ_list)) frames...")
     p = Progress(length(θ_list), dt=1)
     Threads.@threads for elem in collect(enumerate(θ_list))
         index, θ = elem
@@ -270,7 +284,7 @@ function demoanimation(options::Dict{String, Any})
     end
     
     print("Generating animation...")
-    run(pipeline(`ffmpeg -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`, devnull))
+    run(pipeline(`ffmpeg -y -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`, stdout=devnull, stderr=devnull))
     println(" done!")
 
     cd(curdir)
