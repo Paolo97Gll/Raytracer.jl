@@ -56,7 +56,7 @@ export
     PCG,
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     BRDF, DiffuseBRDF, Material,
-    Renderer, OnOffRenderer, FlatRenderer,
+    Renderer, OnOffRenderer, FlatRenderer, PathTracer,
     create_onb_from_z,
     tonemapping, demo
 

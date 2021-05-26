@@ -57,6 +57,42 @@ function at(brdf::DiffuseBRDF, #=normal=#::Normal, #=in_dir=#::Vec, #=out_dir=#:
     brdf.pigment(uv) * brdf.reflectance/π
 end
 
+function scatter_ray(::DiffuseBRDF, pcg::PCG, #=incoming_dir=#::Vec,
+                     interaction_point::Point, normal::Normal, depth::Integer)
+    e1, e2, e3 = create_onb_from_z(normal)
+    cos_theta_sq = rand(pcg, Float32)
+    cos_theta, sin_theta = sqrt(cos_theta_sq), sqrt(1.0 - cos_theta_sq)
+    phi = 2.0 * π * rand(pcg, Float32)
+
+    Ray(interaction_point,
+        e1 * cos(phi) * cos_theta + e2 * sin(phi) * cos_theta + e3 * sin_theta,
+        1.0e-3,
+        Inf,
+        depth)
+end
+
+Base.@kwdef struct SpecularBRDF{T <: AbstractFloat} <: BRDF
+    pigment::Pigment = UniformPigment{RGB{T}}()
+    threshold_angle_rad::T
+end
+
+function at(brdf::SpecularBRDF{T}, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D) where {T}
+    δθ = -((Ref(n) .⋅ (v1, v2) .|> acos)...)
+    δθ < brdf.threshold_angle_rad ? brdf.pigment(uv) : zero(RGB{T})
+end
+
+function scatter_ray(::SpecularBRDF, pcg::PCG, incoming_dir::Vec,
+                     interaction_point::Point, normal::Normal, depth::Integer)
+    ray_dir = normalize(incoming_dir)
+    normal  = normalize(normal)
+
+    Ray(interaction_point,
+        ray_dir - normal * 2 * (normal ⋅ ray_dir),
+        1e-3,
+        inf,
+        depth)
+end
+
 Base.@kwdef struct Material
     brdf::BRDF = DiffuseBRDF{Float64}()
     emitted_radiance::Pigment = UniformPigment(zero(RGB{Float64})) 

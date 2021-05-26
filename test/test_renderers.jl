@@ -43,3 +43,42 @@ end
     @test image[2, 3] |> iszero 
     @test image[3, 3] |> iszero 
 end
+
+# BUG it sometimes fails: find out why
+@testset "PathTracer" begin
+    pcg = PCG()
+    
+    begin
+        # Run the furnace test several times using random values for
+        # the emitted radiance and reflectance
+        for i in 1:5
+            emitted_radiance = rand(pcg, Float64)
+            reflectance = rand(pcg, Float64) * 0.9  # Avoid numbers that are too close to 1
+    
+            world = World()
+    
+            enclosure_material = Material(
+                brdf=DiffuseBRDF{Float64}(pigment=UniformPigment(one(RGB{Float64}) * reflectance)),
+                emitted_radiance=UniformPigment(one(RGB{Float64}) * emitted_radiance),
+            )
+    
+            push!(world, Sphere(material=enclosure_material))
+    
+            path_tracer = PathTracer{Float64}(
+                rng=pcg, 
+                n=1, 
+                world=world, 
+                max_depth=100, 
+                roulette_depth=101,
+            )
+    
+            ray = Ray{Float64}(Point(0, 0, 0), Vec(1, 0, 0))
+            color = path_tracer(ray)
+    
+            expected = emitted_radiance / (1 - reflectance)
+            @test color.r ≈ expected
+            @test color.g ≈ expected
+            @test color.b ≈ expected
+        end
+    end
+end
