@@ -8,6 +8,7 @@
 #   High-level utilities
 
 # TODO write docstrings
+# TODO implement flag for disable print
 
 
 function tonemapping(input_file::AbstractString,

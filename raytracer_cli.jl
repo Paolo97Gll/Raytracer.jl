@@ -137,21 +137,28 @@ end
 
 
 function tonemapping(options::AbstractDict{String, Any})
-    tonemapping(options["input_file"], options["output_file"], options["alpha"], options["gamma"])
+    tonemapping(
+        options["input_file"],
+        options["output_file"],
+        options["alpha"],
+        options["gamma"]
+    )
 end
 
 
 function demo(options::AbstractDict{String, Any})
     renderer_type = Symbol(options["renderer"], "Renderer") |> eval
-    Raytracer.demo(options["output_file"],
-                   Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
-                   options["camera_type"],
-                   Tuple(parse.(Float64, split(options["camera_position"], ","))),
-                   Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
-                   options["screen_distance"],
-                   renderer_type,
-                   options["alpha"],
-                   options["gamma"])
+    Raytracer.demo(
+        options["output_file"],
+        Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+        options["camera_type"],
+        Tuple(parse.(Float64, split(options["camera_position"], ","))),
+        Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
+        options["screen_distance"],
+        renderer_type,
+        options["alpha"],
+        options["gamma"]
+    )
 end
 
 
