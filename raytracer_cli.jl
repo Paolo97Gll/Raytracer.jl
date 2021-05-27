@@ -245,13 +245,18 @@ function demoanimation(options::Dict{String, Any})
     println("-------------------------------")
     println("Threads number: $(Threads.nthreads())\n")
 
+    if Sys.which("ffmpeg") === nothing
+        println("ffmpeg not found. Aborting.")
+        exit(1)
+    end
+
     curdir = pwd()
     demodir = options["output_dir"]
     if !options["force"] && isdir(demodir)
         print("Directory ./$(demodir) existing: overwrite content? [y|n] ")
         if readline() != "y"
             println("Aborting.")
-            return 1
+            exit(1)
         end
         println()
     end
