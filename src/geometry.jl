@@ -14,6 +14,13 @@
 #####################################################################
 
 
+"""
+    Vec{T} <: StaticArrays.FieldVector{3, T}
+
+A vector in 3D space.
+
+For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
+"""
 struct Vec{T} <: FieldVector{3, T}
     x::T
     y::T
@@ -22,6 +29,28 @@ end
 
 Vec(x, y, z) = Vec(promote(x, y, z)...)
 
+# Show in compact mode (i.e. inside a container)
+function show(io::IO, a::Vec)
+    print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
+end
+
+# Human-readable show (more extended)
+function show(io::IO, ::MIME"text/plain", a::Vec)
+    print(io, "Vec with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+end
+
+similar_type(::Type{<:Vec}, ::Type{T}, s::Size{(3,)}) where {T} = Vec{T}
+norm²(v::Vec) = sum(el -> el^2, v)
+
+#####################################################################
+
+"""
+    Normal{T} <: StaticArrays.FieldVector{3, T}
+
+A pseudo-vector in 3D space.
+
+For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
+"""
 struct Normal{T, V} <: FieldVector{3, T}
     x::T
     y::T
@@ -40,34 +69,19 @@ end
 normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
 normalize(n::Normal{T, true }) where {T} = n
 
-for V ∈ (:Vec, :Normal)
-    quote
-        # Show in compact mode (i.e. inside a container)
-        function show(io::IO, a::$V)
-            print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
-        end
-
-        # Human-readable show (more extended)
-        function show(io::IO, ::MIME"text/plain", a::$V)
-            print(io, $V, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
-        end
-
-        similar_type(::Type{<:$V}, ::Type{T}, s::Size{(3,)}) where {T} = $V{T}
-        norm²(v::$V) = sum(el -> el^2, v)
-    end |> eval
+# Show in compact mode (i.e. inside a container)
+function show(io::IO, a::Normal)
+    print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
 end
 
-# docstrings
-let docmsg = V ->"""
-        $V{T} <: StaticArrays.FieldVector{3, T}
-    
-    A $(V == :Normal ? "pseudo-" : "")vector in 3D space. 
-    
-    For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
-    """
-    @doc docmsg(:Vec)    Vec
-    @doc docmsg(:Normal) Normal
+# Human-readable show (more extended)
+function show(io::IO, ::MIME"text/plain", a::Normal)
+    print(io, "Normal with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
 end
+
+similar_type(::Type{<:Normal}, ::Type{T}, s::Size{(3,)}) where {T} = Normal{T}
+norm²(v::Normal) = sum(el -> el^2, v)
+
 
 #####################################################################
 
