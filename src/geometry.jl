@@ -478,14 +478,14 @@ const ORIGIN = Point(0., 0., 0.)
 #######################################################
 
 
-function create_onb_from_z(input_normal::Normal{T, V}) where {T, V}
+function create_onb_from_z(input_normal::Normal{T}) where {T}
     normal = normalize(input_normal)
-    sign = copysign(1., normal.z)
+    sign = copysign(one(T), normal.z)
 
-    a = -1. / (sign + normal.z)
+    a = -one(T) / (sign + normal.z)
     b = normal.x * normal.y * a
 
-    e1 = Vec(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e1 = Vec(one(T) + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
     e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
 
     (e1, e2, Vec(normal))
