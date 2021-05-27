@@ -76,9 +76,10 @@ end
             color = path_tracer(ray)
     
             expected = emitted_radiance / (1 - reflectance)
-            @test color.r ≈ expected
-            @test color.g ≈ expected
-            @test color.b ≈ expected
+            atol = 1e-3
+            @test isapprox(color.r, expected, atol = atol)
+            @test isapprox(color.g, expected, atol = atol)
+            @test isapprox(color.b, expected, atol = atol)
         end
     end
 end
