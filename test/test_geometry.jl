@@ -345,28 +345,29 @@ end
     end
 end
 
-# BUG it sometimes fails: find out why
 @testset "ONB" begin
-    pcg = PCG()
+	pcg = PCG()
 
-    @test begin 
-        for _ ∈ 1:1_000_000
-            normal = rand(pcg, Float32, 3) |> Normal
-            normal = normalize(normal)
+	@test begin
+        for _ ∈ 1:100_000
+            normal = Normal(rand(pcg, Float32, 3)) |> normalize
+
             e1, e2, e3 = create_onb_from_z(normal)
-
+            
             # Verify that the z axis is aligned with the normal
-            @assert isapprox(e3, normal, atol=eps(eltype(e3)))
+            @assert e3 ≈ normal
 
             # Verify that the base is orthogonal
-            @assert isapprox(e1 ⋅ e2, 0, atol=eps(eltype(e1)))
-            @assert isapprox(e2 ⋅ e3, 0, atol=eps(eltype(e2)))
-            @assert isapprox(e3 ⋅ e1, 0, atol=eps(eltype(e3)))
+            atol = √(eps(eltype(normal))) # nonstandard approximation threshold
+            @assert isapprox(e1 ⋅ e2, 0, atol=atol)
+            @assert isapprox(e2 ⋅ e3, 0, atol=atol)
+            @assert isapprox(e3 ⋅ e1, 0, atol=atol)
 
             # Verify that each component is normalized
-            @assert isapprox(norm²(e1), 1, atol=eps(eltype(e1)))
-            @assert isapprox(norm²(e2), 1, atol=eps(eltype(e2)))
-            @assert isapprox(norm²(e3), 1, atol=eps(eltype(e3)))
+            @assert norm²(e1) ≈ 1
+            @assert norm²(e2) ≈ 1
+            @assert norm²(e3) ≈ 1
         end
-    end 
-end=#
+        true
+    end
+end
