@@ -37,6 +37,8 @@ import StaticArrays:
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
+using Random:
+    Sampler, SamplerTrivial, Random.CloseOpen01
 using ProgressMeter, Intervals, Random
 
 export
