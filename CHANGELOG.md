@@ -4,6 +4,7 @@
 
 ### New package features
 
+- Add a PCG-family Random Number Generator (RNG) based on [O'Neill 2014](https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf) as a `Random.AbstractRNG` ([#18](https://github.com/Paolo97Gll/Raytracer.jl/pull/18)).
 - API now includes high-level functions for basic scene rendering, image tonemapping, and a `demo` function (see [user_utils.jl](https://github.com/Paolo97Gll/Raytracer.jl/blob/master/src/user_utils.jl)).
 - Add `OnOffRenderer` and `FlatRenderer` renderers to apply to the scene ([#17](https://github.com/Paolo97Gll/Raytracer.jl/pull/17)).
 - Add the implementation of materials for our shapes, describing both the BRDF and radiance of the shape interface ([#17](https://github.com/Paolo97Gll/Raytracer.jl/pull/17)).
