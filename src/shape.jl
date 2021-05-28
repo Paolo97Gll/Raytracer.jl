@@ -73,7 +73,7 @@ function ray_intersection(ray::Ray, world::World)
         if hit === nothing 
             hit = last_hit
         else
-            last_hit.t >= hit.t && continue
+            last_hit.t/norm(last_hit.ray.dir) >= hit.t/norm(hit.ray.dir) && continue
             hit = last_hit
         end
     end
@@ -124,7 +124,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     normal = Normal(hit_point.v)
     normal = s.transformation * (normal ⋅ ray.dir < 0. ? normal : -normal)
     v = normalize(hit_point.v)
-    surface_point = Vec2D{eltype(ray)}(iszero(v[1:2]) ? 0 : atan(v[2], v[1])/2π + 0.5, acos(v[3])/π)
+    surface_point = Vec2D{eltype(ray)}(iszero(v[1:2]) ? 0 : atan(v[2], v[1])/2π + 0.5, 0.5 - asin(v[3])/π)
     HitRecord(world_point, normal, surface_point, convert(eltype(ray), hit_t), ray, s.material)
 end
 
