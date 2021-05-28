@@ -14,10 +14,10 @@
 using Pkg
 Pkg.activate(normpath(@__DIR__))
 
-using ArgParse
 using Raytracer
-using ProgressMeter
-using FileIO, ImageIO, ImageMagick, ImagePFM
+
+using ArgParse, ProgressMeter
+using ImageIO, ImageMagick, ImagePFM
 using FileIO: File, @format_str, query
 
 
@@ -238,6 +238,23 @@ function demoimage(options::Dict{String, Any})
     )
 end
 
+function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{String, Any})
+    index, θ = elem
+    filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
+    Raytracer.demo(
+        filename * ".jpg",
+        Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+        options["camera_type"],
+        Tuple(parse.(Float64, split(options["camera_position"], ","))),
+        (0, 0, θ),
+        options["screen_distance"],
+        Symbol(options["renderer"], "Renderer") |> eval,
+        options["alpha"],
+        options["gamma"],
+        disable_output = true
+    )
+    rm(filename * ".pfm")
+end
 
 function demoanimation(options::Dict{String, Any})
     println("\n-------------------------------")
@@ -269,28 +286,18 @@ function demoanimation(options::Dict{String, Any})
     θ_list = (0:options["delta_theta"]:360)[begin:end-1]
     println("Generating $(length(θ_list)) frames...")
     cd(demodir)
-    p = Progress(length(θ_list), dt=1)
+    p = Progress(length(θ_list), dt=5)
     Threads.@threads for elem in collect(enumerate(θ_list))
-        index, θ = elem
-        filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(length(θ_list)))+1, '0'))"
-        Raytracer.demo(
-            filename * ".jpg",
-            Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
-            options["camera_type"],
-            Tuple(parse.(Float64, split(options["camera_position"], ","))),
-            (0, 0, θ),
-            options["screen_distance"],
-            Symbol(options["renderer"], "Renderer") |> eval,
-            options["alpha"],
-            options["gamma"],
-            disable_output=true
-        )
-        rm(filename * ".pfm")
+        demoanimationloop(elem, length(θ_list), options)
         next!(p)
     end
     
     print("Generating animation...")
-    run(pipeline(`ffmpeg -y -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`, stdout=devnull, stderr=devnull))
+    run(pipeline(
+        `ffmpeg -y -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`,
+        stdout=devnull,
+        stderr=devnull
+    ))
     println(" done!")
 
     cd(curdir)
