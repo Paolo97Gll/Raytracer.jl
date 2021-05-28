@@ -294,7 +294,7 @@ function demoanimation(options::Dict{String, Any})
     
     print("Generating animation...")
     run(pipeline(
-        `ffmpeg -y -r $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 $(options["output_file"]).mp4`,
+        `ffmpeg -y -framerate $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 -preset slow -tune animation -vf format=yuv420p -movflags +faststart $(options["output_file"]).mp4`,
         stdout=devnull,
         stderr=devnull
     ))
