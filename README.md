@@ -23,9 +23,6 @@ Julia version required: ≥1.6
   - [Command line tool](#command-line-tool)
     - [Installation](#installation-1)
     - [Usage](#usage-1)
-      - [`raytracer_cli.jl`](#raytracer_clijl)
-      - [`raytracer_cli.jl tonemapping`](#raytracer_clijl-tonemapping)
-      - [`raytracer_cli.jl demo`](#raytracer_clijl-demo)
     - [Examples](#examples-1)
       - [Tone mapping](#tone-mapping)
       - [Demo](#demo)
@@ -78,7 +75,19 @@ Pkg.instantiate()
 
 ### Usage
 
-#### `raytracer_cli.jl`
+The menu tree is:
+
+```text
+raytracer_cli.jl
+├── tonemapping
+└── demo
+    ├── image
+    └── animation
+```
+
+**`raytracer_cli.jl`**
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl [-h] {tonemapping|demo}
@@ -93,7 +102,13 @@ optional arguments:
   -h, --help   show this help message and exit
 ```
 
-#### `raytracer_cli.jl tonemapping`
+</details>
+
+**`raytracer_cli.jl tonemapping`**
+
+We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
+
+<details><summary>Show usage</summary>
 
 ```text
 usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
@@ -115,25 +130,39 @@ files:
   output_file        output file name
 ```
 
-We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including:
+</details>
 
-- jpg, jpeg
-- png
-- tif, tiff
-- ppm
-- bmp
-- gif
-- ...
+**`raytracer_cli.jl demo`**
 
-#### `raytracer_cli.jl demo`
+<details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl demo [-t CAMERA_TYPE] [-p CAMERA_POSITION]
-                        [-o CAMERA_ORIENTATION] [-d SCREEN_DISTANCE]
-                        [-r IMAGE_RESOLUTION] [-a ALPHA] [-g GAMMA]
-                        [--output_file OUTPUT_FILE] [-h]
+usage: raytracer_cli.jl demo [-h] {image|animation}
 
 Show a demo of Raytracer.jl.
+
+commands:
+  image       render a demo image of Raytracer.jl
+  animation   create a demo animation of Raytracer.jl (require ffmpeg)
+
+optional arguments:
+  -h, --help  show this help message and exit
+```
+
+</details>
+
+**`raytracer_cli.jl demo image`**
+
+<details><summary>Show usage</summary>
+
+```text
+usage: raytracer_cli.jl demo image [-t CAMERA_TYPE]
+                        [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
+                        [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
+                        [-R RENDERER] [-a ALPHA] [-g GAMMA]
+                        [-O OUTPUT_FILE] [-h]
+
+Render a demo image of Raytracer.jl.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -151,12 +180,15 @@ generation:
   -d, --screen_distance SCREEN_DISTANCE
                         only for 'perspective' camera: distance
                         between camera and screen (type: Float64,
-                        default: 1.0)
+                        default: 2.0)
 
 rendering:
   -r, --image_resolution IMAGE_RESOLUTION
                         resolution of the rendered image (default:
                         "540:540")
+  -R, --renderer RENDERER
+                        type of renderer to use (`OnOff` or `Flat`)
+                        (default: "OnOff")
 
 tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
@@ -165,11 +197,76 @@ tonemapping:
                         (type: Float64, default: 1.0)
 
 files:
-  --output_file OUTPUT_FILE
+  -O, --output_file OUTPUT_FILE
                         output LDR file name (the HDR file will have
                         the same name, but with 'pfm' extension)
                         (default: "demo.jpg")
 ```
+
+</details>
+
+**`raytracer_cli.jl demo animation`**
+
+<details><summary>Show usage</summary>
+
+```text
+usage: raytracer_cli.jl demo animation [-t CAMERA_TYPE]
+                        [-p CAMERA_POSITION] [-d SCREEN_DISTANCE]
+                        [-r IMAGE_RESOLUTION] [-R RENDERER] [-a ALPHA]
+                        [-g GAMMA] [-D DELTA_THETA] [-f FPS]
+                        [-F OUTPUT_DIR] [-O OUTPUT_FILE] [-h]
+
+Create a demo animation of Raytracer.jl, by generating n images with
+different camera orientation and merging them into an mp4 video.
+Require ffmpeg installed on local machine.
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+frame generation:
+  -t, --camera_type CAMERA_TYPE
+                        choose camera type ('perspective' or
+                        'orthogonal') (default: "perspective")
+  -p, --camera_position CAMERA_POSITION
+                        camera position in the scene as 'X,Y,Z'
+                        (default: "-1,0,0")
+  -d, --screen_distance SCREEN_DISTANCE
+                        only for 'perspective' camera: distance
+                        between camera and screen (type: Float64,
+                        default: 2.0)
+
+frame rendering:
+  -r, --image_resolution IMAGE_RESOLUTION
+                        resolution of the rendered image (default:
+                        "540:540")
+  -R, --renderer RENDERER
+                        type of renderer to use (`OnOff` or `Flat`)
+                        (default: "OnOff")
+
+frame tonemapping:
+  -a, --alpha ALPHA     scaling factor for the normalization process
+                        (type: Float64, default: 1.0)
+  -g, --gamma GAMMA     gamma value for the tone mapping process
+                        (type: Float64, default: 1.0)
+
+animation parameter:
+  -D, --delta_theta DELTA_THETA
+                        Δθ in camera orientation (around z axis)
+                        between each frame; the number of frames
+                        generated is [360/Δθ] (type: Int64, default:
+                        10)
+  -f, --fps FPS         FPS (frame-per-second) of the output video
+                        (type: Int64, default: 15)
+
+files:
+  -F, --output_dir OUTPUT_DIR
+                        output directory (default: "demo_animation")
+  -O, --output_file OUTPUT_FILE
+                        name of output frames and animation without
+                        extension (default: "demo")
+```
+
+</details>
 
 ### Examples
 
@@ -178,24 +275,36 @@ files:
 You can use the `tonemapping` command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
 
 ```shell
-./raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
+julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
 ```
 
 You can also change the default values of `alpha` and/or `gamma` to obtain a better tone mapping, according to your source image:
 
 ```shell
-./raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
+julia raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
 ```
 
 #### Demo
 
-You can use the `demo` command to render a demo image:
+You can use the `demo image` command to render a demo image:
 
 ```shell
-./raytracer_cli.jl demo
+julia raytracer_cli.jl demo image
 ```
 
 It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image). You can change the output file name, the LDR extension and other rendering parameters using the command options.
+
+To create a demo animation, use the command `demo animation`:
+
+```shell
+julia raytracer_cli.jl demo animation
+```
+
+To enable multithreading, e.g. use 8 threads, use:
+
+```shell
+julia --threads 8 raytracer_cli.jl demo animation
+```
 
 ## Contributing
 
