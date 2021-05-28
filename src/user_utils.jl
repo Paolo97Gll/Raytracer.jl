@@ -67,9 +67,6 @@ function demo(output_file::AbstractString,
               gamma::Real;
               disable_output::Bool = false)
     io = disable_output ? devnull : stdout
-    println(io, "\n---------------------")
-    println(io, "| Raytracer.jl demo |")
-    println(io, "---------------------")
     println(io, "\n-> RENDERING")
     print(io, "Loading scene...")
     if renderer_type <: OnOffRenderer

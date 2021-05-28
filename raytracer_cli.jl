@@ -215,6 +215,7 @@ end
 
 
 function tonemapping(options::Dict{String, Any})
+    printstyled("apply tone mapping to a pfm image\n", bold=true)
     Raytracer.tonemapping(
         options["input_file"],
         options["output_file"],
@@ -225,6 +226,7 @@ end
 
 
 function demoimage(options::Dict{String, Any})
+    printstyled("Raytracer.jl demo image\n", bold=true)
     Raytracer.demo(
         options["output_file"],
         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
@@ -257,10 +259,8 @@ function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{Strin
 end
 
 function demoanimation(options::Dict{String, Any})
-    println("\n-------------------------------")
-    println("| Raytracer.jl animation demo |")
-    println("-------------------------------")
-    println("Threads number: $(Threads.nthreads())\n")
+    printstyled("Raytracer.jl demo animation\n\n", bold=true)
+    println("Number of threads: $(Threads.nthreads())\n")
 
     if Sys.which("ffmpeg") === nothing
         println("ffmpeg not found. Aborting.")
@@ -318,6 +318,8 @@ function main()
         parsed_command *= parsed_subcommand
         parsed_args = parsed_args[parsed_subcommand]
     end
+
+    printstyled("\nraytracer_cli.jl : ", bold=true)
 
     (Symbol(parsed_command) |> eval)(parsed_args)
 end
