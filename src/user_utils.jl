@@ -90,11 +90,11 @@ function demo(output_file::AbstractString,
                               )
                              )
         end
-        world[end-2] = Plane(transformation = translation([0,0,-1]), material = Material(brdf = DiffuseBRDF{Float64}(pigment = ImagePigment(HdrImage([RGB(1., 0., 0.) RGB(0., 1., 0.) RGB(0., 0., 1.) RGB(1., 0., 1.)]))))) #)CheckeredPigment{4, RGB{Float64}}())))
+        world[end-2] = Plane(transformation = translation([0,0,-1]), material = Material(brdf = DiffuseBRDF{Float64}(pigment = CheckeredPigment{4, RGB{Float64}}())))
         world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10),
                                    material = Material(brdf = 
                                         DiffuseBRDF{Float64}(pigment = 
-                                            CheckeredPigment{4}(color_on  = RGB(1., 0., 1.), 
+                                            CheckeredPigment{4}(color_on  = RGB(1., 0., 0.), 
                                                                 color_off = RGB(0., 1., 0.)
                                                                )
                                         )
