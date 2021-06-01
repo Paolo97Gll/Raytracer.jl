@@ -67,7 +67,9 @@ function Normal{T}(x, y, z) where {T}
 end
 
 normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
-normalize(n::Normal{T, true }) where {T} = n
+normalize(n::Normal{T, true}) where {T} = n
+
+norm(::Normal{T, true}) where {T} = one(T)
 
 # Show in compact mode (i.e. inside a container)
 function show(io::IO, a::Normal)
@@ -81,6 +83,7 @@ end
 
 similar_type(::Type{<:Normal}, ::Type{T}, s::Size{(3,)}) where {T} = Normal{T}
 norm²(v::Normal) = sum(el -> el^2, v)
+norm²(::Normal{T, true}) where {T} = one(T)
 
 
 #####################################################################
@@ -482,9 +485,13 @@ end
 #####################################################################
 
 
-const VEC_X = Vec(1., 0., 0.)
-const VEC_Y = Vec(0., 1., 0.)
-const VEC_Z = Vec(0., 0., 1.)
+const VEC_X = Vec{Float64}(1., 0., 0.)
+const VEC_Y = Vec{Float64}(0., 1., 0.)
+const VEC_Z = Vec{Float64}(0., 0., 1.)
+
+const NORM_X = Normal{Float64, true}(1., 0., 0.)
+const NORM_Y = Normal{Float64, true}(0., 1., 0.)
+const NORM_Z = Normal{Float64, true}(0., 0., 1.)
 
 const ORIGIN = Point(0., 0., 0.)
 

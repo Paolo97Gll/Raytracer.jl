@@ -110,7 +110,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     # intersection ray-sphere
     t_1 = (-scalprod - Δ) / norm²(inv_ray.dir)
     t_2 = (-scalprod + Δ) / norm²(inv_ray.dir)
-    # nearest point 
+    # nearest point
     if t_1 > inv_ray.tmin && t_1 < inv_ray.tmax
         hit_t = t_1
     elseif t_2 > inv_ray.tmin && t_2 < inv_ray.tmax
