@@ -4,6 +4,8 @@ function (p::Pigment)(uv::Vec2D)
     p(uv...)
 end
 
+#############################
+
 Base.@kwdef struct UniformPigment{T <: RGB} <: Pigment
     color::T = one(T)
 end
@@ -11,6 +13,8 @@ end
 function (up::UniformPigment)(::Real, ::Real)
     up.color
 end
+
+#############################
 
 struct CheckeredPigment{N, T <: RGB} <: Pigment
     color_on::T
@@ -34,17 +38,21 @@ function CheckeredPigment(color_on::RGB, color_off::RGB)
 end
 
 function (cp::CheckeredPigment{N})(u::Real, v::Real) where {N}
-    ceil(u*N)%2 == ceil(v*N)%2 ? cp.color_on : cp.color_off
+    ((ceil(u*N) |> iseven) ⊻ (ceil(v*N) |> iseven)) ? cp.color_on : cp.color_off
 end
+
+#############################
 
 struct ImagePigment{T <: HdrImage} <: Pigment
     image::T
 end
 
 function (ip::ImagePigment)(u::Real, v::Real)
-    row, col = (u, v) .* size(ip.image) .|> ceil .|> Int .|> (x -> x == 0 ? x + 1 : x)
+    row, col = (u, v) .* size(ip.image) .|> ceil .|> Int .|> (x -> iszero(x) ? x + 1 : x)
     ip.image[row, col]
 end
+
+#############################
 
 abstract type BRDF end
 
