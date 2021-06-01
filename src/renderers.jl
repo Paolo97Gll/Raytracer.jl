@@ -35,7 +35,7 @@ function (pt::PathTracer{T})(ray::Ray) where {T}
     isnothing(hit_record) && return pt.background_color
 
     hit_material = hit_record.material
-    hit_color = hit_material.brdf.pigment(hit_record.surface_point)
+    hit_color = hit_material.brdf.pigment(hit_record.surface_point) |> RGB{T}
     emitted_radiance = hit_material.emitted_radiance(hit_record.surface_point)
 
     hit_color_lum = max(hit_color...)
