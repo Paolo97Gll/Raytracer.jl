@@ -38,7 +38,7 @@ function CheckeredPigment(color_on::RGB, color_off::RGB)
 end
 
 function (cp::CheckeredPigment{N})(u::Real, v::Real) where {N}
-    ((ceil(u*N) |> iseven) ⊻ (ceil(v*N) |> iseven)) ? cp.color_on : cp.color_off
+    ceil(u*N)%2 == ceil(v*N)%2 ? cp.color_on : cp.color_off
 end
 
 #############################
