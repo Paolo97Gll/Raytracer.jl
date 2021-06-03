@@ -14,46 +14,74 @@
 #####################################################################
 
 
-for V ∈ (:Vec, :Normal)
-    quote
-        struct $V{T} <: FieldVector{3, T}
-            x::T
-            y::T
-            z::T
-        end
+"""
+    Vec{T} <: StaticArrays.FieldVector{3, T}
 
-        $V(x, y, z) = $V(promote(x, y, z)...)
+A vector in 3D space.
 
-        # Show in compact mode (i.e. inside a container)
-        function show(io::IO, a::$V)
-            print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
-        end
-
-        # Human-readable show (more extended)
-        function show(io::IO, ::MIME"text/plain", a::$V)
-            print(io, $V, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
-        end
-
-        similar_type(::Type{<:$V}, ::Type{T}, s::Size{(3,)}) where {T} = $V{T}
-        norm²(v::$V) = sum(el -> el^2, v)
-    end |> eval
+For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
+"""
+struct Vec{T} <: FieldVector{3, T}
+    x::T
+    y::T
+    z::T
 end
 
-# docstrings
-let docmsg = V ->"""
-        $V{T} <: StaticArrays.FieldVector{3, T}
-    
-    A $(V == :Normal ? "pseudo-" : "")vector in 3D space. 
-    
-    For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
-    """
-    @doc docmsg(:Vec)    Vec
-    @doc docmsg(:Normal) Normal
+Vec(x, y, z) = Vec(promote(x, y, z)...)
+
+# Show in compact mode (i.e. inside a container)
+function show(io::IO, a::Vec)
+    print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
 end
+
+# Human-readable show (more extended)
+function show(io::IO, ::MIME"text/plain", a::Vec)
+    print(io, "Vec with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+end
+
+similar_type(::Type{<:Vec}, ::Type{T}, s::Size{(3,)}) where {T} = Vec{T}
+norm²(v::Vec) = sum(el -> el^2, v)
 
 #####################################################################
 
-const Vec2D{T} = SVector{2, T}
+"""
+    Normal{T} <: StaticArrays.FieldVector{3, T}
+
+A pseudo-vector in 3D space.
+
+For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
+"""
+struct Normal{T, V} <: FieldVector{3, T}
+    x::T
+    y::T
+    z::T
+end
+
+function Normal(x, y, z)
+    prom = promote(x, y, z)
+    Normal{eltype(prom), false}(prom...)
+end
+
+Normal{T}(x, y, z) where {T} = Normal{T, false}(map(x -> convert(T, x), (x, y, z))...)
+
+# Show in compact mode (i.e. inside a container)
+function show(io::IO, a::Normal)
+    print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
+end
+
+# Human-readable show (more extended)
+function show(io::IO, ::MIME"text/plain", a::Normal{T, V}) where {T, V}
+    print(io, "Normal with eltype $(eltype(a)), ", V ? "normalized" : "not normalized", "\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+end
+
+similar_type(::Type{<:Normal}, ::Type{T}, s::Size{(3,)}) where {T} = Normal{T}
+
+normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
+norm²(v::Normal{T, false}) where {T} = sum(el -> el^2, v)
+
+normalize(n::Normal{T, true}) where {T} = n
+norm(::Normal{T, true}) where {T} = one(T)
+norm²(::Normal{T, true}) where {T} = one(T)
 
 #####################################################################
 
@@ -87,7 +115,9 @@ Point with eltype Int64
 x = 1, y = 2, z = 3
 ```
 """
-Point(x::Real, y::Real, z::Real) = Point(SVector(x,y,z))
+Point(x, y, z) = Point(SVector(x, y, z))
+Point{T}(x, y, z) where {T} = Point{T}(SVector(map(x -> convert(T, x), (x, y, z))...))
+
 function Point(p::AbstractVector)
     size(p) == (3,) || throw(ArgumentError("argument 'p' has size = $(size(p)) but 'Point' requires an argument of size = (3,)"))
 
@@ -97,14 +127,22 @@ end
 eltype(::Point{T}) where {T} = T
 eltype(::Type{Point{T}}) where {T} = T
 
+length(::Point) = 3
+firstindex(::Point) = 1
+lastindex(p::Point) = length(p.v)
+getindex(p::Point, i::Integer) = p.v[i]
+function iterate(p::Point, state = 1)
+    state > 3 ? nothing : (p[state], state +1)
+end
+
 # Show in compact mode (i.e. inside a container)
-function show(io::IO, a::Point)
-    print(io, typeof(a), "(", join((string(el) for el ∈ a.v), ", "), ")")
+function show(io::IO, p::Point)
+    print(io, typeof(p), "(", join((string(el) for el ∈ p), ", "), ")")
 end
 
 # Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", a::Point)
-    print(io, Point, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a.v)), ", "))
+    print(io, Point, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
 end
 
 (≈)(p1::Point, p2::Point) = p1.v ≈ p2.v
@@ -112,6 +150,52 @@ end
 (+)(p::Point, v::Vec) = Point(p.v + v)
 (-)(p::Point, v::Vec) = Point(p.v - v)
 (*)(p::Point, s...) = (*)(p.v, s...) |> Point
+
+convert(::Type{Point{T}}, p::Point) where {T} = Point{T}(p.v...)
+
+convert(::Type{Vec}, p::Point{T}) where {T} = Vec{T}(p.v)
+convert(::Type{Vec{T}}, p::Point) where {T} = Vec{T}(p.v)
+
+convert(::Type{Normal}, p::Point{T}) where {T} = Normal{T}(p.v)
+convert(::Type{Normal{T}}, p::Point) where {T} = Normal{T}(p.v)
+
+
+#####################################################################
+
+const Vec2D{T} = SVector{2, T}
+
+
+vec_x(T::Type{<:Real} = Float64) = Vec{T}(1., 0., 0.)
+vec_y(T::Type{<:Real} = Float64) = Vec{T}(0., 1., 0.)
+vec_z(T::Type{<:Real} = Float64) = Vec{T}(0., 0., 1.)
+
+normal_x(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(1., 0., 0.)
+normal_y(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 1., 0.)
+normal_z(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 0., 1.)
+
+origin(T::Type{<:Real} = Float64) = Point{T}(0., 0., 0.)
+
+
+#######################################################
+
+
+function create_onb_from_z(input_normal::Normal{T}) where {T}
+    normal = normalize(input_normal)
+
+    sign = copysign(one(T), normal.z)
+
+    a = -1. / (sign + normal.z)
+    b = normal.x * normal.y * a
+
+    e1 = Vec{T}(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e2 = Vec{T}(b, sign + normal.y * normal.y * a, -normal.y)
+
+    (e1, e2, Vec{T}(normal))
+end
+
+
+normalized_dot(v1::Vec, v2::Vec) = normalize(v1) ⋅ normalize(v2)
+normalized_dot(n1::Normal, n2::Normal) = normalize(n1) ⋅ normalize(n2)
 
 
 #####################################################################
@@ -445,13 +529,3 @@ function scaling(v::AbstractVector)
     
     scaling(v...)
 end
-
-
-#####################################################################
-
-
-const VEC_X = Vec(1., 0., 0.)
-const VEC_Y = Vec(0., 1., 0.)
-const VEC_Z = Vec(0., 0., 1.)
-
-const ORIGIN = Point(0., 0., 0.)

@@ -59,7 +59,7 @@ end
 
     @testset "operations" begin
         @test norm(v1) === norm(sv1)
-        @test normalize(v1) === Normal(normalize(sv1))
+        @test normalize(v1) === Normal{eltype(sv1), true}(normalize(sv1))
         @test norm²(v1) ≈ norm(sv1)^2
 
         @test v1 ⋅ v2 === sv1 ⋅ sv2
@@ -328,9 +328,9 @@ end
         @test isconsistent(rotationY(0.1))
         @test isconsistent(rotationZ(0.1))
 
-        @test (rotationX(π/2) * VEC_Y) ≈ VEC_Z
-        @test (rotationY(π/2) * VEC_Z) ≈ VEC_X
-        @test (rotationZ(π/2) * VEC_X) ≈ VEC_Y
+        @test (rotationX(π/2) * vec_y()) ≈ vec_z()
+        @test (rotationY(π/2) * vec_z()) ≈ vec_x()
+        @test (rotationZ(π/2) * vec_x()) ≈ vec_y()
     end
 
     @testset "scalings" begin
@@ -342,5 +342,32 @@ end
 
         expected = scaling(Vec(6.0, 10.0, 40.0))
         @test expected ≈ (tr1 * tr2)
+    end
+end
+
+@testset "ONB" begin
+	pcg = PCG()
+
+	@test begin
+        for _ ∈ 1:100_000
+            normal = Normal(rand(pcg, Float32, 3)) |> normalize
+
+            e1, e2, e3 = create_onb_from_z(normal)
+            
+            # Verify that the z axis is aligned with the normal
+            @assert e3 ≈ normal
+
+            # Verify that the base is orthogonal
+            atol = √(eps(eltype(normal))) # nonstandard approximation threshold
+            @assert isapprox(e1 ⋅ e2, 0, atol=atol)
+            @assert isapprox(e2 ⋅ e3, 0, atol=atol)
+            @assert isapprox(e3 ⋅ e1, 0, atol=atol)
+
+            # Verify that each component is normalized
+            @assert norm²(e1) ≈ 1
+            @assert norm²(e2) ≈ 1
+            @assert norm²(e3) ≈ 1
+        end
+        true
     end
 end

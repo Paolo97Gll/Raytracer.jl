@@ -180,3 +180,6 @@ function one(T::Type{<:RGB})
 end
 
 one(c::RGB) = one(typeof(c))
+
+black(T::Type{<:AbstractFloat} = Float64) = RGB{T}(0., 0., 0.)
+white(T::Type{<:AbstractFloat} = Float64) = RGB{T}(1., 1., 1.)

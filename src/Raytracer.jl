@@ -17,7 +17,7 @@ module Raytracer
 import Base:
     Matrix, OneTo, print_matrix,
     (+), (-), (*), (≈),
-    size, zero, one, fill!, eltype,
+    size, zero, one, fill!, eltype, convert,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
     readline, read, rand
@@ -37,6 +37,8 @@ import StaticArrays:
 import LinearAlgebra:
     (⋅), (×), 
     norm, normalize, inv, I, Diagonal
+using Random:
+    Sampler, SamplerTrivial, Random.CloseOpen01
 using ProgressMeter, Intervals, Random
 
 export
@@ -56,7 +58,8 @@ export
     PCG,
     Pigment, UniformPigment, CheckeredPigment, ImagePigment,
     BRDF, DiffuseBRDF, Material,
-    Renderer, OnOffRenderer, FlatRenderer,
+    Renderer, OnOffRenderer, FlatRenderer, PathTracer,
+    create_onb_from_z,
     tonemapping, demo
 
 include("pcg.jl")
