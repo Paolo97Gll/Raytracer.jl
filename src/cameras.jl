@@ -76,15 +76,15 @@ Parameters `u` and `v` are bound between `0` and `1`:
         +------------------------------+
     (0, 0)                            (1, 0)
 
-Type parameter `T` is passed onto the [`Ray`](@ref) constructor. Default type is `Float64`.
+Type parameter `T` is passed onto the [`Ray`](@ref) constructor. Default type is `Float32`.
 """
-function fire_ray(camera::OrthogonalCamera, u, v; T::Type{<:AbstractFloat} = Float64)
+function fire_ray(camera::OrthogonalCamera, u, v; T::Type{<:AbstractFloat} = Float32)
     camera.transformation * Ray{T}(Point{T}(-1., (1. - 2u) * camera.aspect_ratio, 2v - 1.),
                                    vec_x(T),
                                    tmin = one(T))
 end
 
-function fire_ray(camera::PerspectiveCamera, u, v; T::Type{<:AbstractFloat} = Float64)
+function fire_ray(camera::PerspectiveCamera, u, v; T::Type{<:AbstractFloat} = Float32)
     camera.transformation * Ray{T}(Point{T}(-camera.screen_distance, 0., 0.),
                                    Vec{T}(camera.screen_distance, (1. - 2u) * camera.aspect_ratio, 2v - 1.),
                                    tmin = one(T))
