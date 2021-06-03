@@ -2,7 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# Extension of ColorTypes.RGB for color manipulation
+# Permuted congruential generator (simple fast space-efficient statistically good algorithms for random number generation)
 # TODO write docstrings
 
 
