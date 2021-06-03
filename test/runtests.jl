@@ -13,13 +13,9 @@ using StaticArrays, LinearAlgebra
 using Test, Documenter
 import Raytracer:
     _clamp, luminosity, average_luminosity, _γ_correction,
-    norm², VEC_X, VEC_Y, VEC_Z
+    norm², vec_x, vec_y, vec_z, normal_x, normal_y, normal_z
 
 DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
-
-@testset "PCG" begin
-    include("test_pcg.jl")
-end
 
 @testset "Color" begin
     include("test_color.jl")
@@ -39,6 +35,10 @@ end
 
 @testset "Camera" begin
     include("test_cameras.jl")
+end
+
+@testset "PCG" begin
+    include("test_pcg.jl")
 end
 
 @testset "ImageTracer" begin

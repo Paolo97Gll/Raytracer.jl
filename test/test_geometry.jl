@@ -328,9 +328,9 @@ end
         @test isconsistent(rotationY(0.1))
         @test isconsistent(rotationZ(0.1))
 
-        @test (rotationX(π/2) * VEC_Y) ≈ VEC_Z
-        @test (rotationY(π/2) * VEC_Z) ≈ VEC_X
-        @test (rotationZ(π/2) * VEC_X) ≈ VEC_Y
+        @test (rotationX(π/2) * vec_y()) ≈ vec_z()
+        @test (rotationY(π/2) * vec_z()) ≈ vec_x()
+        @test (rotationZ(π/2) * vec_x()) ≈ vec_y()
     end
 
     @testset "scalings" begin

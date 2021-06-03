@@ -40,13 +40,14 @@ corner is placed at `(0, 0)`. The values of `u_pixel` and `v_pixel` are floating
 `[0, 1]`: they specify where the ray should cross the pixel; passing 0.5 to both means that the ray will pass
 through the pixel's center.
 """
-function fire_ray(tracer::ImageTracer, 
+function fire_ray(tracer::ImageTracer,
                   col::Integer, row::Integer; 
                   u_pixel::AbstractFloat = 0.5, 
                   v_pixel::AbstractFloat = 0.5)
-    u = ((col-1) + u_pixel) / size(tracer.image)[1]
-    v = 1.0 - ((row-1) + v_pixel) / size(tracer.image)[2]
-    fire_ray(tracer.camera, u, v, eltype(eltype(tracer)))
+    size_col, size_raw = size(tracer.image)
+    u = ((col-1) + u_pixel) / size_col
+    v = 1.0 - ((row-1) + v_pixel) / size_raw
+    fire_ray(tracer.camera, u, v, T=eltype(eltype(tracer)))
 end
 
 """

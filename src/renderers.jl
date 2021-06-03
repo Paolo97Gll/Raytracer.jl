@@ -1,5 +1,7 @@
 abstract type Renderer <: Function end
 
+#############################
+
 Base.@kwdef struct OnOffRenderer{T <: AbstractFloat} <: Renderer 
     world::World
     on_color::RGB{T} = one(RGB{T})
@@ -9,6 +11,8 @@ end
 function (oor::OnOffRenderer)(ray::Ray)
     ray_intersection(ray, oor.world) !== nothing ? oor.on_color : oor.off_color
 end
+
+#############################
 
 Base.@kwdef struct FlatRenderer{T <: AbstractFloat} <: Renderer 
     world::World
