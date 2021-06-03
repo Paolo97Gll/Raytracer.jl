@@ -105,18 +105,20 @@ if none exists, return `nothing`.
 
 function ray_intersection(ray::Ray{T}, s::Sphere) where {T}
     inv_ray = inv(s.transformation) * ray
-    O = inv_ray.origin - origin(T)
-    scalprod = O ⋅ inv_ray.dir
-    # Δ/4 where Δ is the discriminant of the intersection system solution
-    Δ = (scalprod)^2 - norm²(inv_ray.dir) * (norm²(O) - 1)
+    # compute intersection
+    origin_vec = convert(Vec, inv_ray.origin)
+    a = norm²(inv_ray.dir)
+    b = 2f0 * origin_vec ⋅ inv_ray.dir
+    c = norm²(origin_vec) - 1f0
+    Δ = b^2 - 4 * a * c
     Δ < 0 && return nothing
-    # intersection ray-sphere
-    t_1 = (-scalprod - Δ) / norm²(inv_ray.dir)
-    t_2 = (-scalprod + Δ) / norm²(inv_ray.dir)
+    sqrt_Δ = sqrt(Δ)
+    t_1 = (-b - sqrt_Δ) / (2f0 * a)
+    t_2 = (-b + sqrt_Δ) / (2f0 * a)
     # nearest point
-    if t_1 > inv_ray.tmin && t_1 < inv_ray.tmax
+    if (t_1 > inv_ray.tmin) && (t_1 < inv_ray.tmax)
         hit_t = t_1
-    elseif t_2 > inv_ray.tmin && t_2 < inv_ray.tmax
+    elseif (t_2 > inv_ray.tmin) && (t_2 < inv_ray.tmax)
         hit_t = t_2
     else
         return nothing
@@ -124,10 +126,12 @@ function ray_intersection(ray::Ray{T}, s::Sphere) where {T}
     hit_point = inv_ray(hit_t)
     # generate HitRecord
     world_point = s.transformation * hit_point
-    normal = Normal{T}(hit_point.v)
-    normal = s.transformation * (normal ⋅ ray.dir < 0. ? normal : -normal)
-    v = hit_point.v
-    surface_point = Vec2D{T}(iszero(v[1:2]) ? 0 : atan(v[2], v[1])/2π + 0.5, acos(clamp(v[3], -1, 1))/π)
+    normal = convert(Normal, hit_point)
+    normal = s.transformation * ((normal ⋅ ray.dir < 0f0) ? normal : -normal)
+    u = atan(hit_point[2], hit_point[1]) / (2f0 * π)
+    u = u >= 0 ? u : u+1f0
+    v = acos(hit_point[3]) / π
+    surface_point = Vec2D{T}(u, v)
     HitRecord{T}(world_point, normal, surface_point, hit_t, ray, s.material)
 end
 
