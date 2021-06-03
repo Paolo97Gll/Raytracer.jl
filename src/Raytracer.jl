@@ -17,7 +17,7 @@ module Raytracer
 import Base:
     Matrix, OneTo, print_matrix,
     (+), (-), (*), (≈),
-    size, zero, one, fill!, eltype,
+    size, zero, one, fill!, eltype, convert,
     length, firstindex, lastindex, getindex, setindex!, iterate, axes,
     show, write,
     readline, read, rand
