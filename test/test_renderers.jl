@@ -5,7 +5,7 @@
     tracer = ImageTracer(image, camera)
     world = World([sphere])
     renderer = OnOffRenderer{Float32}(world=world)
-    fire_all_rays!(tracer, renderer)
+    fire_all_rays!(tracer, renderer, enable_progress_bar=false)
     
     @test image[1, 1] |> iszero
     @test image[2, 1] |> iszero
