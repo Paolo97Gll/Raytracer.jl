@@ -1,53 +1,37 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   color.jl
-# description:
-#   Extensions to the type ColorTypes.RGB, such as operations,
-#   iterations, broadcasting and others.
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+# Extension of ColorTypes.RGB for color manipulation
 # TODO write docstrings
 
 
-##############
-# OPERATIONS #
-##############
+#############
+# Operations
 
 
-# Element-wise addition of two RGB type instances
 (+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
 
-# Element-wise subtraction of two RGB type instances
 (-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
 
-# Scalar multiplication for a RGB type instance
 (*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}(scalar * c.r, scalar * c.g, scalar * c.b)
-
-# Scalar multiplication for a RGB type instance
 (*)(c::RGB, scalar::Number) = scalar * c
-
-# Element-wise multiplication between two RGB type instances
 (*)(c1::RGB, c2::RGB) = RGB(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
 
-# Element-wise ≈ operator between two RGB type instances
-(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r && 
+(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r &&  
                         c1.g ≈ c2.g &&
                         c1.b ≈ c2.b
 
 
-##############
-# ITERATIONS #
-##############
+#############
+# Iterations
 
 
 length(::RGB) = 3
 
 firstindex(::RGB) = 1
 
-lastindex(c::RGB) = length(c)
-
+lastindex(c::RGB) = 3
 
 # Since there is no standard that specifies the order in which the colors
 # should be reported, here we use the convention whereby the colors should
@@ -65,19 +49,13 @@ function getindex(c::RGB, i::Integer)
 end
 
 getindex(c::RGB, i::CartesianIndex{1}) = getindex(c, Tuple(i)[1])
-
-
 # setindex! not implemented since RGB is immutable
 
-
-function iterate(c::RGB, state = 1)
-    state > 3 ? nothing : (c[state], state +1)
-end
+iterate(c::RGB, state = 1) = state > 3 ? nothing : (c[state], state +1)
 
 
-################
-# BROADCASTING #
-################
+###############
+# Broadcasting
 
 
 # Broadcasting a function `f` on a series of arguments `xs` (ie. `f.(xs...)`) is equivalent to writing
@@ -127,44 +105,23 @@ BroadcastStyle(::RGBBroadcastStyle, ::BroadcastStyle) = RGBBroadcastStyle()
 end
 
 
-######################
-# COLOR MANIPULATION #
-######################
+################
+# Miscellaneous
 
 
-function luminosity(c::RGB)
-    (max(c...) + min(c...)) / 2
-end
+show(io::IO, c::RGB) = print(io, "($(c.r) $(c.g) $(c.b))")
 
-
-_clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1+x), c)...)
-
-_γ_correction(c::RGB{T}, γ::Number) where {T} = RGB{T}(map(x -> x^(1/γ), c)...)
-
-
-######
-# IO #
-######
-
-
-# Show in compact mode (i.e. inside a container)
-function show(io::IO, c::RGB)
-    print(io, "($(c.r) $(c.g) $(c.b))")
-end
-
-# Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
 
+luminosity(c::RGB) = (max(c...) + min(c...)) / 2f0
 
-#########
-# OTHER #
-#########
+clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 
+γ_correction(c::RGB{T}, γ::Number) where {T} = RGB{T}(map(x -> x^(1f0 / γ), c)...)
 
 eltype(::RGB{T}) where {T} = T
-
 
 function zero(T::Type{<:RGB})
     z = zero(eltype(T))
@@ -173,7 +130,6 @@ end
 
 zero(c::RGB) = zero(typeof(c))
 
-
 function one(T::Type{<:RGB})
     z = one(eltype(T))
     RGB(z, z, z)
@@ -181,5 +137,5 @@ end
 
 one(c::RGB) = one(typeof(c))
 
-black(T::Type{<:AbstractFloat} = Float64) = RGB{T}(0., 0., 0.)
-white(T::Type{<:AbstractFloat} = Float64) = RGB{T}(1., 1., 1.)
+const BLACK = zero(RGB{Float32})
+const WHITE = one(RGB{Float32})
