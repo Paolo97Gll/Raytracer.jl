@@ -62,14 +62,7 @@ function Normal(x, y, z)
     Normal{eltype(prom), false}(prom...)
 end
 
-function Normal{T}(x, y, z) where {T}
-    Normal{T, false}(convert(T, x), convert(T, y), convert(T, z))
-end
-
-normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
-normalize(n::Normal{T, true}) where {T} = n
-
-norm(::Normal{T, true}) where {T} = one(T)
+Normal{T}(x, y, z) where {T} = Normal{T, false}(map(x -> convert(T, x), (x, y, z))...)
 
 # Show in compact mode (i.e. inside a container)
 function show(io::IO, a::Normal)
@@ -77,18 +70,18 @@ function show(io::IO, a::Normal)
 end
 
 # Human-readable show (more extended)
-function show(io::IO, ::MIME"text/plain", a::Normal)
-    print(io, "Normal with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+function show(io::IO, ::MIME"text/plain", a::Normal{T, V}) where {T, V}
+    print(io, "Normal with eltype $(eltype(a)), ", V ? "normalized" : "not normalized", "\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
 end
 
 similar_type(::Type{<:Normal}, ::Type{T}, s::Size{(3,)}) where {T} = Normal{T}
-norm²(v::Normal) = sum(el -> el^2, v)
+
+normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
+norm²(v::Normal{T, false}) where {T} = sum(el -> el^2, v)
+
+normalize(n::Normal{T, true}) where {T} = n
+norm(::Normal{T, true}) where {T} = one(T)
 norm²(::Normal{T, true}) where {T} = one(T)
-
-
-#####################################################################
-
-const Vec2D{T} = SVector{2, T}
 
 #####################################################################
 
@@ -122,7 +115,9 @@ Point with eltype Int64
 x = 1, y = 2, z = 3
 ```
 """
-Point(x::Real, y::Real, z::Real) = Point(SVector(x,y,z))
+Point(x, y, z) = Point(SVector(x, y, z))
+Point{T}(x, y, z) where {T} = Point{T}(SVector(map(x -> convert(T, x), (x, y, z))...))
+
 function Point(p::AbstractVector)
     size(p) == (3,) || throw(ArgumentError("argument 'p' has size = $(size(p)) but 'Point' requires an argument of size = (3,)"))
 
@@ -147,6 +142,49 @@ end
 (+)(p::Point, v::Vec) = Point(p.v + v)
 (-)(p::Point, v::Vec) = Point(p.v - v)
 (*)(p::Point, s...) = (*)(p.v, s...) |> Point
+
+convert(::Type{Point{T}}, p::Point) where {T} = Point{T}(p.v...)
+
+convert(::Type{Vec}, p::Point{T}) where {T} = Vec{T}(p.v)
+convert(::Type{Vec{T}}, p::Point) where {T} = Vec{T}(p.v)
+
+
+#####################################################################
+
+const Vec2D{T} = SVector{2, T}
+
+
+vec_x(T::Type{<:Real} = Float64) = Vec{T}(1., 0., 0.)
+vec_y(T::Type{<:Real} = Float64) = Vec{T}(0., 1., 0.)
+vec_z(T::Type{<:Real} = Float64) = Vec{T}(0., 0., 1.)
+
+normal_x(T::Type{<:Real} = Float64) = Normal{T, true}(1., 0., 0.)
+normal_y(T::Type{<:Real} = Float64) = Normal{T, true}(0., 1., 0.)
+normal_z(T::Type{<:Real} = Float64) = Normal{T, true}(0., 0., 1.)
+
+origin(T::Type{<:Real} = Float64) = Point{T}(0., 0., 0.)
+
+
+#######################################################
+
+
+function create_onb_from_z(input_normal::Normal{T}) where {T}
+    normal = normalize(input_normal)
+
+    sign = copysign(one(T), normal.z)
+
+    a = -1. / (sign + normal.z)
+    b = normal.x * normal.y * a
+
+    e1 = Vec{T}(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e2 = Vec{T}(b, sign + normal.y * normal.y * a, -normal.y)
+
+    (e1, e2, Vec{T}(normal))
+end
+
+
+normalized_dot(v1::Vec, v2::Vec) = normalize(v1) ⋅ normalize(v2)
+normalized_dot(n1::Normal, n2::Normal) = normalize(n1) ⋅ normalize(n2)
 
 
 #####################################################################
@@ -479,35 +517,4 @@ function scaling(v::AbstractVector)
     size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'scaling' requires an argument of size = (3,)"))
     
     scaling(v...)
-end
-
-
-#####################################################################
-
-
-const VEC_X = Vec{Float64}(1., 0., 0.)
-const VEC_Y = Vec{Float64}(0., 1., 0.)
-const VEC_Z = Vec{Float64}(0., 0., 1.)
-
-const NORM_X = Normal{Float64, true}(1., 0., 0.)
-const NORM_Y = Normal{Float64, true}(0., 1., 0.)
-const NORM_Z = Normal{Float64, true}(0., 0., 1.)
-
-const ORIGIN = Point(0., 0., 0.)
-
-
-#######################################################
-
-
-function create_onb_from_z(input_normal::Normal{T}) where {T}
-    normal = normalize(input_normal)
-    sign = copysign(one(T), normal.z)
-
-    a = -one(T) / (sign + normal.z)
-    b = normal.x * normal.y * a
-
-    e1 = Vec(one(T) + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
-    e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
-
-    (e1, e2, Vec(normal))
 end
