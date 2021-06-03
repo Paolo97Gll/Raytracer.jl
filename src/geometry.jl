@@ -127,14 +127,22 @@ end
 eltype(::Point{T}) where {T} = T
 eltype(::Type{Point{T}}) where {T} = T
 
+length(::Point) = 3
+firstindex(::Point) = 1
+lastindex(p::Point) = length(p.v)
+getindex(p::Point, i::Integer) = p.v[i]
+function iterate(p::Point, state = 1)
+    state > 3 ? nothing : (p[state], state +1)
+end
+
 # Show in compact mode (i.e. inside a container)
-function show(io::IO, a::Point)
-    print(io, typeof(a), "(", join((string(el) for el ∈ a.v), ", "), ")")
+function show(io::IO, p::Point)
+    print(io, typeof(p), "(", join((string(el) for el ∈ p), ", "), ")")
 end
 
 # Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", a::Point)
-    print(io, Point, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a.v)), ", "))
+    print(io, Point, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
 end
 
 (≈)(p1::Point, p2::Point) = p1.v ≈ p2.v
@@ -148,6 +156,9 @@ convert(::Type{Point{T}}, p::Point) where {T} = Point{T}(p.v...)
 convert(::Type{Vec}, p::Point{T}) where {T} = Vec{T}(p.v)
 convert(::Type{Vec{T}}, p::Point) where {T} = Vec{T}(p.v)
 
+convert(::Type{Normal}, p::Point{T}) where {T} = Normal{T}(p.v)
+convert(::Type{Normal{T}}, p::Point) where {T} = Normal{T}(p.v)
+
 
 #####################################################################
 
@@ -158,9 +169,9 @@ vec_x(T::Type{<:Real} = Float64) = Vec{T}(1., 0., 0.)
 vec_y(T::Type{<:Real} = Float64) = Vec{T}(0., 1., 0.)
 vec_z(T::Type{<:Real} = Float64) = Vec{T}(0., 0., 1.)
 
-normal_x(T::Type{<:Real} = Float64) = Normal{T, true}(1., 0., 0.)
-normal_y(T::Type{<:Real} = Float64) = Normal{T, true}(0., 1., 0.)
-normal_z(T::Type{<:Real} = Float64) = Normal{T, true}(0., 0., 1.)
+normal_x(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(1., 0., 0.)
+normal_y(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 1., 0.)
+normal_z(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 0., 1.)
 
 origin(T::Type{<:Real} = Float64) = Point{T}(0., 0., 0.)
 
