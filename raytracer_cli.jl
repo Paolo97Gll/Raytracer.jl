@@ -216,6 +216,8 @@ end
 
 function tonemapping(options::Dict{String, Any})
     printstyled("apply tone mapping to a pfm image\n", bold=true)
+    options["input_file"] = normpath(options["input_file"])
+    options["output_file"] = normpath(options["output_file"])
     Raytracer.tonemapping(
         options["input_file"],
         options["output_file"],
@@ -227,6 +229,7 @@ end
 
 function demoimage(options::Dict{String, Any})
     printstyled("Raytracer.jl demo image\n", bold=true)
+    options["output_file"] = normpath(options["output_file"])
     Raytracer.demo(
         options["output_file"],
         Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
@@ -266,6 +269,9 @@ function demoanimation(options::Dict{String, Any})
         println("ffmpeg not found. Aborting.")
         exit(1)
     end
+
+    options["output_dir"] = normpath(options["output_dir"])
+    options["output_file"] = normpath(options["output_file"])
 
     curdir = pwd()
     demodir = options["output_dir"]
