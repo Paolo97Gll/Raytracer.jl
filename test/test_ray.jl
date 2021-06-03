@@ -1,17 +1,14 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   test_ray.jl
-# description:
-#   Unit tests for ray.jl
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Unit test file for ray.jl
 
 
 @testset "constructor" begin
-    ray1 = Ray(Point(1.0, 2.0, 3.0), Vec(5.0, 4.0, -1.0))
-    ray2 = Ray(Point(1.0, 2.0, 3.0), Vec(5.0, 4.0, -1.0))
-    ray3 = Ray(Point(5.0, 1.0, 4.0), Vec(3.0, 9.0, 4.0))
+    ray1 = Ray(Point(1f0, 2f0, 3f0), Vec(5f0, 4f0, -1f0))
+    ray2 = Ray(Point(1f0, 2f0, 3f0), Vec(5f0, 4f0, -1f0))
+    ray3 = Ray(Point(5f0, 1f0, 4f0), Vec(3f0, 9f0, 4f0))
 
     @test ray1 ≈ ray2
     @test !(ray1 ≈ ray3)
@@ -19,28 +16,28 @@ end
 
 
 @testset "methods" begin
-    ray = Ray(Point(1.0, 2.0, 4.0), Vec(4.0, 2.0, 1.0))
-    @test ray(0.0) ≈ ray.origin
-    @test ray(1.0) ≈ Point(5.0, 4.0, 5.0)
-    @test ray(2.0) ≈ Point(9.0, 6.0, 6.0)
+    ray = Ray(Point(1f0, 2f0, 4f0), Vec(4f0, 2f0, 1f0))
+    @test ray(0f0) ≈ ray.origin
+    @test ray(1f0) ≈ Point(5f0, 4f0, 5f0)
+    @test ray(2f0) ≈ Point(9f0, 6f0, 6f0)
 
-    ray = Ray(Point(1.0, 2.0, 3.0), Vec(1.0, 2.0, 3.0))
-    m = Transformation([1.0 2.0 3.0 4.0;
-                        5.0 6.0 7.0 8.0;
-                        9.0 9.0 8.0 7.0;
-                        0.0 0.0 0.0 1.0],
-                       [-3.75 2.75 -1 0;
-                        5.75 -4.75 2.0 1.0;
-                        -2.25 2.25 -1.0 -2.0;
-                        0.0 0.0 0.0 1.0])
-    @test m * ray ≈ Ray(Point(18.0, 46.0, 58.0), Vec(14.0, 38.0, 51.0))
+    ray = Ray(Point(1f0, 2f0, 3f0), Vec(1f0, 2f0, 3f0))
+    m = Transformation([1f0 2f0 3f0 4f0;
+                        5f0 6f0 7f0 8f0;
+                        9f0 9f0 8f0 7f0;
+                        0f0 0f0 0f0 1f0],
+                       [-3.75f0 2.75f0 -1f0 0f0;
+                        5.75f0 -4.75f0 2f0 1f0;
+                        -2.25f0 2.25f0 -1f0 -2f0;
+                        0f0 0f0 0f0 1f0])
+    @test m * ray ≈ Ray(Point(18f0, 46f0, 58f0), Vec(14f0, 38f0, 51f0))
 end
 
 @testset "transform" begin
-    ray = Ray(Point(1.0, 2.0, 3.0), Vec(6.0, 5.0, 4.0))
-    transformation = translation(Vec(10.0, 11.0, 12.0)) * rotationX(π/2)
+    ray = Ray(Point(1f0, 2f0, 3f0), Vec(6f0, 5f0, 4f0))
+    transformation = translation(Vec(10f0, 11f0, 12f0)) * rotationX(π/2)
     transformed = transformation * ray
 
-    @test transformed.origin ≈ Point(11.0, 8.0, 14.0)
-    @test transformed.dir ≈ Vec(6.0, -4.0, 5.0)
+    @test transformed.origin ≈ Point(11f0, 8f0, 14f0)
+    @test transformed.dir ≈ Vec(6f0, -4f0, 5f0)
 end

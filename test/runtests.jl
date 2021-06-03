@@ -38,15 +38,15 @@ end
 @testset "Transformations" begin
     include("test_transformations.jl")
 end
-# @testset "Ray" begin
-#     include("test_ray.jl")
-# end
-# @testset "Camera" begin
-#     include("test_cameras.jl")
-# end
-# @testset "ImageTracer" begin
-#     include("test_image_tracer.jl")
-# end
+@testset "Ray" begin
+    include("test_ray.jl")
+end
+@testset "Cameras" begin
+    include("test_cameras.jl")
+end
+@testset "ImageTracer" begin
+    include("test_image_tracer.jl")
+end
 # @testset "Material" begin
 #     include("test_materials.jl")
 # end

@@ -1,13 +1,10 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   image_tracer.jl
-# description:
-#   Implementation of ImageTracer and its methods
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# TODO check docstrings
+# Trace utility to generate an image by shooting light rays through each of its pixels
+# TODO write docstrings
+
 
 """
     ImageTracer{T}
@@ -18,16 +15,9 @@ To fill an image store it into `ImageTracer` along with the desired
 camera and apply [`fire_all_rays`](@ref) to it. Alternatively apply iteratively [`fire_ray`](@ref) 
 on the desired ranges.
 """
-struct ImageTracer{T}
-    image::HdrImage{T}
+struct ImageTracer
+    image::HdrImage
     camera::Camera
-end
-
-eltype(::ImageTracer{T}) where {T} = T
-
-function show(io::IO, ::MIME"text/plain", t::ImageTracer)
-    println(io, typeof(t), " with camera of type ", typeof(t.camera))
-    print(io, "image of size ", join(size(t.image), "x"), " and of type ", typeof(t.image));
 end
 
 """
@@ -42,12 +32,12 @@ through the pixel's center.
 """
 function fire_ray(tracer::ImageTracer,
                   col::Integer, row::Integer; 
-                  u_pixel::AbstractFloat = 0.5, 
-                  v_pixel::AbstractFloat = 0.5)
+                  u_pixel::Float32 = 0.5f0, 
+                  v_pixel::Float32 = 0.5f0)
     size_col, size_raw = size(tracer.image)
-    u = ((col-1) + u_pixel) / size_col
-    v = 1.0 - ((row-1) + v_pixel) / size_raw
-    fire_ray(tracer.camera, u, v, T=eltype(eltype(tracer)))
+    u = (col - 1f0 + u_pixel) / size_col
+    v = 1f0 - (row - 1f0 + v_pixel) / size_raw
+    fire_ray(tracer.camera, u, v)
 end
 
 """
@@ -60,7 +50,6 @@ pass it to the function `func`, which must accept a `Ray` as its only parameter 
 instance containing the color to assign to that pixel in the image.
 """
 function fire_all_rays!(tracer::ImageTracer, func::Function; enable_progress_bar::Bool = true)
-    # rangerow, rangecol = axes(tracer.image)
     indices = CartesianIndices(tracer.image.pixel_matrix)
     p = Progress(length(indices), color=:white, enabled=enable_progress_bar)
     for ind ∈ indices
@@ -69,3 +58,16 @@ function fire_all_rays!(tracer::ImageTracer, func::Function; enable_progress_bar
         next!(p)
     end
 end
+
+
+################
+# Miscellaneous
+
+
+function show(io::IO, ::MIME"text/plain", t::ImageTracer)
+    println(io, typeof(t), " with camera of type ", typeof(t.camera))
+    print(io, "image of size ", join(size(t.image), "x"), " and of type ", typeof(t.image));
+end
+
+eltype(::ImageTracer) = Float32
+eltype(::Type{ImageTracer}) = Float32
