@@ -114,7 +114,7 @@ function ray_intersection(ray::Ray, s::Sphere)
     normal = s.transformation * ((normal ⋅ ray.dir < 0f0) ? normal : -normal)
     u = atan(hit_point[2], hit_point[1]) / (2f0 * π)
     u = u >= 0f0 ? u : u+1f0
-    v = acos(hit_point[3]) / π
+    v = acos(clamp(hit_point[3], -1f0, 1f0)) / π
     surface_point = Vec2D(u, v)
     HitRecord(world_point, normal, surface_point, hit_t, ray, s.material)
 end
