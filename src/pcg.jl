@@ -1,3 +1,11 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Permuted congruential generator (simple fast space-efficient statistically good algorithms for random number generation)
+# TODO write docstrings
+
+
 mutable struct PCG <: AbstractRNG
     state::UInt64
     inc::UInt64

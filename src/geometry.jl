@@ -1,100 +1,98 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   geometry.jl
-# description:
-#   Implementation of the geometry required for the generation
-#   and manipulation of a 3D scene.
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# TODO check docstrings
+# Implementation of the geometry required by the renderer (manipulation of 3D scenes, cameras, rays, ...)
+# TODO write docstrings
 
 
 #####################################################################
 
 
 """
-    Vec{T} <: StaticArrays.FieldVector{3, T}
+    Vec <: StaticArrays.FieldVector{3, Float32}
 
 A vector in 3D space.
 
 For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
 """
-struct Vec{T} <: FieldVector{3, T}
-    x::T
-    y::T
-    z::T
+struct Vec <: FieldVector{3, Float32}
+    x::Float32
+    y::Float32
+    z::Float32
 end
 
-Vec(x, y, z) = Vec(promote(x, y, z)...)
+similar_type(::Type{<:Vec}, ::Type{Float32}, s::Size{(3,)}) = Vec
 
-# Show in compact mode (i.e. inside a container)
+################
+# Miscellaneous
+
 function show(io::IO, a::Vec)
     print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
 end
 
-# Human-readable show (more extended)
 function show(io::IO, ::MIME"text/plain", a::Vec)
     print(io, "Vec with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
 end
 
-similar_type(::Type{<:Vec}, ::Type{T}, s::Size{(3,)}) where {T} = Vec{T}
 norm²(v::Vec) = sum(el -> el^2, v)
 
 #####################################################################
 
 """
-    Normal{T} <: StaticArrays.FieldVector{3, T}
+    Normal{V} <: StaticArrays.FieldVector{3, Float32}
 
 A pseudo-vector in 3D space.
 
 For inherited properties and constructors see [`StaticArrays.FieldVector`](@ref).
 """
-struct Normal{T, V} <: FieldVector{3, T}
-    x::T
-    y::T
-    z::T
+struct Normal{V} <: FieldVector{3, Float32}
+    x::Float32
+    y::Float32
+    z::Float32
 end
 
-function Normal(x, y, z)
-    prom = promote(x, y, z)
-    Normal{eltype(prom), false}(prom...)
-end
+Normal(x, y, z) = Normal{false}(convert(Float32, x), convert(Float32, y), convert(Float32, z))
 
-Normal{T}(x, y, z) where {T} = Normal{T, false}(map(x -> convert(T, x), (x, y, z))...)
+similar_type(::Type{<:Normal}, ::Type{Float32}, s::Size{(3,)}) = Normal
 
-# Show in compact mode (i.e. inside a container)
+################
+# Miscellaneous
+
 function show(io::IO, a::Normal)
     print(io, typeof(a), "(", join((string(el) for el ∈ a), ", "), ")")
 end
 
-# Human-readable show (more extended)
-function show(io::IO, ::MIME"text/plain", a::Normal{T, V}) where {T, V}
-    print(io, "Normal with eltype $(eltype(a)), ", V ? "normalized" : "not normalized", "\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+function show(io::IO, ::MIME"text/plain", n::Normal{V}) where {V}
+    print(io, "Normal with eltype $(eltype(n)), ", V ? "normalized" : "not normalized", "\n",
+          join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), n)), ", "))
 end
 
-similar_type(::Type{<:Normal}, ::Type{T}, s::Size{(3,)}) where {T} = Normal{T}
+normalize(n::Normal{false}) = Normal{true}(normalize(SVector{3}(n)))
+norm²(n::Normal{false}) = sum(el -> el^2, n)
 
-normalize(n::Normal{T, false}) where {T} = Normal{T, true}(normalize(SVector{3}(n)))
-norm²(v::Normal{T, false}) where {T} = sum(el -> el^2, v)
+normalize(n::Normal{true}) = n
+norm(::Normal{true}) = 1f0
+norm²(::Normal{true}) = 1f0
 
-normalize(n::Normal{T, true}) where {T} = n
-norm(::Normal{T, true}) where {T} = one(T)
-norm²(::Normal{T, true}) where {T} = one(T)
 
 #####################################################################
 
-"""
-    Point{T}
 
-A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, T}`.
 """
-struct Point{T}
-    v::SVector{3, T}
+    Point
+
+A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, Float32}`.
+"""
+struct Point
+    v::SVector{3, Float32}
+
+    function Point(p::AbstractVector)
+        size(p) == (3,) || throw(ArgumentError("argument 'p' has size = $(size(p)) but 'Point' requires an argument of size = (3,)"))
+        new(SVector{3}(p))
+    end
 end
 
-# Convenience constructors
 """
     Point(x, y, z)
     Point(p::AbstractVector)
@@ -107,425 +105,86 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 
 ```jldoctest
 julia> Point(1, 2, 3)
-Point with eltype Int64
-x = 1, y = 2, z = 3
+Point with eltype Float32
+x = 1.0, y = 2.0, z = 3.0
 
 julia> Point([1, 2, 3])
-Point with eltype Int64
-x = 1, y = 2, z = 3
+Point with eltype Float32
+x = 1.0, y = 2.0, z = 3.0
 ```
 """
-Point(x, y, z) = Point(SVector(x, y, z))
-Point{T}(x, y, z) where {T} = Point{T}(SVector(map(x -> convert(T, x), (x, y, z))...))
+Point(x, y, z) = Point(SVector(convert(Float32, x), convert(Float32, y), convert(Float32, z)))
 
-function Point(p::AbstractVector)
-    size(p) == (3,) || throw(ArgumentError("argument 'p' has size = $(size(p)) but 'Point' requires an argument of size = (3,)"))
+################
+# Miscellaneous
 
-    Point(SVector{3}(p))
-end
-
-eltype(::Point{T}) where {T} = T
-eltype(::Type{Point{T}}) where {T} = T
+eltype(::Point) = Float32
+eltype(::Type{Point}) = Float32
 
 length(::Point) = 3
 firstindex(::Point) = 1
-lastindex(p::Point) = length(p.v)
+lastindex(p::Point) = 3
 getindex(p::Point, i::Integer) = p.v[i]
-function iterate(p::Point, state = 1)
-    state > 3 ? nothing : (p[state], state +1)
-end
+iterate(p::Point, state = 1) = state > 3 ? nothing : (p[state], state +1)
 
-# Show in compact mode (i.e. inside a container)
 function show(io::IO, p::Point)
     print(io, typeof(p), "(", join((string(el) for el ∈ p), ", "), ")")
 end
 
-# Human-readable show (more extended)
-function show(io::IO, ::MIME"text/plain", a::Point)
-    print(io, Point, " with eltype $(eltype(a))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), a)), ", "))
+function show(io::IO, ::MIME"text/plain", p::Point)
+    print(io, Point, " with eltype $(eltype(p))\n", join(("$label = $el" for (label, el) ∈ zip((:x, :y, :z), p)), ", "))
 end
 
 (≈)(p1::Point, p2::Point) = p1.v ≈ p2.v
+
 (-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
-(+)(p::Point, v::Vec) = Point(p.v + v)
 (-)(p::Point, v::Vec) = Point(p.v - v)
+
+(+)(p::Point, v::Vec) = Point(p.v + v)
+
 (*)(p::Point, s...) = (*)(p.v, s...) |> Point
 
-convert(::Type{Point{T}}, p::Point) where {T} = Point{T}(p.v...)
-
-convert(::Type{Vec}, p::Point{T}) where {T} = Vec{T}(p.v)
-convert(::Type{Vec{T}}, p::Point) where {T} = Vec{T}(p.v)
-
-convert(::Type{Normal}, p::Point{T}) where {T} = Normal{T}(p.v)
-convert(::Type{Normal{T}}, p::Point) where {T} = Normal{T}(p.v)
+convert(::Type{Vec}, p::Point) = Vec(p.v)
+convert(::Type{Normal}, p::Point)= Normal{false}(p.v)
 
 
 #####################################################################
 
-const Vec2D{T} = SVector{2, T}
 
+const Vec2D = SVector{2, Float32}
 
-vec_x(T::Type{<:Real} = Float64) = Vec{T}(1., 0., 0.)
-vec_y(T::Type{<:Real} = Float64) = Vec{T}(0., 1., 0.)
-vec_z(T::Type{<:Real} = Float64) = Vec{T}(0., 0., 1.)
+const VEC_X = Vec(1f0, 0f0, 0f0)
+const VEC_Y = Vec(0f0, 1f0, 0f0)
+const VEC_Z = Vec(0f0, 0f0, 1f0)
 
-normal_x(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(1., 0., 0.)
-normal_y(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 1., 0.)
-normal_z(T::Type{<:Real} = Float64, normalized::Bool = true) = Normal{T, normalized}(0., 0., 1.)
+const NORMAL_X = Normal{true}(1f0, 0f0, 0f0)
+const NORMAL_Y = Normal{true}(0f0, 1f0, 0f0)
+const NORMAL_Z = Normal{true}(0f0, 0f0, 1f0)
 
-origin(T::Type{<:Real} = Float64) = Point{T}(0., 0., 0.)
+const NORMAL_X_false = Normal{false}(1f0, 0f0, 0f0)
+const NORMAL_Y_false = Normal{false}(0f0, 1f0, 0f0)
+const NORMAL_Z_false = Normal{false}(0f0, 0f0, 1f0)
+
+const ORIGIN = Point(0f0, 0f0, 0f0)
 
 
 #######################################################
 
 
-function create_onb_from_z(input_normal::Normal{T}) where {T}
+function create_onb_from_z(input_normal::Normal)
     normal = normalize(input_normal)
 
-    sign = copysign(one(T), normal.z)
+    sign = copysign(1f0, normal.z)
 
-    a = -1. / (sign + normal.z)
+    a = -1f0 / (sign + normal.z)
     b = normal.x * normal.y * a
 
-    e1 = Vec{T}(1. + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
-    e2 = Vec{T}(b, sign + normal.y * normal.y * a, -normal.y)
+    e1 = Vec(1f0 + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
+    e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
 
-    (e1, e2, Vec{T}(normal))
+    (e1, e2, convert(Vec, normal))
 end
 
 
 normalized_dot(v1::Vec, v2::Vec) = normalize(v1) ⋅ normalize(v2)
 normalized_dot(n1::Normal, n2::Normal) = normalize(n1) ⋅ normalize(n2)
-
-
-#####################################################################
-
-
-"""
-    Transformation{T}
-
-A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
-
-A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation 
-significantly increases performance at the cost of memory space.
-
-Members:
-- `m` ([`AbstractMatrix{T}`](@ref)): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
-- `invm` ([`AbstractMatrix`](@ref)): the homogeneous matrix representation of the inverse transformation. 
-  Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
-
-# Examples
-```jldoctest
-julia> Transformation{Float64}()
-4x4 Transformation{Float64}:
-Matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅    ⋅ 
-  ⋅   1.0   ⋅    ⋅ 
-  ⋅    ⋅   1.0   ⋅ 
-  ⋅    ⋅    ⋅   1.0
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅    ⋅ 
-  ⋅   1.0   ⋅    ⋅ 
-  ⋅    ⋅   1.0   ⋅ 
-  ⋅    ⋅    ⋅   1.0
-```
-"""
-struct Transformation{T}
-    m::AbstractMatrix{T}
-    invm::AbstractMatrix 
-
-    function Transformation{T}(m::AbstractMatrix{T} = Diagonal(ones(T,4)), invm::AbstractMatrix = T != Bool ? inv(m) : m) where {T}
-        @assert(size(m)==size(invm)==(4,4))
-        new{T}(m, invm)
-    end
-end
-
-"""
-    Transformation(m)
-    Transformation(m, invm)
-
-Construct a `Transformation{T}` instance where `T = eltype(m)`
-
-If any argument is a [`Matrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
-
-# Examples
-```jldoctest; setup = :(import StaticArrays)
-julia> Transformation(StaticArrays.SMatrix{4,4}([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1]))
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  2  0  0
- 0  0  4  0
- 0  0  0  1
-Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
- 1.0  0.0  0.0   0.0
- 0.0  0.5  0.0   0.0
- 0.0  0.0  0.25  0.0
- 0.0  0.0  0.0   1.0
-
-julia> Transformation([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1])
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  2  0  0
- 0  0  4  0
- 0  0  0  1
-Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
- 1.0  0.0  0.0   0.0
- 0.0  0.5  0.0   0.0
- 0.0  0.0  0.25  0.0
- 0.0  0.0  0.0   1.0
-```
-
-```jldoctest; setup = :(import LinearAlgebra)
-julia> Transformation(LinearAlgebra.Diagonal([1,2,4,1]))
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  4  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅     ⋅ 
-  ⋅   0.5   ⋅     ⋅ 
-  ⋅    ⋅   0.25   ⋅ 
-  ⋅    ⋅    ⋅    1.0
-```
-"""
-Transformation(m::AbstractMatrix{T}) where {T} = Transformation{T}(m)
-Transformation(m::Matrix{T}) where {T} = Transformation(SMatrix{4,4}(m))
-Transformation(m::AbstractMatrix{T}, invm::AbstractMatrix) where {T} = (@assert(m*invm ≈ I(4)); Transformation{T}(m, invm))
-Transformation(m::Matrix{T}, invm::AbstractMatrix) where {T} = Transformation(SMatrix{4, 4, T}(m), invm)
-Transformation(m::AbstractMatrix, invm::Matrix{T}) where {T} = Transformation(m, SMatrix{4, 4, T}(invm))
-Transformation(m::Matrix{T}, invm::Matrix{T2}) where {T, T2} = Transformation(SMatrix{4, 4, T}(m), SMatrix{4, 4, T2}(invm))
-
-eltype(::Transformation{T}) where {T} = T
-eltype(::Type{Transformation{T}}) where {T} = T
-
-function show(io::IO, ::MIME"text/plain", t::Transformation)
-    println(io, "4x4 $(typeof(t)):")
-    println(io, "Matrix of type ", typeof(t.m), ":");
-    print_matrix(io, t.m);
-    println(io, "\nInverse matrix of type ", typeof(t.invm), ":");
-    print_matrix(io, t.invm);
-end
-
-"""
-    isconsistent(t)
-
-Return `true` if `t.m * t.invm` is similar to the identity matrix.
-
-Mainly used for testing and to verify matrices haven't been mutated.
-"""
-isconsistent(t::Transformation) = (t.m * t.invm) ≈ I(4)
-(≈)(t1::Transformation, t2::Transformation) = t1.m ≈ t2.m && t1.invm ≈ t2.invm
-
-(*)(t1::Transformation, t2::Transformation) = Transformation(t1.m * t2.m, t2.invm * t1.invm)
-(*)(t ::Transformation, v ::Vec)            = Vec(@view(t.m[1:3,1:3]) * v)
-(*)(t ::Transformation, n ::Normal)         = Normal(transpose(@view(t.invm[1:3,1:3])) * n)
-
-function (*)(t ::Transformation, p ::Point)
-    res = t.m * SVector(p.v..., one(eltype(p)))
-    res = res[end] == 1 ? res : res/res[end]
-    Point(@view(res[1:3]))
-end
-
-"""
-    inv(t)
-
-Return the inverse [`Transformation`](@ref).
-
-Returns a `Transformation` which has the `m` and `invm` fields swapped. 
-Note that the returned `Transformation` may have a different eltype with respect of the given one.
-
-#Examples
-```jldoctest; setup = :(using LinearAlgebra: Diagonal) 
-julia> t = Transformation(Diagonal([1, 2, 3, 1]))
-4x4 Transformation{Int64}:
-Matrix of type Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
-
-julia> inv(t)
-4x4 Transformation{Float64}:
-Matrix of type Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
-Inverse matrix of type Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
- ```
-"""
-inv(t::Transformation) = Transformation(t.invm, t.m)
-
-let rotation_matrices = Dict(
-        :X => :(@SMatrix([   1       0      0     0;
-                             0     cos(θ) -sin(θ) 0;
-                             0     sin(θ)  cos(θ) 0;
-                             0       0      0     1])),
-        :Y => :(@SMatrix([ cos(θ)    0    sin(θ) 0;
-                             0       1      0    0;
-                           -sin(θ)   0    cos(θ) 0;
-                             0       0      0    1])),
-        :Z => :(@SMatrix([ cos(θ) -sin(θ)    0    0;
-                           sin(θ) cos(θ)     0    0;
-                             0      0        1    0;
-                             0      0        0    1]))
-    )
-
-    for (ax, mat) ∈ pairs(rotation_matrices)
-        quote
-            function $(Symbol(:rotation, ax))(θ::Real) 
-                m = $mat
-                Transformation(m, transpose(m))
-            end
-        end |> eval
-    end
-
-    # docstrings
-    let docmsg = (ax, mat) -> """
-            rotation$ax(θ)
-
-        Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
-        
-        If an `AbstractVector` is provided as argument it must have a size = (3,)
-        
-        #Examples
-        ```jldoctest
-        julia> rotation$ax(π/4)
-        $(replace(repr(MIME("text/plain"), mat), "Raytracer." => "" ))
-        ```            
-        """
-        @doc docmsg(:X, rotationX(π/4)) rotationX
-        @doc docmsg(:Y, rotationY(π/4)) rotationY
-        @doc docmsg(:Z, rotationZ(π/4)) rotationZ
-    end
-end
-
-"""
-    translation(x, y, z)
-    translation(v)
-
-Return a [`Transformation`](@ref) that translates a 3D vector field of the given coordinates.
-
-If an `AbstractVector` is provided as argument it must have a size = (3,)
-
-#Examples
-```jldoctest
-julia> translation(1, 2, 3)
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  1
- 0  1  0  2
- 0  0  1  3
- 0  0  0  1
-Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  -1
- 0  1  0  -2
- 0  0  1  -3
- 0  0  0   1
-```
-
-```jldoctest
-julia> translation([1, 2, 3])
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  1
- 0  1  0  2
- 0  0  1  3
- 0  0  0  1
-Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  -1
- 0  1  0  -2
- 0  0  1  -3
- 0  0  0   1
-```
-"""
-function translation(v::AbstractVector)
-    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'translate' requires an argument of size = (3,)")) 
-
-    mat = Diagonal(ones(eltype(v), 4)) |> MMatrix{4, 4}
-    mat⁻¹ = copy(mat)
-    mat[1:3, end]   =  v
-    mat⁻¹[1:3, end] = -v
-    Transformation(mat, mat⁻¹)
-end
-translation(x::Real, y::Real, z::Real) = translation([x,y,z]) 
-
-"""
-    scaling(x, y, z)
-    scaling(s::Real)
-    scaling(v::AbstractVector)
-
-Return a [`Transformation`](@ref) that scales a 3D vector field of a given factor for each axis.
-
-If a single `Real` is provided as argument then the scaling is considered uniform.
-If an `AbstractVector` is provided as argument it must have a size = (3,)
-
-#Examples
-```jldoctest
-julia> scaling(1, 2, 3)
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
-```
-
-```jldoctest
-julia> scaling(2)
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 2  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  2  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 0.5   ⋅    ⋅    ⋅ 
-  ⋅   0.5   ⋅    ⋅ 
-  ⋅    ⋅   0.5   ⋅ 
-  ⋅    ⋅    ⋅   1.0
-```
-
-```jldoctest
-julia> scaling([1, 2, 3])
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
-```
-"""
-function scaling(x::Real, y::Real, z::Real)
-    Transformation(Diagonal(        [x, y, z, true]), 
-                   Diagonal(true ./ [x, y, z, true])) # NOTE: the use of true is to avoid unwanted promotions
-end
-scaling(s::Real) = scaling(s, s, s)
-function scaling(v::AbstractVector) 
-    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'scaling' requires an argument of size = (3,)"))
-    
-    scaling(v...)
-end
