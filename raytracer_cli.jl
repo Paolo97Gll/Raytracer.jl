@@ -312,13 +312,9 @@ function demoanimation(options::Dict{String, Any})
     end
     
     print("Generating animation...")
-    if Sys.iswindows()
-        file_pattern = ["-i", "demo_%0$(trunc(Int, log10(length(θ_list)))+1)d.jpg"]
-    else
-        file_pattern = ["-pattern_type", "glob", "-i", "\"$(options["output_file"])_*.jpg\""]
-    end
+    padding = trunc(Int, log10(length(θ_list))) + 1
     run(pipeline(
-        `ffmpeg -y -framerate $(options["fps"]) $(file_pattern) -c:v libx264 -preset slow -tune animation -vf format=yuv420p -movflags +faststart $(options["output_file"]).mp4`,
+        `ffmpeg -y -framerate $(options["fps"]) -i demo_%0$(padding)d.jpg -c:v libx264 -preset slow -tune animation -vf format=yuv420p -movflags +faststart $(options["output_file"]).mp4`,
         stdout=devnull,
         stderr=devnull
     ))
