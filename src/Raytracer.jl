@@ -17,6 +17,7 @@ module Raytracer
 # TODO since only import allows adding methods to a function, use import only when needed, otherwise use using
 
 
+using Intervals: include
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
@@ -50,7 +51,7 @@ import LinearAlgebra:
 import Random:
     Random.CloseOpen01, Sampler, SamplerTrivial
 
-using Intervals, ProgressMeter, Random
+using ProgressMeter, Random
 
 
 ##########
@@ -64,9 +65,9 @@ export
     Transformation, UniformPigment, Vec, Vec2D, World
 
 export
-    aperture_deg, clamp_image, create_onb_from_z, demo, fire_all_rays!, fire_ray,
-    isconsistent, load, normalize_image, norm², ray_intersection, rotationX, rotationY,
-    rotationZ, save, scaling, tonemapping, translation, γ_correction
+    BLACK, WHITE, aperture_deg, clamp_image, create_onb_from_z, demo, fire_all_rays!, fire_ray,
+    isconsistent, load, normalize, normalize_image, norm², ray_intersection, rotationX,
+    rotationY, rotationZ, save, scaling, tonemapping, translation, γ_correction
 
 
 ###########
@@ -83,11 +84,12 @@ include("transformations.jl")
 include("ray.jl")
 include("cameras.jl")
 include("image_tracer.jl")
-# include("materials.jl")
-# include("shape.jl")
-# include("renderers.jl")
+include("materials.jl")
+include("shapes.jl")
+include("world.jl")
+include("renderers.jl")
 
-# include("user_utils.jl")
+include("user_utils.jl")
 
 
 end # module Raytracer
