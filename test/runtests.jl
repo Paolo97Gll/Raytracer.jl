@@ -11,7 +11,7 @@ using Documenter, LinearAlgebra, StaticArrays
 
 using Raytracer
 using Raytracer:
-    NORMAL_X, NORMAL_Y, NORMAL_Z, VEC_X, VEC_Y, VEC_Z,
+    NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, VEC_X, VEC_Y, VEC_Z,
     average_luminosity, clamp, luminosity, norm², γ_correction
 
 
@@ -47,15 +47,18 @@ end
 @testset "ImageTracer" begin
     include("test_image_tracer.jl")
 end
-# @testset "Material" begin
-#     include("test_materials.jl")
-# end
-# @testset "Shape" begin
-#     include("test_shape.jl")
-# end
-# @testset "Renderers" begin
-#     include("test_renderers.jl")
-# end
+@testset "Materials" begin
+    include("test_materials.jl")
+end
+@testset "Shapes" begin
+    include("test_shapes.jl")
+end
+@testset "World" begin
+    include("test_world.jl")
+end
+@testset "Renderers" begin
+    include("test_renderers.jl")
+end
 
 
 ################
