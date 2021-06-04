@@ -17,7 +17,7 @@ module Raytracer
 # TODO since only import allows adding methods to a function, use import only when needed, otherwise use using
 
 
-using Intervals: include
+using Intervals
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
