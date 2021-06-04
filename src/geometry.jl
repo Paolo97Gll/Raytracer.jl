@@ -161,6 +161,10 @@ const NORMAL_X = Normal{true}(1f0, 0f0, 0f0)
 const NORMAL_Y = Normal{true}(0f0, 1f0, 0f0)
 const NORMAL_Z = Normal{true}(0f0, 0f0, 1f0)
 
+const NORMAL_X_false = Normal{false}(1f0, 0f0, 0f0)
+const NORMAL_Y_false = Normal{false}(0f0, 1f0, 0f0)
+const NORMAL_Z_false = Normal{false}(0f0, 0f0, 1f0)
+
 const ORIGIN = Point(0f0, 0f0, 0f0)
 
 
