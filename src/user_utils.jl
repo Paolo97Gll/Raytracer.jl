@@ -1,19 +1,15 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   user_utils.jl
-# description:
-#   High-level utilities
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+# High-level utilities
 # TODO write docstrings
 
 
-function tonemapping(input_file::AbstractString,
-                     output_file::AbstractString,
-                     alpha::Real,
-                     gamma::Real;
+function tonemapping(input_file::String,
+                     output_file::String,
+                     alpha::Float32,
+                     gamma::Float32;
                      disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     println(io, "\n-> TONE MAPPING PROCESS")
@@ -27,15 +23,15 @@ function tonemapping(input_file::AbstractString,
     println(io, " done!")
 end
 
-function load_tracer(image_resolution::Tuple{Integer, Integer}, 
-                     camera_type::AbstractString, 
-                     camera_position::Tuple{Real, Real, Real}, 
-                     camera_orientation::Tuple{Real, Real, Real},
-                     screen_distance::Real;
+function load_tracer(image_resolution::Tuple{Int, Int},
+                     camera_type::String,
+                     camera_position::Tuple{Float32, Float32, Float32},
+                     camera_orientation::Tuple{Float32, Float32, Float32},
+                     screen_distance::Float32;
                      disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     print(io, "Loading tracing informations...")
-    image = HdrImage{RGB{Float64}}(image_resolution...)
+    image = HdrImage(image_resolution...)
     angx, angy, angz = deg2rad.(camera_orientation)
     transformation = (rotationX(angx) * rotationY(angy) * rotationZ(angz)) * translation(camera_position...)
     if camera_type == "perspective"
@@ -55,15 +51,15 @@ function rendering!(image_tracer::ImageTracer, renderer::Renderer; disable_outpu
     fire_all_rays!(image_tracer, renderer, enable_progress_bar=!disable_output)
 end
 
-function demo(output_file::AbstractString,
-              image_resolution::Tuple{Integer, Integer},
-              camera_type::AbstractString,
-              camera_position::Tuple{Real, Real, Real},
-              camera_orientation::Tuple{Real, Real, Real},
-              screen_distance::Real,
+function demo(output_file::String,
+              image_resolution::Tuple{Int, Int},
+              camera_type::String,
+              camera_position::Tuple{Float32, Float32, Float32},
+              camera_orientation::Tuple{Float32, Float32, Float32},
+              screen_distance::Float32,
               renderer_type::Type{<:Renderer},
-              alpha::Real,
-              gamma::Real;
+              alpha::Float32,
+              gamma::Float32;
               disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     println(io, "\n-> RENDERING")
@@ -71,39 +67,39 @@ function demo(output_file::AbstractString,
     if renderer_type <: OnOffRenderer
         world = World(undef, 10)
         for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-            world[i] = Sphere(transformation = translation(coords * 0.5) * scaling(1/10))
+            world[i] = Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10))
         end
-        world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10)), Sphere(transformation = translation([0, 0.5, 0]) * scaling(1/10))]
-        renderer = renderer_type(world, one(RGB{Float64}), zero(RGB{Float64}))
+        world[end-1:end] = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10)), Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10))]
+        renderer = renderer_type(world, WHITE, BLACK)
     elseif renderer_type <: FlatRenderer
         world = World(undef, 11)
         for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-            world[i] = Sphere(transformation = translation(coords * 0.5) * scaling(1/10), 
+            world[i] = Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10), 
                               material = Material(brdf = 
-                                DiffuseBRDF{Float64}(pigment = 
-                                    UniformPigment(RGB(0., 1., 0.))
+                                DiffuseBRDF(pigment = 
+                                    UniformPigment(RGB(0f0, 1f0, 0f0))
                                 )
                               )
                              )
         end
-        world[end-2] = Plane(transformation = translation([0,0,-1]), material = Material(brdf = DiffuseBRDF{Float64}(pigment = CheckeredPigment{4, RGB{Float64}}())))
-        world[end-1:end] = [Sphere(transformation = translation([0, 0, -0.5]) * scaling(1/10),
+        world[end-2] = Plane(transformation = translation([0f0, 0f0, -1f0]), material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}())))
+        world[end-1:end] = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10),
                                    material = Material(brdf = 
-                                        DiffuseBRDF{Float64}(pigment = 
-                                            CheckeredPigment{4}(color_on  = RGB(1., 0., 0.), 
-                                                                color_off = RGB(0., 1., 0.)
+                                        DiffuseBRDF(pigment = 
+                                            CheckeredPigment{4}(color_on  = RGB(1f0, 0f0, 0f0), 
+                                                                color_off = RGB(0f0, 1f0, 0f0)
                                                                )
                                         )
                                    )
                                   ), 
-                            Sphere(transformation = translation([0, 0.5, 0]) * scaling(1/10),
+                            Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10),
                                    material = Material(brdf = 
-                                        DiffuseBRDF{Float64}(pigment = 
-                                            ImagePigment(HdrImage([RGB(1., 0., 0.) RGB(0., 1., 0.) RGB(0., 0., 1.) RGB(1., 0., 1.)]))
+                                        DiffuseBRDF(pigment = 
+                                            ImagePigment(HdrImage([RGB(1f0, 0f0, 0f0) RGB(0f0, 1f0, 0f0) RGB(0f0, 0f0, 1f0) RGB(1f0, 0f0, 1f0)]))
                                         )
                                    )
                                   )] 
-        renderer = renderer_type(world, zero(RGB{Float64}))
+        renderer = renderer_type(world, BLACK)
     else
         # TODO throw error
     end
@@ -112,7 +108,7 @@ function demo(output_file::AbstractString,
     rendering!(image_tracer, renderer, disable_output=disable_output)
     print(io, "Saving pfm image...")
     input_file = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
-    save(input_file, permutedims(image_tracer.image.pixel_matrix) |> Matrix{RGB{Float32}})
+    save(input_file, permutedims(image_tracer.image.pixel_matrix))
     println(io, " done!")
     tonemapping(input_file, output_file, alpha, gamma, disable_output=disable_output)
 end
