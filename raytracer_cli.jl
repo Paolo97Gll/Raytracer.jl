@@ -16,9 +16,9 @@ Pkg.activate(normpath(@__DIR__))
 
 using Raytracer
 
-using ArgParse, ProgressMeter
-using ImageIO, ImageMagick, ImagePFM
-using FileIO: File, @format_str, query
+using ArgParse, ImageIO, ImageMagick, ImagePFM, ProgressMeter
+using FileIO:
+    File, @format_str, query
 
 
 #####################################################
@@ -54,12 +54,12 @@ function parse_commandline()
     @add_arg_table! s["tonemapping"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
-            arg_type = Float64
-            default = 0.5
+            arg_type = Float32
+            default = 0.5f0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
-            arg_type = Float64
-            default = 1.
+            arg_type = Float32
+            default = 1f0
     end
     add_arg_group!(s["tonemapping"], "files");
     @add_arg_table! s["tonemapping"] begin
@@ -102,8 +102,8 @@ function parse_commandline()
             range_tester = input -> (length(split(input, ",")) == 3)
         "--screen_distance", "-d"
             help = "only for 'perspective' camera: distance between camera and screen"
-            arg_type = Float64
-            default = 2.
+            arg_type = Float32
+            default = 2f0
     end
     add_arg_group!(s["demo"]["image"], "rendering");
     @add_arg_table! s["demo"]["image"] begin
@@ -121,12 +121,12 @@ function parse_commandline()
     @add_arg_table! s["demo"]["image"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
-            arg_type = Float64
-            default = 1.
+            arg_type = Float32
+            default = 1f0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
-            arg_type = Float64
-            default = 1.
+            arg_type = Float32
+            default = 1f0
     end
     add_arg_group!(s["demo"]["image"], "files");
     @add_arg_table! s["demo"]["image"] begin
@@ -158,8 +158,8 @@ function parse_commandline()
             range_tester = input -> (length(split(input, ",")) == 3)
         "--screen_distance", "-d"
             help = "only for 'perspective' camera: distance between camera and screen"
-            arg_type = Float64
-            default = 2.
+            arg_type = Float32
+            default = 2f0
     end
     add_arg_group!(s["demo"]["animation"], "frame rendering");
     @add_arg_table! s["demo"]["animation"] begin
@@ -177,22 +177,22 @@ function parse_commandline()
     @add_arg_table! s["demo"]["animation"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
-            arg_type = Float64
-            default = 1.
+            arg_type = Float32
+            default = 1f0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
-            arg_type = Float64
-            default = 1.
+            arg_type = Float32
+            default = 1f0
     end
     add_arg_group!(s["demo"]["animation"], "animation parameter");
     @add_arg_table! s["demo"]["animation"] begin
         "--delta_theta", "-D"
             help = "Δθ in camera orientation (around z axis) between each frame; the number of frames generated is [360/Δθ]"
-            arg_type = Int64
+            arg_type = Int
             default = 10
         "--fps", "-f"
             help = "FPS (frame-per-second) of the output video"
-            arg_type = Int64
+            arg_type = Int
             default = 15
     end
     add_arg_group!(s["demo"]["animation"], "files");
@@ -232,10 +232,10 @@ function demoimage(options::Dict{String, Any})
     options["output_file"] = normpath(options["output_file"])
     Raytracer.demo(
         options["output_file"],
-        Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+        Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         options["camera_type"],
-        Tuple(parse.(Float64, split(options["camera_position"], ","))),
-        Tuple(parse.(Float64, split(options["camera_orientation"], ","))),
+        Tuple(parse.(Float32, split(options["camera_position"], ","))),
+        Tuple(parse.(Float32, split(options["camera_orientation"], ","))),
         options["screen_distance"],
         Symbol(options["renderer"], "Renderer") |> eval,
         options["alpha"],
@@ -248,10 +248,10 @@ function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{Strin
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
     Raytracer.demo(
         filename * ".jpg",
-        Tuple(parse.(Int64, split(options["image_resolution"], ":"))),
+        Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         options["camera_type"],
-        Tuple(parse.(Float64, split(options["camera_position"], ","))),
-        (0, 0, θ),
+        Tuple(parse.(Float32, split(options["camera_position"], ","))),
+        (0f0, 0f0, θ),
         options["screen_distance"],
         Symbol(options["renderer"], "Renderer") |> eval,
         options["alpha"],
@@ -289,7 +289,7 @@ function demoanimation(options::Dict{String, Any})
     mkdir(demodir)
     println(" done!")
 
-    θ_list = (0:options["delta_theta"]:360)[begin:end-1]
+    θ_list = (0f0:options["delta_theta"]:360f0)[begin:end-1]
     println("Generating $(length(θ_list)) frames...")
     cd(demodir)
     p = Progress(length(θ_list), dt=5)
@@ -299,8 +299,13 @@ function demoanimation(options::Dict{String, Any})
     end
     
     print("Generating animation...")
+    if Sys.iswindows()
+        file_pattern = ["-i", "demo_%0$(trunc(Int, log10(length(θ_list)))+1)d.jpg"]
+    else
+        file_pattern = ["-pattern_type", "glob", "-i", "\"$(options["output_file"])_*.jpg\""]
+    end
     run(pipeline(
-        `ffmpeg -y -framerate $(options["fps"]) -pattern_type glob -i "$(options["output_file"])_*.jpg" -c:v libx264 -preset slow -tune animation -vf format=yuv420p -movflags +faststart $(options["output_file"]).mp4`,
+        `ffmpeg -y -framerate $(options["fps"]) $(file_pattern) -c:v libx264 -preset slow -tune animation -vf format=yuv420p -movflags +faststart $(options["output_file"]).mp4`,
         stdout=devnull,
         stderr=devnull
     ))
