@@ -65,7 +65,7 @@ end
 # Documentation
 
 
-# DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
-# @testset "Docs" begin
-#     doctest(Raytracer, manual=false)
-# end
+DocMeta.setdocmeta!(Raytracer, :DocTestSetup, :(using Raytracer); recursive=true)
+@testset "Docs" begin
+    doctest(Raytracer, manual=false)
+end

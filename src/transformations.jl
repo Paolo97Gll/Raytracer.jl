@@ -7,7 +7,7 @@
 
 
 """
-    Transformation{T}
+    Transformation
 
 A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
 
@@ -15,24 +15,24 @@ A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D sp
 significantly increases performance at the cost of memory space.
 
 Members:
-- `m` ([`AbstractMatrix{T}`](@ref)): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
-- `invm` ([`AbstractMatrix`](@ref)): the homogeneous matrix representation of the inverse transformation. 
+- `m` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
+- `invm` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the inverse transformation. 
   Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
 
 # Examples
 ```jldoctest
-julia> Transformation{Float64}()
-4x4 Transformation{Float64}:
-Matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅    ⋅ 
-  ⋅   1.0   ⋅    ⋅ 
-  ⋅    ⋅   1.0   ⋅ 
-  ⋅    ⋅    ⋅   1.0
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅    ⋅ 
-  ⋅   1.0   ⋅    ⋅ 
-  ⋅    ⋅   1.0   ⋅ 
-  ⋅    ⋅    ⋅   1.0
+julia> Transformation()
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  1.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  1.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  1.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  1.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
 ```
 """
 struct Transformation
@@ -49,52 +49,52 @@ end
     Transformation(m)
     Transformation(m, invm)
 
-Construct a `Transformation{T}` instance where `T = eltype(m)`
+Construct a `Transformation` instance from `m` and `invm`. The elements of the matrix will be casted to `Float32`.
 
-If any argument is a [`Matrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
+If any argument is an [`AbstractMatrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
 
 # Examples
 ```jldoctest; setup = :(import StaticArrays)
 julia> Transformation(StaticArrays.SMatrix{4,4}([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1]))
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  2  0  0
- 0  0  4  0
- 0  0  0  1
-Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
- 1.0  0.0  0.0   0.0
- 0.0  0.5  0.0   0.0
- 0.0  0.0  0.25  0.0
- 0.0  0.0  0.0   1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  4.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0   0.0f0
+ 0.0f0  0.5f0  0.0f0   0.0f0
+ 0.0f0  0.0f0  0.25f0  0.0f0
+ 0.0f0  0.0f0  0.0f0   1.0f0
 
 julia> Transformation([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1])
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.SMatrix{4, 4, Int64, 16}:
- 1  0  0  0
- 0  2  0  0
- 0  0  4  0
- 0  0  0  1
-Inverse matrix of type StaticArrays.SMatrix{4, 4, Float64, 16}:
- 1.0  0.0  0.0   0.0
- 0.0  0.5  0.0   0.0
- 0.0  0.0  0.25  0.0
- 0.0  0.0  0.0   1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  4.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0   0.0f0
+ 0.0f0  0.5f0  0.0f0   0.0f0
+ 0.0f0  0.0f0  0.25f0  0.0f0
+ 0.0f0  0.0f0  0.0f0   1.0f0
 ```
 
 ```jldoctest; setup = :(import LinearAlgebra)
 julia> Transformation(LinearAlgebra.Diagonal([1,2,4,1]))
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  4  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅     ⋅ 
-  ⋅   0.5   ⋅     ⋅ 
-  ⋅    ⋅   0.25   ⋅ 
-  ⋅    ⋅    ⋅    1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  4.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0   0.0f0
+ 0.0f0  0.5f0  0.0f0   0.0f0
+ 0.0f0  0.0f0  0.25f0  0.0f0
+ 0.0f0  0.0f0  0.0f0   1.0f0
 ```
 """
 Transformation(m::AbstractMatrix) = Transformation(SMatrix{4, 4, Float32}(m))
@@ -147,35 +147,34 @@ end
 Return the inverse [`Transformation`](@ref).
 
 Returns a `Transformation` which has the `m` and `invm` fields swapped. 
-Note that the returned `Transformation` may have a different eltype with respect of the given one.
 
 #Examples
 ```jldoctest; setup = :(using LinearAlgebra: Diagonal) 
 julia> t = Transformation(Diagonal([1, 2, 3, 1]))
-4x4 Transformation{Int64}:
-Matrix of type Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  3.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0         0.0f0
+ 0.0f0  0.5f0  0.0f0         0.0f0
+ 0.0f0  0.0f0  0.33333334f0  0.0f0
+ 0.0f0  0.0f0  0.0f0         1.0f0
 
 julia> inv(t)
-4x4 Transformation{Float64}:
-Matrix of type Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
-Inverse matrix of type Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0         0.0f0
+ 0.0f0  0.5f0  0.0f0         0.0f0
+ 0.0f0  0.0f0  0.33333334f0  0.0f0
+ 0.0f0  0.0f0  0.0f0         1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  3.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
  ```
 """
 inv(t::Transformation) = Transformation(t.invm, t.m)
@@ -245,32 +244,32 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 #Examples
 ```jldoctest
 julia> translation(1, 2, 3)
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  1
- 0  1  0  2
- 0  0  1  3
- 0  0  0  1
-Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  -1
- 0  1  0  -2
- 0  0  1  -3
- 0  0  0   1
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  1.0f0
+ 0.0f0  1.0f0  0.0f0  2.0f0
+ 0.0f0  0.0f0  1.0f0  3.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  -1.0f0
+ 0.0f0  1.0f0  0.0f0  -2.0f0
+ 0.0f0  0.0f0  1.0f0  -3.0f0
+ 0.0f0  0.0f0  0.0f0   1.0f0
 ```
 
 ```jldoctest
 julia> translation([1, 2, 3])
-4x4 Transformation{Int64}:
-Matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  1
- 0  1  0  2
- 0  0  1  3
- 0  0  0  1
-Inverse matrix of type StaticArrays.MMatrix{4, 4, Int64, 16}:
- 1  0  0  -1
- 0  1  0  -2
- 0  0  1  -3
- 0  0  0   1
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  1.0f0
+ 0.0f0  1.0f0  0.0f0  2.0f0
+ 0.0f0  0.0f0  1.0f0  3.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  -1.0f0
+ 0.0f0  1.0f0  0.0f0  -2.0f0
+ 0.0f0  0.0f0  1.0f0  -3.0f0
+ 0.0f0  0.0f0  0.0f0   1.0f0
 ```
 """
 function translation(v::AbstractVector)
@@ -303,47 +302,47 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 #Examples
 ```jldoctest
 julia> scaling(1, 2, 3)
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  3.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0         0.0f0
+ 0.0f0  0.5f0  0.0f0         0.0f0
+ 0.0f0  0.0f0  0.33333334f0  0.0f0
+ 0.0f0  0.0f0  0.0f0         1.0f0
 ```
 
 ```jldoctest
 julia> scaling(2)
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 2  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  2  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 0.5   ⋅    ⋅    ⋅ 
-  ⋅   0.5   ⋅    ⋅ 
-  ⋅    ⋅   0.5   ⋅ 
-  ⋅    ⋅    ⋅   1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 2.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  2.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 0.5f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  0.5f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  0.5f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
 ```
 
 ```jldoctest
 julia> scaling([1, 2, 3])
-4x4 Transformation{Int64}:
-Matrix of type LinearAlgebra.Diagonal{Int64, Vector{Int64}}:
- 1  ⋅  ⋅  ⋅
- ⋅  2  ⋅  ⋅
- ⋅  ⋅  3  ⋅
- ⋅  ⋅  ⋅  1
-Inverse matrix of type LinearAlgebra.Diagonal{Float64, Vector{Float64}}:
- 1.0   ⋅    ⋅                   ⋅ 
-  ⋅   0.5   ⋅                   ⋅ 
-  ⋅    ⋅   0.3333333333333333   ⋅ 
-  ⋅    ⋅    ⋅                  1.0
+4x4 Transformation:
+Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0  0.0f0
+ 0.0f0  2.0f0  0.0f0  0.0f0
+ 0.0f0  0.0f0  3.0f0  0.0f0
+ 0.0f0  0.0f0  0.0f0  1.0f0
+Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
+ 1.0f0  0.0f0  0.0f0         0.0f0
+ 0.0f0  0.5f0  0.0f0         0.0f0
+ 0.0f0  0.0f0  0.33333334f0  0.0f0
+ 0.0f0  0.0f0  0.0f0         1.0f0
 ```
 """
 function scaling(x::Real, y::Real, z::Real)

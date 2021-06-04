@@ -105,12 +105,12 @@ If an `AbstractVector` is provided as argument it must have a size = (3,)
 
 ```jldoctest
 julia> Point(1, 2, 3)
-Point with eltype Int64
-x = 1, y = 2, z = 3
+Point with eltype Float32
+x = 1.0, y = 2.0, z = 3.0
 
 julia> Point([1, 2, 3])
-Point with eltype Int64
-x = 1, y = 2, z = 3
+Point with eltype Float32
+x = 1.0, y = 2.0, z = 3.0
 ```
 """
 Point(x, y, z) = Point(SVector(convert(Float32, x), convert(Float32, y), convert(Float32, z)))
