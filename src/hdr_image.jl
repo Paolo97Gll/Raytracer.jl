@@ -101,9 +101,9 @@ function normalize_image(image::HdrImage, α::Float32; luminosity::Float32 = ave
     HdrImage([α / luminosity * pix for pix ∈ image], size(image))
 end
 
-clamp_image(image::HdrImage) = clamp.(image)
+clamp_image(image::HdrImage) = HdrImage(clamp.(image))
 
-γ_correction(image::HdrImage, γ::Float32) = γ_correction.(image, γ)
+γ_correction(image::HdrImage, γ::Float32) = HdrImage(γ_correction.(image, γ))
 
 
 ################
