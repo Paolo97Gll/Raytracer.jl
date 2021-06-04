@@ -15,7 +15,8 @@ An abstract type representing an observer.
 abstract type Camera end
 
 
-#####################################################################
+###################
+# OrthogonalCamera
 
 
 """
@@ -59,7 +60,8 @@ function fire_ray(camera::OrthogonalCamera, u::Float32, v::Float32)
 end
 
 
-#####################################################################
+####################
+# PerspectiveCamera
 
 
 """
@@ -104,9 +106,6 @@ function fire_ray(camera::PerspectiveCamera, u::Float32, v::Float32)
                                 Vec(camera.screen_distance, (1f0 - 2u) * camera.aspect_ratio, 2v - 1f0),
                                 tmin = 1f0)
 end
-
-################
-# Miscellaneous
 
 """
     aperture_deg(camera)

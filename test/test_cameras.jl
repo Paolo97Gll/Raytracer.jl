@@ -14,9 +14,9 @@
     ray4 = fire_ray(cam, 1f0, 1f0)
 
     # Verify that the rays are parallel by verifying that cross-products vanish
-    @test (ray1.dir × ray2.dir |> norm²) ≈ 0f0 
-    @test (ray1.dir × ray3.dir |> norm²) ≈ 0f0 
-    @test (ray1.dir × ray4.dir |> norm²) ≈ 0f0 
+    @test (ray1.dir × ray2.dir |> norm²) ≈ 0f0
+    @test (ray1.dir × ray3.dir |> norm²) ≈ 0f0
+    @test (ray1.dir × ray4.dir |> norm²) ≈ 0f0
 
     # Verify that the ray hitting the corners have the right coordinates
     @test ray1(1f0) ≈ Point(0f0, 2f0, -1f0)

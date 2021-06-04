@@ -105,7 +105,6 @@ Transformation(m::AbstractMatrix, invm::AbstractMatrix) = Transformation(SMatrix
 # Miscellaneous
 
 
-
 function show(io::IO, ::MIME"text/plain", t::Transformation)
     println(io, "4x4 $(typeof(t)):")
     println(io, "Matrix of type ", typeof(t.m), ":")
