@@ -18,7 +18,8 @@ using FileIO:
     File, @format_str, query
 
 
-#####################################################
+###########
+# ArgParse
 
 
 function parse_commandline_error_handler(settings::ArgParseSettings, err, err_code::Int = 1)
@@ -36,7 +37,11 @@ function parse_commandline()
     s = ArgParseSettings()
     s.description = "Raytracing for the generation of photorealistic images in Julia."
     s.exc_handler = parse_commandline_error_handler
-    s.version = @project_version
+    s.version = "Raytracer.jl version: $(@project_version)"
+    s.add_version = true
+
+    # main
+
     @add_arg_table! s begin
         "tonemapping"
             action = :command
@@ -45,6 +50,8 @@ function parse_commandline()
             action = :command
             help = "show a demo of Raytracer.jl"
     end
+
+    # tonemapping
 
     s["tonemapping"].description = "Apply tone mapping to a pfm image and save it to file."
     add_arg_group!(s["tonemapping"], "tonemapping settings");
@@ -69,6 +76,8 @@ function parse_commandline()
             required = true
     end
 
+    # demo
+
     s["demo"].description = "Show a demo of Raytracer.jl."
     @add_arg_table! s["demo"] begin
         "image"
@@ -78,6 +87,8 @@ function parse_commandline()
             action = :command
             help = "create a demo animation of Raytracer.jl (require ffmpeg)"
     end
+
+    # demo image
 
     s["demo"]["image"].description = "Render a demo image of Raytracer.jl."
     add_arg_group!(s["demo"]["image"], "generation");
@@ -132,6 +143,8 @@ function parse_commandline()
             arg_type = String
             default = "demo.jpg"
     end
+
+    # demo animation
 
     s["demo"]["animation"].description =
         "Create a demo animation of Raytracer.jl, by generating n images with different camera " *
@@ -208,7 +221,8 @@ function parse_commandline()
 end
 
 
-#####################################################
+####################
+# Utility functions
 
 
 function tonemapping(options::Dict{String, Any})
@@ -312,7 +326,8 @@ function demoanimation(options::Dict{String, Any})
 end
 
 
-#####################################################
+#######
+# main
 
 
 function main()
