@@ -34,7 +34,7 @@
         color1 = RGB(1f0, 2f0, 3f0)
         color2 = RGB(10f0, 20f0, 30f0)
 
-        pigment = CheckeredPigment{2}(color1, color2)
+        pigment = CheckeredPigment{2}(color_on=color1, color_off=color2)
 
         # With num_of_steps == 2, the pattern should be the following:
         #
