@@ -239,7 +239,8 @@ end
 
 
 function demoimage(options::Dict{String, Any})
-    printstyled("Raytracer.jl demo image\n", bold=true)
+    printstyled("Raytracer.jl demo image\n\n", bold=true)
+    println("Number of threads: $(Threads.nthreads())")
     options["output_file"] = normpath(options["output_file"])
     Raytracer.demo(
         options["output_file"],
@@ -267,6 +268,7 @@ function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{Strin
         Symbol(options["renderer"], "Renderer") |> eval,
         options["alpha"],
         options["gamma"],
+        use_threads = false,
         disable_output = true
     )
     rm(filename * ".pfm")
@@ -303,7 +305,7 @@ function demoanimation(options::Dict{String, Any})
     θ_list = (0f0:options["delta_theta"]:360f0)[begin:end-1]
     println("Generating $(length(θ_list)) frames...")
     cd(demodir)
-    p = Progress(length(θ_list), dt=5)
+    p = Progress(length(θ_list), dt=2, color=:white)
     Threads.@threads for elem in collect(enumerate(θ_list))
         demoanimationloop(elem, length(θ_list), options)
         next!(p)

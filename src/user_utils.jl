@@ -45,10 +45,10 @@ function load_tracer(image_resolution::Tuple{Int, Int},
     ImageTracer(image, camera)
 end
 
-function rendering!(image_tracer::ImageTracer, renderer::Renderer; disable_output::Bool = false)
+function rendering!(image_tracer::ImageTracer, renderer::Renderer; use_threads::Bool = true, disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     println(io, "Rendering image...")
-    fire_all_rays!(image_tracer, renderer, enable_progress_bar=!disable_output)
+    fire_all_rays!(image_tracer, renderer, use_threads=use_threads, enable_progress_bar=!disable_output)
 end
 
 function demo(output_file::String,
@@ -60,6 +60,7 @@ function demo(output_file::String,
               renderer_type::Type{<:Renderer},
               alpha::Float32,
               gamma::Float32;
+              use_threads::Bool = true,
               disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     println(io, "\n-> RENDERING")
@@ -105,7 +106,7 @@ function demo(output_file::String,
     end
     println(io, " done!")
     image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance, disable_output=disable_output)
-    rendering!(image_tracer, renderer, disable_output=disable_output)
+    rendering!(image_tracer, renderer, use_threads=use_threads, disable_output=disable_output)
     print(io, "Saving pfm image...")
     input_file = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
     save(input_file, permutedims(image_tracer.image.pixel_matrix))
