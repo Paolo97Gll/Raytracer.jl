@@ -239,7 +239,8 @@ end
 
 
 function demoimage(options::Dict{String, Any})
-    printstyled("Raytracer.jl demo image\n", bold=true)
+    printstyled("Raytracer.jl demo image\n\n", bold=true)
+    println("Number of threads: $(Threads.nthreads())")
     options["output_file"] = normpath(options["output_file"])
     Raytracer.demo(
         options["output_file"],
@@ -267,6 +268,7 @@ function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{Strin
         Symbol(options["renderer"], "Renderer") |> eval,
         options["alpha"],
         options["gamma"],
+        use_threads = false,
         disable_output = true
     )
     rm(filename * ".pfm")
