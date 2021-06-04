@@ -2,6 +2,10 @@
 
 ## HEAD
 
+### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
+
+- Removed type parameters from most structs. All floating points calculations are now performed on `Float32`. This provides a significant speedup. All code specifying type parameters will be broken from now on ([#23](https://github.com/Paolo97Gll/Raytracer.jl/pull/23)).
+
 ### New package features
 
 - Add `PathTracer` renderer ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
