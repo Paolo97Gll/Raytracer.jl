@@ -1,4 +1,5 @@
 .vscode/
+*.ipynb
 
 # PFM
 *.pfm
