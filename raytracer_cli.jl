@@ -198,7 +198,7 @@ function parse_commandline()
     @add_arg_table! s["demo"]["animation"] begin
         "--delta_theta", "-D"
             help = "Δθ in camera orientation (around z axis) between each frame; the number of frames generated is [360/Δθ]"
-            arg_type = Int
+            arg_type = Float32
             default = 10
         "--fps", "-f"
             help = "FPS (frame-per-second) of the output video"
