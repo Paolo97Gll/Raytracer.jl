@@ -300,11 +300,11 @@ function demoanimation(options::Dict{String, Any})
     print("Creating directory ./$(options["output_dir"])...")
     rm(demodir, force=true, recursive=true)
     mkdir(demodir)
+    cd(demodir)
     println(" done!")
 
     θ_list = (0f0:options["delta_theta"]:360f0)[begin:end-1]
     println("Generating $(length(θ_list)) frames...")
-    cd(demodir)
     p = Progress(length(θ_list), dt=2, color=:white)
     Threads.@threads for elem in collect(enumerate(θ_list))
         demoanimationloop(elem, length(θ_list), options)
