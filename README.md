@@ -90,7 +90,7 @@ raytracer_cli.jl
 <details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl [-h] {tonemapping|demo}
+usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo}
 
 Raytracing for the generation of photorealistic images in Julia.
 
@@ -99,6 +99,7 @@ commands:
   demo         show a demo of Raytracer.jl
 
 optional arguments:
+  --version    show version information and exit
   -h, --help   show this help message and exit
 ```
 
@@ -111,19 +112,20 @@ We support as output image type all the formats supported by the packages [Image
 <details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [-h]
-                        input_file output_file
+usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [--version]
+                        [-h] input_file output_file
 
 Apply tone mapping to a pfm image and save it to file.
 
 optional arguments:
+  --version          show version information and exit
   -h, --help         show this help message and exit
 
 tonemapping settings:
   -a, --alpha ALPHA  scaling factor for the normalization process
-                     (type: Float64, default: 0.5)
+                     (type: Float32, default: 0.5)
   -g, --gamma GAMMA  gamma value for the tone mapping process (type:
-                     Float64, default: 1.0)
+                     Float32, default: 1.0)
 
 files:
   input_file         path to input file, it must be a PFM file
@@ -137,7 +139,7 @@ files:
 <details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl demo [-h] {image|animation}
+usage: raytracer_cli.jl demo [--version] [-h] {image|animation}
 
 Show a demo of Raytracer.jl.
 
@@ -146,6 +148,7 @@ commands:
   animation   create a demo animation of Raytracer.jl (require ffmpeg)
 
 optional arguments:
+  --version   show version information and exit
   -h, --help  show this help message and exit
 ```
 
@@ -160,11 +163,12 @@ usage: raytracer_cli.jl demo image [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
                         [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
                         [-R RENDERER] [-a ALPHA] [-g GAMMA]
-                        [-O OUTPUT_FILE] [-h]
+                        [-O OUTPUT_FILE] [--version] [-h]
 
 Render a demo image of Raytracer.jl.
 
 optional arguments:
+  --version             show version information and exit
   -h, --help            show this help message and exit
 
 generation:
@@ -179,7 +183,7 @@ generation:
                         (default: "0,0,0")
   -d, --screen_distance SCREEN_DISTANCE
                         only for 'perspective' camera: distance
-                        between camera and screen (type: Float64,
+                        between camera and screen (type: Float32,
                         default: 2.0)
 
 rendering:
@@ -192,9 +196,9 @@ rendering:
 
 tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float64, default: 1.0)
+                        (type: Float32, default: 1.0)
   -g, --gamma GAMMA     gamma value for the tone mapping process
-                        (type: Float64, default: 1.0)
+                        (type: Float32, default: 1.0)
 
 files:
   -O, --output_file OUTPUT_FILE
@@ -210,17 +214,20 @@ files:
 <details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl demo animation [-t CAMERA_TYPE]
+usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-d SCREEN_DISTANCE]
                         [-r IMAGE_RESOLUTION] [-R RENDERER] [-a ALPHA]
                         [-g GAMMA] [-D DELTA_THETA] [-f FPS]
-                        [-F OUTPUT_DIR] [-O OUTPUT_FILE] [-h]
+                        [-F OUTPUT_DIR] [-O OUTPUT_FILE] [--version]
+                        [-h]
 
 Create a demo animation of Raytracer.jl, by generating n images with
 different camera orientation and merging them into an mp4 video.
 Require ffmpeg installed on local machine.
 
 optional arguments:
+  --force               force overwrite
+  --version             show version information and exit
   -h, --help            show this help message and exit
 
 frame generation:
@@ -232,7 +239,7 @@ frame generation:
                         (default: "-1,0,0")
   -d, --screen_distance SCREEN_DISTANCE
                         only for 'perspective' camera: distance
-                        between camera and screen (type: Float64,
+                        between camera and screen (type: Float32,
                         default: 2.0)
 
 frame rendering:
@@ -245,16 +252,16 @@ frame rendering:
 
 frame tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float64, default: 1.0)
+                        (type: Float32, default: 1.0)
   -g, --gamma GAMMA     gamma value for the tone mapping process
-                        (type: Float64, default: 1.0)
+                        (type: Float32, default: 1.0)
 
 animation parameter:
   -D, --delta_theta DELTA_THETA
                         Δθ in camera orientation (around z axis)
                         between each frame; the number of frames
-                        generated is [360/Δθ] (type: Int64, default:
-                        10)
+                        generated is [360/Δθ] (type: Float32, default:
+                        10.0)
   -f, --fps FPS         FPS (frame-per-second) of the output video
                         (type: Int64, default: 15)
 
