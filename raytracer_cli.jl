@@ -255,7 +255,7 @@ function demoimage(options::Dict{String, Any})
     )
 end
 
-function demoanimationloop(elem::Tuple, total_elem::Integer, options::Dict{String, Any})
+function demoanimationloop(elem::Tuple{Int, Float32}, total_elem::Int, options::Dict{String, Any})
     index, θ = elem
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
     Raytracer.demo(
