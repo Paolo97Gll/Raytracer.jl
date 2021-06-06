@@ -9,6 +9,7 @@
 mutable struct PCG <: AbstractRNG
     state::UInt64
     inc::UInt64
+    
     function PCG(state::UInt64 = UInt64(42), inc::UInt64 = UInt64(54))
         self = new(UInt64(0), (inc << UInt64(1)) | UInt64(1))
         rand(self)
