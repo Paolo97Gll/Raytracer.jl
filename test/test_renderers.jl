@@ -11,7 +11,7 @@
     camera = OrthogonalCamera()
     tracer = ImageTracer(image, camera)
     world = World([sphere])
-    renderer = OnOffRenderer(world=world)
+    renderer = OnOffRenderer(world)
     fire_all_rays!(tracer, renderer, enable_progress_bar=false)
     
     @test image[1, 1] |> iszero
@@ -36,7 +36,7 @@ end
     camera = OrthogonalCamera()
     tracer = ImageTracer(image, camera)
     world = World([sphere])
-    renderer = FlatRenderer(world=world)
+    renderer = FlatRenderer(world)
     fire_all_rays!(tracer, renderer)
 
     @test image[1, 1] |> iszero 
@@ -73,10 +73,10 @@ end
             push!(world, Sphere(material=enclosure_material))
     
             path_tracer = PathTracer(
-                rng=pcg, 
-                n=1, 
-                world=world, 
-                max_depth=100, 
+                world,
+                rng=pcg,
+                n=1,
+                max_depth=100,
                 roulette_depth=101,
             )
     
