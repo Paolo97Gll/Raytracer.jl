@@ -115,6 +115,11 @@ function parse_commandline()
     # demo image
 
     s["demo"]["image"].description = "Render a demo image of Raytracer.jl."
+    @add_arg_table! s["demo"]["image"] begin
+        "--force"
+            help = "force overwrite"
+            action = :store_true
+    end
     add_arg_group!(s["demo"]["image"], "generation");
     @add_arg_table! s["demo"]["image"] begin
         "--camera_type", "-t"
@@ -265,8 +270,18 @@ end
 function demoimage(options::Dict{String, Any})
     printstyled("Raytracer.jl demo image\n\n", bold=true)
     println("Renderer: $(options["renderer"])")
-    println("Number of threads: $(Threads.nthreads())")
+    println("Number of threads: $(Threads.nthreads())\n")
+
     options["output_file"] = normpath(options["output_file"])
+
+    if !options["force"] && isfile(options["output_file"])
+        print("Image ./$(options["output_file"]) existing: overwrite? [y|n] ")
+        if readline() != "y"
+            println("Aborting.")
+            exit(1)
+        end
+    end
+    
     Raytracer.demo(
         output_file = options["output_file"],
         image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
@@ -280,7 +295,7 @@ function demoimage(options::Dict{String, Any})
     )
 end
 
-function demoanimationloop(elem::Tuple{Int, Float32}, total_elem::Int, options::Dict{String, Any})
+function demoanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, options::Dict{String, Any})
     index, θ = elem
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
     Raytracer.demo(
@@ -333,7 +348,7 @@ function demoanimation(options::Dict{String, Any})
     println("Generating $(length(θ_list)) frames...")
     p = Progress(length(θ_list), dt=2, color=:white)
     Threads.@threads for elem in collect(enumerate(θ_list))
-        demoanimationloop(elem, length(θ_list), options)
+        demoanimation_loop(elem, length(θ_list), options)
         next!(p)
     end
     
