@@ -94,22 +94,22 @@ function parse_commandline()
     add_arg_group!(s["demo"]["image"], "generation");
     @add_arg_table! s["demo"]["image"] begin
         "--camera_type", "-t"
-            help = "choose camera type ('perspective' or 'orthogonal')"
+            help = "choose camera type (\"perspective\" or \"orthogonal\")"
             arg_type = String
             default = "perspective"
             range_tester = input -> (input ∈ ["perspective", "orthogonal"])
         "--camera_position", "-p"
-            help = "camera position in the scene as 'X,Y,Z'"
+            help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
             default = "-1,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--camera_orientation", "-o"
-            help = "camera orientation as 'angX,angY,angZ'"
+            help = "camera orientation as \"angX,angY,angZ\""
             arg_type = String
             default = "0,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--screen_distance", "-d"
-            help = "only for 'perspective' camera: distance between camera and screen"
+            help = "only for \"perspective\" camera: distance between camera and screen"
             arg_type = Float32
             default = 2f0
     end
@@ -120,17 +120,17 @@ function parse_commandline()
             arg_type = String
             default = "540:540"
         "--renderer", "-R"
-            help = "type of renderer to use (`OnOff` or `Flat`)"
+            help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
-            default = "OnOff"
-            range_tester = input -> (input ∈ ["OnOff", "Flat"])
+            default = "path"
+            range_tester = input -> (input ∈ ["onoff", "flat", "path"])
     end
     add_arg_group!(s["demo"]["image"], "tonemapping");
     @add_arg_table! s["demo"]["image"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
             arg_type = Float32
-            default = 1f0
+            default = 0.75f0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
             arg_type = Float32
@@ -139,7 +139,7 @@ function parse_commandline()
     add_arg_group!(s["demo"]["image"], "files");
     @add_arg_table! s["demo"]["image"] begin
         "--output_file", "-O"
-            help = "output LDR file name (the HDR file will have the same name, but with 'pfm' extension)"
+            help = "output LDR file name (the HDR file will have the same name, but with \"pfm\" extension)"
             arg_type = String
             default = "demo.jpg"
     end
@@ -157,17 +157,17 @@ function parse_commandline()
     add_arg_group!(s["demo"]["animation"], "frame generation");
     @add_arg_table! s["demo"]["animation"] begin
         "--camera_type", "-t"
-            help = "choose camera type ('perspective' or 'orthogonal')"
+            help = "choose camera type (\"perspective\" or \"orthogonal\")"
             arg_type = String
             default = "perspective"
             range_tester = input -> (input ∈ ["perspective", "orthogonal"])
         "--camera_position", "-p"
-            help = "camera position in the scene as 'X,Y,Z'"
+            help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
-            default = "-1,0,0"
+            default = "-2,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--screen_distance", "-d"
-            help = "only for 'perspective' camera: distance between camera and screen"
+            help = "only for \"perspective\" camera: distance between camera and screen"
             arg_type = Float32
             default = 2f0
     end
@@ -178,17 +178,17 @@ function parse_commandline()
             arg_type = String
             default = "540:540"
         "--renderer", "-R"
-            help = "type of renderer to use (`OnOff` or `Flat`)"
+            help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
-            default = "OnOff"
-            range_tester = input -> (input ∈ ["OnOff", "Flat"])
+            default = "path"
+            range_tester = input -> (input ∈ ["onoff", "flat", "path"])
     end
     add_arg_group!(s["demo"]["animation"], "frame tonemapping");
     @add_arg_table! s["demo"]["animation"] begin
         "--alpha", "-a"
             help = "scaling factor for the normalization process"
             arg_type = Float32
-            default = 1f0
+            default = 0.75f0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
             arg_type = Float32
@@ -249,7 +249,7 @@ function demoimage(options::Dict{String, Any})
         Tuple(parse.(Float32, split(options["camera_position"], ","))),
         Tuple(parse.(Float32, split(options["camera_orientation"], ","))),
         options["screen_distance"],
-        Symbol(options["renderer"], "Renderer") |> eval,
+        options["renderer"],
         options["alpha"],
         options["gamma"]
     )
@@ -265,7 +265,7 @@ function demoanimationloop(elem::Tuple{Int, Float32}, total_elem::Int, options::
         Tuple(parse.(Float32, split(options["camera_position"], ","))),
         (0f0, 0f0, θ),
         options["screen_distance"],
-        Symbol(options["renderer"], "Renderer") |> eval,
+        options["renderer"],
         options["alpha"],
         options["gamma"],
         use_threads = false,
