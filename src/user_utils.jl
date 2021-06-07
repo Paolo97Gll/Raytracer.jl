@@ -27,18 +27,18 @@ end
 #####################################################################
 
 
-function load_scene(renderer_type::String)
+function load_scene(renderer_type::Type{<:Renderer})
     world = World()
     coords_list = map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01))
-    if renderer_type == "onoff"
+    if renderer_type <: OnOffRenderer
         cube_vertices = [Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10)) for coords ∈ coords_list]
         other_spheres = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10)),
                          Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10))]
         append!(world, cube_vertices, other_spheres)
         return OnOffRenderer(world)
-    elseif renderer_type == "flat"
+    elseif renderer_type <: FlatRenderer
         cube_vertices = [Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10),
-                                material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(CYANO))))
+                                material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(CYAN))))
                          for coords ∈ coords_list]
         other_spheres = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10),
                                 material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}(color_on = RED, color_off = GREEN)))),
@@ -50,7 +50,7 @@ function load_scene(renderer_type::String)
                      material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(WHITE))))]
         append!(world, cube_vertices, other_spheres, ground, sky)
         return FlatRenderer(world)
-    elseif renderer_type == "path"
+    elseif renderer_type <: PathTracer
         ground = [Plane(transformation = translation([0f0, 0f0, -1f0]),
                         material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)),
                                                                reflectance = 0.5f0)))]
@@ -74,12 +74,12 @@ function load_scene(renderer_type::String)
         append!(world, ground, sky, other_spheres)
         return PathTracer(world, max_depth=5, n=1)
     else
-        # TODO throw error
+        error("`Renderer` subtype $renderer_type is not supported by this function.")
     end
 end
 
 function load_tracer(image_resolution::Tuple{Int, Int},
-                     camera_type::String,
+                     camera_type::Type{<:Camera},
                      camera_position::Tuple{Float32, Float32, Float32},
                      camera_orientation::Tuple{Float32, Float32, Float32},
                      screen_distance::Float32;
@@ -89,12 +89,12 @@ function load_tracer(image_resolution::Tuple{Int, Int},
     image = HdrImage(image_resolution...)
     angx, angy, angz = deg2rad.(camera_orientation)
     transformation = (rotationX(angx) * rotationY(angy) * rotationZ(angz)) * translation(camera_position...)
-    if camera_type == "perspective"
+    if camera_type <: PerspectiveCamera
         camera = PerspectiveCamera(//(image_resolution...), transformation, screen_distance)
-    elseif camera_type == "orthogonal"
+    elseif camera_type <: OrthogonalCamera
         camera = OrthogonalCamera(//(image_resolution...), transformation)
     else
-        # TODO throw error
+        error("`Camera` subtype $camera_type is not supported by this function.")
     end
     println(io, " done!")
     ImageTracer(image, camera)
@@ -108,11 +108,11 @@ end
 
 function demo(output_file::String,
               image_resolution::Tuple{Int, Int},
-              camera_type::String,
+              camera_type::Type{<:Camera},
               camera_position::Tuple{Float32, Float32, Float32},
               camera_orientation::Tuple{Float32, Float32, Float32},
               screen_distance::Float32,
-              renderer_type::String,
+              renderer_type::Type{<:Renderer},
               alpha::Float32,
               gamma::Float32;
               use_threads::Bool = true,
