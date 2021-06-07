@@ -3,8 +3,6 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Implementation of transformations (generics, translations, rotations, ...)
-# TODO write docstrings
-
 
 """
     Transformation
@@ -15,7 +13,7 @@ A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D sp
 significantly increases performance at the cost of memory space.
 
 Members:
-- `m` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the transformation. Default value is the identity matrix of type `T`.
+- `m` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the transformation. Default value is the identity matrix.
 - `invm` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the inverse transformation. 
   Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
 
@@ -216,7 +214,7 @@ let rotation_matrices = Dict(
         
         If an `AbstractVector` is provided as argument it must have a size = (3,)
         
-        #Examples
+        # Examples
         ```jldoctest
         julia> rotation$ax(π/4)
         $(replace(repr(MIME("text/plain"), mat), "Raytracer." => "" ))
@@ -241,7 +239,7 @@ Return a [`Transformation`](@ref) that translates a 3D vector field of the given
 
 If an `AbstractVector` is provided as argument it must have a size = (3,)
 
-#Examples
+# Examples
 ```jldoctest
 julia> translation(1, 2, 3)
 4x4 Transformation:
@@ -299,7 +297,7 @@ Return a [`Transformation`](@ref) that scales a 3D vector field of a given facto
 If a single `Real` is provided as argument then the scaling is considered uniform.
 If an `AbstractVector` is provided as argument it must have a size = (3,)
 
-#Examples
+# Examples
 ```jldoctest
 julia> scaling(1, 2, 3)
 4x4 Transformation:

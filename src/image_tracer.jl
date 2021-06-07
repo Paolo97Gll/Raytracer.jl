@@ -54,28 +54,28 @@ pass it to the function `func`, which must accept a `Ray` as its only parameter 
 instance containing the color to assign to that pixel in the image.
 """
 
-function fire_all_rays_loop(tracer::ImageTracer, ind::CartesianIndex{2}, func::Function)
+function fire_all_rays_loop(tracer::ImageTracer, ind::CartesianIndex{2}, renderer::Renderer)
     # TODO implement antialiasing: need to modify imagetracer since it need a pcg inside and other parameters
     ray = fire_ray(tracer, Tuple(ind)...)
-    tracer.image.pixel_matrix[ind] = func(ray)
+    tracer.image.pixel_matrix[ind] = renderer(ray)
 end
 
-function fire_all_rays!(tracer::ImageTracer, func::Function; use_threads::Bool = true, enable_progress_bar::Bool = true)
+function fire_all_rays!(tracer::ImageTracer, renderer::Renderer; use_threads::Bool = true, enable_progress_bar::Bool = true)
     indices = CartesianIndices(tracer.image.pixel_matrix)
     p = Progress(length(indices), color=:white, enabled=enable_progress_bar)
     # for ind ∈ indices
-    #     fire_all_rays_loop(tracer, ind, func)
+    #     fire_all_rays_loop(tracer, ind, renderer)
     #     next!(p)
     # end
     # FIXME find a more clean way to do this
     if use_threads
         Threads.@threads for ind ∈ indices
-            fire_all_rays_loop(tracer, ind, func)
+            fire_all_rays_loop(tracer, ind, renderer)
             next!(p)
         end
     else
         for ind ∈ indices
-            fire_all_rays_loop(tracer, ind, func)
+            fire_all_rays_loop(tracer, ind, renderer)
             next!(p)
         end
     end

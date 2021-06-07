@@ -17,6 +17,30 @@ using ArgParse, ImageIO, ImageMagick, ImagePFM, ProgressMeter
 using FileIO:
     File, @format_str, query
 
+###########
+# Parsers
+
+function parse_item(::Type{Camera}, x::AbstractString)
+    if x == "perspective"
+        return PerspectiveCamera
+    elseif x == "orthogonal"
+        return OrthogonalCamera
+    else
+        error("No parsing is available from string \"$x\" to any subtype of `Camera`.")
+    end
+end
+
+function parse_item(::Type{Renderer}, x::AbstractString)
+    if x == "onoff"
+        return OnOffRenderer
+    elseif x == "flat"
+        return FlatRenderer
+    elseif x == "path"
+        return PathTracer
+    else
+        error("No parsing is available from string \"$x\" to any subtype of `Renderer`.")
+    end
+end
 
 ###########
 # ArgParse
@@ -338,6 +362,11 @@ function main()
         parsed_subcommand = parsed_args["%COMMAND%"]
         parsed_command *= parsed_subcommand
         parsed_args = parsed_args[parsed_subcommand]
+    end
+
+    k = keys(parsed_args)
+    for (parsable, parse_type) ∈ ["camera_type" => Camera, "renderer" => Renderer]
+        parsable ∈ k && (parsed_args[parsable] = parse_item(parse_type, parsed_args[parsable]))
     end
 
     printstyled("\nraytracer_cli.jl : ", bold=true)

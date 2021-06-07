@@ -9,6 +9,13 @@ image = HdrImage(4, 2)
 camera = PerspectiveCamera(aspect_ratio=2f0)
 tracer = ImageTracer(image, camera)
 
+struct LambdaRenderer <: Renderer
+    f::Function
+end
+
+function (lr::LambdaRenderer)(ray::Ray)
+    lr.f(ray)
+end
 
 @testset "uv_sub_mapping" begin
     ray1 = fire_ray(tracer, 1, 1, u_pixel=2.5f0, v_pixel=1.5f0)
@@ -18,7 +25,7 @@ end
 
 
 @testset "image_coverage" begin
-    fire_all_rays!(tracer, ray -> RGB(1f0, 2f0, 3f0))
+    fire_all_rays!(tracer, LambdaRenderer(ray -> RGB(1f0, 2f0, 3f0)))
     rangerow, rangecol = axes(tracer.image)
     for row ∈ rangerow, col ∈ rangecol
         @test image[row, col] == RGB(1f0, 2f0, 3f0)
