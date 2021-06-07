@@ -72,7 +72,7 @@ function load_scene(renderer_type::String)
                          Sphere(transformation = translation([-4f0, 0f0, 2f0]) * scaling(0.6),
                                 material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.2f0, 0.6f0, 0.3f0)))))]
         append!(world, ground, sky, other_spheres)
-        return PathTracer(world, max_depth=5, n=1)
+        return PathTracer(world)
     else
         # TODO throw error
     end
