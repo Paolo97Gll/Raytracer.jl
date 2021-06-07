@@ -52,7 +52,7 @@ struct Normal{V} <: FieldVector{3, Float32}
     z::Float32
 end
 
-Normal(x, y, z) = Normal{false}(convert(Float32, x), convert(Float32, y), convert(Float32, z))
+Normal(x, y, z) = Normal{false}(map(x -> convert(Float32, x), (x,y,z)))
 
 similar_type(::Type{<:Normal}, ::Type{Float32}, s::Size{(3,)}) = Normal
 
@@ -113,7 +113,7 @@ Point with eltype Float32
 x = 1.0, y = 2.0, z = 3.0
 ```
 """
-Point(x, y, z) = Point(SVector(convert(Float32, x), convert(Float32, y), convert(Float32, z)))
+Point(x, y, z) = Point(SVector(map(x -> convert(Float32, x), (x,y,z))))
 
 ################
 # Miscellaneous
@@ -181,8 +181,9 @@ function create_onb_from_z(input_normal::Normal)
 
     e1 = Vec(1f0 + sign * normal.x * normal.x * a, sign * b, -sign * normal.x)
     e2 = Vec(b, sign + normal.y * normal.y * a, -normal.y)
+    e3 = convert(Vec, normal)
 
-    (e1, e2, convert(Vec, normal))
+    (e1, e2, e3)
 end
 
 
