@@ -207,7 +207,7 @@ function parse_commandline()
             help = "force overwrite"
             action = :store_true
     end
-    add_arg_group!(s["demo"]["animation"], "frame generation");
+    add_arg_group!(s["demo"]["animation"], "frame camera");
     @add_arg_table! s["demo"]["animation"] begin
         "--camera_type", "-t"
             help = "choose camera type (\"perspective\" or \"orthogonal\")"
