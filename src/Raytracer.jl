@@ -50,7 +50,7 @@ import LinearAlgebra:
 import Random:
     Random.CloseOpen01, Sampler, SamplerTrivial
 
-using ProgressMeter, Random
+using ProgressMeter, Random, Intervals
 
 
 ##########
