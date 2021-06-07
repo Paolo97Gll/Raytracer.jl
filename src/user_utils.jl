@@ -23,6 +23,61 @@ function tonemapping(input_file::String,
     println(io, " done!")
 end
 
+
+#####################################################################
+
+
+function load_scene(renderer_type::String)
+    world = World()
+    coords_list = map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01))
+    if renderer_type == "onoff"
+        cube_vertices = [Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10)) for coords ∈ coords_list]
+        other_spheres = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10)),
+                         Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10))]
+        append!(world, cube_vertices, other_spheres)
+        return OnOffRenderer(world)
+    elseif renderer_type == "flat"
+        cube_vertices = [Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10),
+                                material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(CYANO))))
+                         for coords ∈ coords_list]
+        other_spheres = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10),
+                                material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}(color_on = RED, color_off = GREEN)))),
+                         Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10),
+                                material = Material(brdf = DiffuseBRDF(pigment = ImagePigment(HdrImage([RED GREEN BLUE MAGENTA])))))]
+        ground = [Plane(transformation = translation([0f0, 0f0, -1f0]),
+                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}())))]
+        sky = [Plane(transformation = translation([0f0, 0f0, 10f0]),
+                     material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(WHITE))))]
+        append!(world, cube_vertices, other_spheres, ground, sky)
+        return FlatRenderer(world)
+    elseif renderer_type == "path"
+        ground = [Plane(transformation = translation([0f0, 0f0, -1f0]),
+                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)),
+                                                               reflectance = 0.5f0)))]
+        sky = [Plane(transformation = translation([0f0, 0f0, 100f0]),
+                     material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(BLACK)),
+                                         emitted_radiance = UniformPigment(RGB(1f0, 1f0, 1.2f0))))]
+        # other_spheres = [Sphere(transformation = translation([0.5f0, 0.7f0, 0.1f0]),
+        #                         material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(RGB(0.2f0, 0.7f0, 0.8f0))))),
+        #                  Sphere(transformation = translation([-0.2f0, -0.8f0, -0.8f0]) * scaling(0.5f0),
+        #                         material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.6f0, 0.2f0, 0.3f0)))))]
+        other_spheres = [Sphere(transformation = translation([0f0, 0f0, -0.8f0]),
+                                material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.55f0, 0.55f0, 0.55f0))))),
+                         Sphere(transformation = translation([4f0, 0f0, -0.2f0]) * scaling(0.8),
+                                material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.6f0, 0.2f0, 0.3f0))))),
+                         Sphere(transformation = translation([0f0, 4f0, 0f0]),
+                                material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(RGB(0.2f0, 0.7f0, 0.8f0))))),
+                         Sphere(transformation = translation([0f0, -5f0, 0.5f0]) * scaling(1.5),
+                                material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(07f0, 0.7f0, 0.1f0))))),
+                         Sphere(transformation = translation([-4f0, 0f0, 2f0]) * scaling(0.6),
+                                material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.2f0, 0.6f0, 0.3f0)))))]
+        append!(world, ground, sky, other_spheres)
+        return PathTracer(world)
+    else
+        # TODO throw error
+    end
+end
+
 function load_tracer(image_resolution::Tuple{Int, Int},
                      camera_type::String,
                      camera_position::Tuple{Float32, Float32, Float32},
@@ -57,7 +112,7 @@ function demo(output_file::String,
               camera_position::Tuple{Float32, Float32, Float32},
               camera_orientation::Tuple{Float32, Float32, Float32},
               screen_distance::Float32,
-              renderer_type::Type{<:Renderer},
+              renderer_type::String,
               alpha::Float32,
               gamma::Float32;
               use_threads::Bool = true,
@@ -65,45 +120,7 @@ function demo(output_file::String,
     io = disable_output ? devnull : stdout
     println(io, "\n-> RENDERING")
     print(io, "Loading scene...")
-    if renderer_type <: OnOffRenderer
-        world = World(undef, 10)
-        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-            world[i] = Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10))
-        end
-        world[end-1:end] = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10)), Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10))]
-        renderer = renderer_type(world, WHITE, BLACK)
-    elseif renderer_type <: FlatRenderer
-        world = World(undef, 11)
-        for (i, coords) ∈ enumerate(map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01)))
-            world[i] = Sphere(transformation = translation(coords * 0.5f0) * scaling(1f0/10), 
-                              material = Material(brdf = 
-                                DiffuseBRDF(pigment = 
-                                    UniformPigment(RGB(0f0, 1f0, 0f0))
-                                )
-                              )
-                             )
-        end
-        world[end-2] = Plane(transformation = translation([0f0, 0f0, -1f0]), material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{4}())))
-        world[end-1:end] = [Sphere(transformation = translation([0f0, 0f0, -0.5f0]) * scaling(1f0/10),
-                                   material = Material(brdf = 
-                                        DiffuseBRDF(pigment = 
-                                            CheckeredPigment{4}(color_on  = RGB(1f0, 0f0, 0f0), 
-                                                                color_off = RGB(0f0, 1f0, 0f0)
-                                                               )
-                                        )
-                                   )
-                                  ), 
-                            Sphere(transformation = translation([0f0, 0.5f0, 0f0]) * scaling(1f0/10),
-                                   material = Material(brdf = 
-                                        DiffuseBRDF(pigment = 
-                                            ImagePigment(HdrImage([RGB(1f0, 0f0, 0f0) RGB(0f0, 1f0, 0f0) RGB(0f0, 0f0, 1f0) RGB(1f0, 0f0, 1f0)]))
-                                        )
-                                   )
-                                  )] 
-        renderer = renderer_type(world, BLACK)
-    else
-        # TODO throw error
-    end
+    renderer = load_scene(renderer_type)
     println(io, " done!")
     image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance, disable_output=disable_output)
     rendering!(image_tracer, renderer, use_threads=use_threads, disable_output=disable_output)
