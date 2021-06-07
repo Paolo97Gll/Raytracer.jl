@@ -243,8 +243,8 @@ function parse_commandline()
             default = 0
             range_tester = x -> isqrt(x)^2 == x
     end
-    add_arg_group!(s["demo"]["image"], "path-tracer options (only for \"path\" renderer)");
-    @add_arg_table! s["demo"]["image"] begin
+    add_arg_group!(s["demo"]["animation"], "path-tracer options (only for \"path\" renderer)");
+    @add_arg_table! s["demo"]["animation"] begin
         "--pt_n"
             help = "number of rays fired for mc integration"
             arg_type = Int
