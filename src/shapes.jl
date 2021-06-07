@@ -81,12 +81,13 @@ Base.@kwdef struct Sphere <: Shape
     material::Material = Material()
 end
 
-"""
+@doc """
     ray_intersection(ray, s)
 
 Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
 if none exists, return `nothing`.
-"""
+""" ray_intersection
+
 function ray_intersection(ray::Ray, s::Sphere)
     inv_ray = inv(s.transformation) * ray
     # compute intersection
@@ -182,7 +183,7 @@ end
 """
     ray_intersection(ray, aabb)
 
-Return the parameter `t` at which `ray` first hits the bounding box. If no hit exists, return `typemax(eltype(ray))`.
+Return the parameter `t` at which `ray` first hits the bounding box. If no hit exists, return `Inf32`.
 """
 function ray_intersection(ray::Ray, aabb::AABB)
     dir = ray.dir
