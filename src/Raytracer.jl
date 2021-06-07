@@ -121,11 +121,11 @@ include("geometry.jl")
 include("transformations.jl")
 include("ray.jl")
 include("cameras.jl")
-include("image_tracer.jl")
 include("materials.jl")
 include("shapes.jl")
 include("world.jl")
 include("renderers.jl")
+include("image_tracer.jl")
 
 include("user_utils.jl")
 
