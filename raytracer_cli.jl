@@ -17,42 +17,37 @@ using ArgParse, ImageIO, ImageMagick, ImagePFM, ProgressMeter
 using FileIO:
     File, @format_str, query
 
-###########
-# Parsers
-
-function parse_item(::Type{Camera}, x::AbstractString)
-    if x == "perspective"
-        return PerspectiveCamera
-    elseif x == "orthogonal"
-        return OrthogonalCamera
-    else
-        error("No parsing is available from string \"$x\" to any subtype of `Camera`.")
-    end
-end
-
-function parse_item(::Type{Renderer}, x::AbstractString)
-    if x == "onoff"
-        return OnOffRenderer
-    elseif x == "flat"
-        return FlatRenderer
-    elseif x == "path"
-        return PathTracer
-    else
-        error("No parsing is available from string \"$x\" to any subtype of `Renderer`.")
-    end
-end
 
 ###########
 # ArgParse
 
 
 function parse_commandline_error_handler(settings::ArgParseSettings, err, err_code::Int = 1)
-    if occursin("out of range input for input_file:", err.text)
-        println(stderr, "input_file is not a PFM file")
+    s = reduce(replace, ["out of range input for " => "", " " => ""], init=err.text)
+    parameter, value = split(s, ":")
+
+    println()
+
+    if parameter == "input_file"
+        @error "the parameter $(parameter) (\"$(value)\") must be a PFM file"
+    elseif parameter ∈ ["--alpha", "-a", "--gamma", "-g", "--screen_distance", "-d", "--pt_n", "--pt_max_depth", "--pt_roulette_depth", "--fps", "-f"]
+        @error "the parameter $(parameter) (\"$(value)\") must be > 0"
+    elseif parameter ∈ ["--camera_type", "-t"]
+        @error "the parameter $(parameter) (\"$(value)\") must be \"perspective\" or \"orthogonal\""
+    elseif parameter ∈ ["--camera_position", "-p", "--camera_orientation", "-o"]
+        @error "the parameter $(parameter) (\"$(value)\") must be composed of 3 Float32 values divided by a ',' (e.g., \"-3,0,0\")"
+    elseif parameter ∈ ["--image_resolution", "-r"]
+        @error "the parameter $(parameter) (\"$(value)\") must be composed of 2 positive Int values divided by a ':' (e.g., \"540:540\")"
+    elseif parameter ∈ ["--renderer", "-R"]
+        @error "the parameter $(parameter) (\"$(value)\") must be \"onoff\", \"flat\" or \"path\""
+    elseif parameter ∈ ["--antialiasing", "-A"]
+        @error "the parameter $(parameter) (\"$(value)\") must be a perfect square (e.g., 4, 9 or 16)"
+    elseif parameter ∈ ["--delta_theta", "-D"]
+        @error "the parameter $(parameter) (\"$(value)\") must be > 0 and < 360"
     else
-        println(stderr, err.text)
+        @error err.text
     end
-    println(stderr, usage_string(settings))
+
     exit(err_code)
 end
 
@@ -84,16 +79,18 @@ function parse_commandline()
             help = "scaling factor for the normalization process"
             arg_type = Float32
             default = 0.5f0
+            range_tester = x -> x > 0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
             arg_type = Float32
             default = 1f0
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["tonemapping"], "files");
     @add_arg_table! s["tonemapping"] begin
         "input_file"
             help = "path to input file, it must be a PFM file"
-            range_tester = input -> (typeof(query(input))<:File{format"PFM"})
+            range_tester = x -> typeof(query(x))<:File{format"PFM"}
             required = true
         "output_file"
             help = "output file name"
@@ -120,27 +117,28 @@ function parse_commandline()
             help = "force overwrite"
             action = :store_true
     end
-    add_arg_group!(s["demo"]["image"], "generation");
+    add_arg_group!(s["demo"]["image"], "camera");
     @add_arg_table! s["demo"]["image"] begin
         "--camera_type", "-t"
             help = "choose camera type (\"perspective\" or \"orthogonal\")"
             arg_type = String
             default = "perspective"
-            range_tester = input -> (input ∈ ["perspective", "orthogonal"])
+            range_tester = x -> x ∈ ["perspective", "orthogonal"]
         "--camera_position", "-p"
             help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
             default = "-3,0,0"
-            range_tester = input -> (length(split(input, ",")) == 3)
+            range_tester = x -> length(Tuple(parse.(Float32, split(x, ",")))) == 3
         "--camera_orientation", "-o"
             help = "camera orientation as \"angX,angY,angZ\""
             arg_type = String
             default = "0,0,0"
-            range_tester = input -> (length(split(input, ",")) == 3)
+            range_tester = x -> length(Tuple(parse.(Float32, split(x, ",")))) == 3
         "--screen_distance", "-d"
             help = "only for \"perspective\" camera: distance between camera and screen"
             arg_type = Float32
             default = 2f0
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["image"], "rendering");
     @add_arg_table! s["demo"]["image"] begin
@@ -148,11 +146,35 @@ function parse_commandline()
             help = "resolution of the rendered image"
             arg_type = String
             default = "540:540"
+            range_tester = x -> length(Tuple(parse.(Int, split(x, ":")))) == 2
         "--renderer", "-R"
             help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
             default = "path"
-            range_tester = input -> (input ∈ ["onoff", "flat", "path"])
+            range_tester = x -> (x ∈ ["onoff", "flat", "path"])
+        "--antialiasing", "-A"
+            help = "number of samples per pixel (must be a perfect square)"
+            arg_type = Int
+            default = 0
+            range_tester = x -> isqrt(x)^2 == x
+    end
+    add_arg_group!(s["demo"]["image"], "path-tracer options (only for \"path\" renderer)");
+    @add_arg_table! s["demo"]["image"] begin
+        "--pt_n"
+            help = "number of rays fired for mc integration"
+            arg_type = Int
+            default = 10
+            range_tester = x -> x > 0
+        "--pt_max_depth"
+            help = "maximum number of reflections for each ray"
+            arg_type = Int
+            default = 2
+            range_tester = x -> x > 0
+        "--pt_roulette_depth"
+            help = "depth of the russian-roulette algorithm"
+            arg_type = Int
+            default = 3
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["image"], "tonemapping");
     @add_arg_table! s["demo"]["image"] begin
@@ -160,10 +182,12 @@ function parse_commandline()
             help = "scaling factor for the normalization process"
             arg_type = Float32
             default = 0.75f0
+            range_tester = x -> x > 0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
             arg_type = Float32
             default = 1f0
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["image"], "files");
     @add_arg_table! s["demo"]["image"] begin
@@ -189,16 +213,17 @@ function parse_commandline()
             help = "choose camera type (\"perspective\" or \"orthogonal\")"
             arg_type = String
             default = "perspective"
-            range_tester = input -> (input ∈ ["perspective", "orthogonal"])
+            range_tester = x -> x ∈ ["perspective", "orthogonal"]
         "--camera_position", "-p"
             help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
             default = "-3,0,0"
-            range_tester = input -> (length(split(input, ",")) == 3)
+            range_tester = x -> length(Tuple(parse.(Float32, split(x, ",")))) == 3
         "--screen_distance", "-d"
             help = "only for \"perspective\" camera: distance between camera and screen"
             arg_type = Float32
             default = 2f0
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["animation"], "frame rendering");
     @add_arg_table! s["demo"]["animation"] begin
@@ -206,11 +231,35 @@ function parse_commandline()
             help = "resolution of the rendered image"
             arg_type = String
             default = "540:540"
+            range_tester = x -> length(Tuple(parse.(Int, split(x, ":")))) == 2
         "--renderer", "-R"
             help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
             default = "path"
-            range_tester = input -> (input ∈ ["onoff", "flat", "path"])
+            range_tester = x -> (x ∈ ["onoff", "flat", "path"])
+        "--antialiasing", "-A"
+            help = "number of samples per pixel (must be a perfect square)"
+            arg_type = Int
+            default = 0
+            range_tester = x -> isqrt(x)^2 == x
+    end
+    add_arg_group!(s["demo"]["image"], "path-tracer options (only for \"path\" renderer)");
+    @add_arg_table! s["demo"]["image"] begin
+        "--pt_n"
+            help = "number of rays fired for mc integration"
+            arg_type = Int
+            default = 10
+            range_tester = x -> x > 0
+        "--pt_max_depth"
+            help = "maximum number of reflections for each ray"
+            arg_type = Int
+            default = 2
+            range_tester = x -> x > 0
+        "--pt_roulette_depth"
+            help = "depth of the russian-roulette algorithm"
+            arg_type = Int
+            default = 3
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["animation"], "frame tonemapping");
     @add_arg_table! s["demo"]["animation"] begin
@@ -218,10 +267,12 @@ function parse_commandline()
             help = "scaling factor for the normalization process"
             arg_type = Float32
             default = 0.75f0
+            range_tester = x -> x > 0
         "--gamma", "-g"
             help = "gamma value for the tone mapping process"
             arg_type = Float32
             default = 1f0
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["animation"], "animation parameter");
     @add_arg_table! s["demo"]["animation"] begin
@@ -229,10 +280,12 @@ function parse_commandline()
             help = "Δθ in camera orientation (around z axis) between each frame; the number of frames generated is [360/Δθ]"
             arg_type = Float32
             default = 10f0
+            range_tester = x -> 0 < x < 360
         "--fps", "-f"
             help = "FPS (frame-per-second) of the output video"
             arg_type = Int
             default = 15
+            range_tester = x -> x > 0
     end
     add_arg_group!(s["demo"]["animation"], "files");
     @add_arg_table! s["demo"]["animation"] begin
@@ -284,12 +337,16 @@ function demoimage(options::Dict{String, Any})
     
     Raytracer.demo(
         output_file = options["output_file"],
-        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         camera_type = options["camera_type"],
         camera_position = Tuple(parse.(Float32, split(options["camera_position"], ","))),
         camera_orientation = Tuple(parse.(Float32, split(options["camera_orientation"], ","))),
         screen_distance = options["screen_distance"],
+        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         renderer_type = options["renderer"],
+        samples_per_side = isqrt(options["antialiasing"]),
+        pt_n = options["pt_n"],
+        pt_max_depth = options["pt_max_depth"],
+        pt_roulette_depth = options["pt_roulette_depth"],
         α = options["alpha"],
         γ = options["gamma"]
     )
@@ -300,12 +357,16 @@ function demoanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, options:
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
     Raytracer.demo(
         output_file = filename * ".jpg",
-        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         camera_type = options["camera_type"],
         camera_position = Tuple(parse.(Float32, split(options["camera_position"], ","))),
         camera_orientation = (0f0, 0f0, θ),
         screen_distance = options["screen_distance"],
+        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
         renderer_type = options["renderer"],
+        samples_per_side = isqrt(options["antialiasing"]),
+        pt_n = options["pt_n"],
+        pt_max_depth = options["pt_max_depth"],
+        pt_roulette_depth = options["pt_roulette_depth"],
         α = options["alpha"],
         γ = options["gamma"],
         use_threads = false,
@@ -362,6 +423,33 @@ function demoanimation(options::Dict{String, Any})
     println(" done!")
 
     cd(curdir)
+end
+
+
+###########
+# Parsers
+
+
+function parse_item(::Type{Camera}, x::AbstractString)
+    if x == "perspective"
+        return PerspectiveCamera
+    elseif x == "orthogonal"
+        return OrthogonalCamera
+    else
+        error("No parsing is available from string \"$x\" to any subtype of `Camera`.")
+    end
+end
+
+function parse_item(::Type{Renderer}, x::AbstractString)
+    if x == "onoff"
+        return OnOffRenderer
+    elseif x == "flat"
+        return FlatRenderer
+    elseif x == "path"
+        return PathTracer
+    else
+        error("No parsing is available from string \"$x\" to any subtype of `Renderer`.")
+    end
 end
 
 
