@@ -6,7 +6,7 @@
 # TODO write docstrings
 
 
-abstract type Renderer <: Function end
+abstract type Renderer end
 
 
 ################
