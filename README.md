@@ -162,8 +162,11 @@ optional arguments:
 usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
                         [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
-                        [-R RENDERER] [-a ALPHA] [-g GAMMA]
-                        [-O OUTPUT_FILE] [--version] [-h]
+                        [-R RENDERER] [-A ANTIALIASING] [--pt_n PT_N]
+                        [--pt_max_depth PT_MAX_DEPTH]
+                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
+                        [-a ALPHA] [-g GAMMA] [-O OUTPUT_FILE]
+                        [--version] [-h]
 
 Render a demo image of Raytracer.jl.
 
@@ -172,7 +175,7 @@ optional arguments:
   --version             show version information and exit
   -h, --help            show this help message and exit
 
-generation:
+camera:
   -t, --camera_type CAMERA_TYPE
                         choose camera type ("perspective" or
                         "orthogonal") (default: "perspective")
@@ -194,6 +197,19 @@ rendering:
   -R, --renderer RENDERER
                         type of renderer to use ("onoff", "flat" or
                         "path") (default: "path")
+  -A, --antialiasing ANTIALIASING
+                        number of samples per pixel (must be a perfect
+                        square) (type: Int64, default: 0)
+
+path-tracer options (only for "path" renderer):
+  --pt_n PT_N           number of rays fired for mc integration (type:
+                        Int64, default: 10)
+  --pt_max_depth PT_MAX_DEPTH
+                        maximum number of reflections for each ray
+                        (type: Int64, default: 2)
+  --pt_roulette_depth PT_ROULETTE_DEPTH
+                        depth of the russian-roulette algorithm (type:
+                        Int64, default: 3)
 
 tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
@@ -217,10 +233,13 @@ files:
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-d SCREEN_DISTANCE]
-                        [-r IMAGE_RESOLUTION] [-R RENDERER] [-a ALPHA]
-                        [-g GAMMA] [-D DELTA_THETA] [-f FPS]
-                        [-F OUTPUT_DIR] [-O OUTPUT_FILE] [--version]
-                        [-h]
+                        [-r IMAGE_RESOLUTION] [-R RENDERER]
+                        [-A ANTIALIASING] [--pt_n PT_N]
+                        [--pt_max_depth PT_MAX_DEPTH]
+                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
+                        [-a ALPHA] [-g GAMMA] [-D DELTA_THETA]
+                        [-f FPS] [-F OUTPUT_DIR] [-O OUTPUT_FILE]
+                        [--version] [-h]
 
 Create a demo animation of Raytracer.jl, by generating n images with
 different camera orientation and merging them into an mp4 video.
@@ -231,7 +250,7 @@ optional arguments:
   --version             show version information and exit
   -h, --help            show this help message and exit
 
-frame generation:
+frame camera:
   -t, --camera_type CAMERA_TYPE
                         choose camera type ("perspective" or
                         "orthogonal") (default: "perspective")
@@ -250,6 +269,19 @@ frame rendering:
   -R, --renderer RENDERER
                         type of renderer to use ("onoff", "flat" or
                         "path") (default: "path")
+  -A, --antialiasing ANTIALIASING
+                        number of samples per pixel (must be a perfect
+                        square) (type: Int64, default: 0)
+
+path-tracer options (only for "path" renderer):
+  --pt_n PT_N           number of rays fired for mc integration (type:
+                        Int64, default: 10)
+  --pt_max_depth PT_MAX_DEPTH
+                        maximum number of reflections for each ray
+                        (type: Int64, default: 2)
+  --pt_roulette_depth PT_ROULETTE_DEPTH
+                        depth of the russian-roulette algorithm (type:
+                        Int64, default: 3)
 
 frame tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
