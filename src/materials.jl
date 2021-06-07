@@ -109,7 +109,7 @@ end
 
 Base.@kwdef struct SpecularBRDF <: BRDF
     pigment::Pigment = UniformPigment()
-    threshold_angle_rad::Float32
+    threshold_angle_rad::Float32 = π / 1800f0
 end
 
 function at(brdf::SpecularBRDF, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)
