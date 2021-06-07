@@ -56,17 +56,56 @@ using ProgressMeter, Random, Intervals
 ##########
 # Exports
 
+export # Rendering
+    RGB, 
+    HdrImage,
+    Camera, 
+        PerspectiveCamera, OrthogonalCamera,
+        aperture_deg,
+        fire_ray,
+    ImageTracer,
+        fire_all_rays!,
+    Ray,
+    HitRecord,
+    Pigment, 
+        UniformPigment,
+        CheckeredPigment,
+        ImagePigment,
+    BRDF, 
+        DiffuseBRDF, SpecularBRDF,
+    Material, 
+    Renderer, 
+        OnOffRenderer, FlatRenderer, PathTracer
 
-export
-    BRDF, CheckeredPigment, DiffuseBRDF, FlatRenderer, HdrImage, HitRecord, ImagePigment,
-    ImageTracer, Material, Normal, OnOffRenderer, OrthogonalCamera, PCG, PathTracer,
-    PerspectiveCamera, Pigment, Plane, Point, RGB, Ray, Renderer, Shape, Sphere,
-    Transformation, UniformPigment, Vec, Vec2D, World
+export # Scene
+    Normal, Vec, 
+        normalize,
+        norm²,
+        create_onb_from_z,
+    Point,
+    Vec2D,
+    Transformation,
+        isconsistent, 
+        rotationX, rotationY, rotationZ,
+        scaling, translation,
+    Shape,
+        Sphere, Plane,
+        ray_intersection,
+    World
 
-export
-    BLACK, WHITE, aperture_deg, clamp_image, create_onb_from_z, demo, fire_all_rays!, fire_ray,
-    isconsistent, load, normalize, normalize_image, norm², ray_intersection, rotationX,
-    rotationY, rotationZ, save, scaling, tonemapping, translation, γ_correction
+export # Random number generation
+    PCG
+
+export # High level API
+    demo, tonemapping
+
+export # image tools
+    clamp_image, normalize_image, γ_correction, load, save
+
+export # Colors
+    BLACK, WHITE,
+    RED, GREEN, BLUE, 
+    CYAN, MAGENTA, YELLOW 
 
 
 ###########
