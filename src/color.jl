@@ -3,21 +3,147 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Extension of ColorTypes.RGB for color manipulation
-# TODO write docstrings
 
 
 #############
 # Operations
 
 
+"""
+    (+)(c1::RGB, c2::RGB)
+
+Return the elementwise sum of two colors.
+
+# Examples
+
+```jldoctest
+julia> c1 = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> c2 = RGB(4f0, 5f0, 6f0)
+RGB color with eltype Float32
+R: 4.0, G: 5.0, B: 6.0
+
+julia> c1 + c2
+RGB color with eltype Float32
+R: 5.0, G: 7.0, B: 9.0
+```
+"""
 (+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
 
+"""
+    (-)(c1::RGB, c2::RGB)
+
+Return the elementwise difference of two colors.
+
+# Examples
+
+```jldoctest
+julia> c1 = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> c2 = RGB(4f0, 5f0, 6f0)
+RGB color with eltype Float32
+R: 4.0, G: 5.0, B: 6.0
+
+julia> c1 - c2
+RGB color with eltype Float32
+R: -3.0, G: -3.0, B: -3.0
+```
+"""
 (-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
 
+"""
+    (*)(scalar::Number, c::RGB{T}) where {T}
+    (*)(c::RGB, scalar::Number)
+
+Return a RGB{T} color with each component multiplied by `scalar`.
+
+# Examples
+
+```jldoctest
+julia> scalar = 2.0
+2.0
+
+julia> c = RGB(4f0, 5f0, 6f0)
+RGB color with eltype Float32
+R: 4.0, G: 5.0, B: 6.0
+
+julia> scalar * c
+RGB color with eltype Float32
+R: 8.0, G: 10.0, B: 12.0
+
+julia> c * scalar
+RGB color with eltype Float32
+R: 8.0, G: 10.0, B: 12.0
+```
+
+```jldoctest
+julia> scalar = 2.0
+2.0
+
+julia> c = RGB(4.0, 5.0, 6.0)
+RGB color with eltype Float64
+R: 4.0, G: 5.0, B: 6.0
+
+julia> scalar * c
+RGB color with eltype Float64
+R: 8.0, G: 10.0, B: 12.0
+```
+
+Note that the eltype of RGB is mantained.
+"""
 (*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}(scalar * c.r, scalar * c.g, scalar * c.b)
 (*)(c::RGB, scalar::Number) = scalar * c
+
+"""
+    (*)(c1::RGB, c2::RGB)
+
+Return the elementwise product of two colors.
+
+# Examples
+
+```jldoctest
+julia> c1 = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> c2 = RGB(4f0, 5f0, 6f0)
+RGB color with eltype Float32
+R: 4.0, G: 5.0, B: 6.0
+
+julia> c1 * c2
+RGB color with eltype Float32
+R: 4.0, G: 10.0, B: 18.0
+```
+"""
 (*)(c1::RGB, c2::RGB) = RGB(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
 
+"""
+    (≈)(c1::RGB, c2::RGB)
+
+Check if two colors are close.
+
+# Examples
+
+```jldoctest
+julia> c1 = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> c2 = RGB(4f0, 5f0, 6f0)
+RGB color with eltype Float32
+R: 4.0, G: 5.0, B: 6.0
+
+julia> c1 * c2 ≈ RGB(4f0, 10f0, 18f0)
+true
+
+julia> c1 * c2 ≈ RGB(0f0, 0f0, 0f0)
+false
+```
+"""
 (≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r &&  
                         c1.g ≈ c2.g &&
                         c1.b ≈ c2.b
@@ -35,7 +161,7 @@ lastindex(c::RGB) = 3
 
 # Since there is no standard that specifies the order in which the colors
 # should be reported, here we use the convention whereby the colors should
-# be reported in the RGB order (first R, then G and finally B).
+# be reported in the RGB order (first R, then G, and finally B).
 function getindex(c::RGB, i::Integer)
     if i == 1
         return c.r
@@ -115,10 +241,80 @@ function show(io::IO, ::MIME"text/plain", c::RGB{T}) where {T}
     print(io, "RGB color with eltype $T\n", "R: $(c.r), G: $(c.g), B: $(c.b)")
 end
 
-luminosity(c::RGB) = (max(c...) + min(c...)) / 2f0
+@doc raw"""
+    luminosity(c::RGB)
 
+Return the luminosity of a color, computed as the mean value between the maximum component and the minumum component:
+
+```math
+\frac{max(c) + min(c)}{2}
+```
+
+# Examples
+
+```jldoctest
+julia> c = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> luminosity(c)
+2.0f0
+```
+"""
+luminosity(c::RGB) = (max(c...) + min(c...)) / 2
+
+@doc raw"""
+    clamp(c::RGB{T}) where {T}
+
+Return a clamped RGB{T} color, with each component `x` obtained with the formula:
+
+```math
+\frac{x}{1 + x}
+```
+
+# Examples
+
+```jldoctest
+julia> c = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> clamp(c)
+RGB color with eltype Float32
+R: 0.5, G: 0.6666667, B: 0.75
+```
+"""
 clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 
+@doc raw"""
+    γ_correction(c::RGB{T}, γ::Number) where {T}
+
+Compute the γ correction of a color. Return a RGB{T} color, with each component `x` obtained with the formula:
+
+```math
+x^{\frac{1}{\gamma}}
+```
+
+# Examples
+
+```jldoctest
+julia> c = RGB(1f0, 2f0, 3f0)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> γ_correction(c, 1)
+RGB color with eltype Float32
+R: 1.0, G: 2.0, B: 3.0
+
+julia> γ_correction(c, 0.8)
+RGB color with eltype Float32
+R: 1.0, G: 2.3784142, B: 3.948222
+
+julia> γ_correction(c, 2.4)
+RGB color with eltype Float32
+R: 1.0, G: 1.3348398, B: 1.580522
+```
+"""
 γ_correction(c::RGB{T}, γ::Number) where {T} = RGB{T}(map(x -> x^(1f0 / γ), c)...)
 
 eltype(::RGB{T}) where {T} = T
