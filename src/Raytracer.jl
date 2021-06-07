@@ -28,7 +28,7 @@ import Base.Broadcast:
     BroadcastStyle, Broadcasted, Style,
     broadcastable, combine_eltypes, copy, similar
 
-import ColorTypes:
+using ColorTypes:
     RGB, Fractional
 
 import FileIO:
@@ -47,10 +47,11 @@ import LinearAlgebra:
     Diagonal, I,
     inv, norm, normalize 
 
+using Random
 import Random:
     Random.CloseOpen01, Sampler, SamplerTrivial
 
-using ProgressMeter, Random, Intervals
+using Intervals, ProgressMeter
 
 
 ##########
