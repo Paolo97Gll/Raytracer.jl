@@ -125,7 +125,7 @@ function parse_commandline()
         "--camera_position", "-p"
             help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
-            default = "-1,0,0"
+            default = "-3,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--camera_orientation", "-o"
             help = "camera orientation as \"angX,angY,angZ\""
@@ -188,7 +188,7 @@ function parse_commandline()
         "--camera_position", "-p"
             help = "camera position in the scene as \"X,Y,Z\""
             arg_type = String
-            default = "-2,0,0"
+            default = "-3,0,0"
             range_tester = input -> (length(split(input, ",")) == 3)
         "--screen_distance", "-d"
             help = "only for \"perspective\" camera: distance between camera and screen"
@@ -264,18 +264,19 @@ end
 
 function demoimage(options::Dict{String, Any})
     printstyled("Raytracer.jl demo image\n\n", bold=true)
+    println("Renderer: $(options["renderer"])")
     println("Number of threads: $(Threads.nthreads())")
     options["output_file"] = normpath(options["output_file"])
     Raytracer.demo(
-        options["output_file"],
-        Tuple(parse.(Int, split(options["image_resolution"], ":"))),
-        options["camera_type"],
-        Tuple(parse.(Float32, split(options["camera_position"], ","))),
-        Tuple(parse.(Float32, split(options["camera_orientation"], ","))),
-        options["screen_distance"],
-        options["renderer"],
-        options["alpha"],
-        options["gamma"]
+        output_file = options["output_file"],
+        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
+        camera_type = options["camera_type"],
+        camera_position = Tuple(parse.(Float32, split(options["camera_position"], ","))),
+        camera_orientation = Tuple(parse.(Float32, split(options["camera_orientation"], ","))),
+        screen_distance = options["screen_distance"],
+        renderer_type = options["renderer"],
+        α = options["alpha"],
+        γ = options["gamma"]
     )
 end
 
@@ -283,15 +284,15 @@ function demoanimationloop(elem::Tuple{Int, Float32}, total_elem::Int, options::
     index, θ = elem
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
     Raytracer.demo(
-        filename * ".jpg",
-        Tuple(parse.(Int, split(options["image_resolution"], ":"))),
-        options["camera_type"],
-        Tuple(parse.(Float32, split(options["camera_position"], ","))),
-        (0f0, 0f0, θ),
-        options["screen_distance"],
-        options["renderer"],
-        options["alpha"],
-        options["gamma"],
+        output_file = filename * ".jpg",
+        image_resolution = Tuple(parse.(Int, split(options["image_resolution"], ":"))),
+        camera_type = options["camera_type"],
+        camera_position = Tuple(parse.(Float32, split(options["camera_position"], ","))),
+        camera_orientation = (0f0, 0f0, θ),
+        screen_distance = options["screen_distance"],
+        renderer_type = options["renderer"],
+        α = options["alpha"],
+        γ = options["gamma"],
         use_threads = false,
         disable_output = true
     )
@@ -300,6 +301,7 @@ end
 
 function demoanimation(options::Dict{String, Any})
     printstyled("Raytracer.jl demo animation\n\n", bold=true)
+    println("Renderer: $(options["renderer"])")
     println("Number of threads: $(Threads.nthreads())\n")
 
     if Sys.which("ffmpeg") === nothing
