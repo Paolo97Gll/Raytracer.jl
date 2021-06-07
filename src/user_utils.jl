@@ -27,7 +27,10 @@ end
 #####################################################################
 
 
-function load_scene(renderer_type::Type{<:Renderer})
+function load_scene(renderer_type::Type{<:Renderer},
+                    pt_n::Int,
+                    pt_max_depth::Int,
+                    pt_roulette_depth::Int)
     world = World()
     if renderer_type <: OnOffRenderer
         coords_list = map(i -> map(bit -> Bool(bit) ? 1 : -1 , digits(i, base=2, pad=3)) |> collect, 0x00:(0x02^3-0x01))
@@ -73,7 +76,7 @@ function load_scene(renderer_type::Type{<:Renderer})
         #                  Sphere(transformation = translation([4f0, 0f0, 2f0]) * scaling(0.6),
         #                         material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.4f0, 0.6f0, 0.4f0)))))]
         append!(world, ground, sky, other_spheres)
-        return PathTracer(world)
+        return PathTracer(world, n = pt_n, max_depth=pt_max_depth, roulette_depth = pt_roulette_depth)
     else
         error("`Renderer` subtype $renderer_type is not supported by this function.")
     end
@@ -83,7 +86,8 @@ function load_tracer(image_resolution::Tuple{Int, Int},
                      camera_type::Type{<:Camera},
                      camera_position::Tuple{Float32, Float32, Float32},
                      camera_orientation::Tuple{Float32, Float32, Float32},
-                     screen_distance::Float32;
+                     screen_distance::Float32,
+                     samples_per_side::Int;
                      disable_output::Bool = false)
     io = disable_output ? devnull : stdout
     print(io, "Loading tracing informations...")
@@ -98,7 +102,7 @@ function load_tracer(image_resolution::Tuple{Int, Int},
         error("`Camera` subtype $camera_type is not supported by this function.")
     end
     println(io, " done!")
-    ImageTracer(image, camera)
+    ImageTracer(image, camera, samples_per_side=samples_per_side)
 end
 
 function rendering!(image_tracer::ImageTracer, renderer::Renderer; use_threads::Bool = true, disable_output::Bool = false)
@@ -108,12 +112,16 @@ function rendering!(image_tracer::ImageTracer, renderer::Renderer; use_threads::
 end
 
 function demo(;output_file::String = "demo.jpg",
-               image_resolution::Tuple{Int, Int} = (540,540),
                camera_type::Type{<:Camera} = PerspectiveCamera,
                camera_position::Tuple{Float32, Float32, Float32} = (-3f0, 0f0, 0f0),
                camera_orientation::Tuple{Float32, Float32, Float32} = (0f0, 0f0, 0f0),
                screen_distance::Float32 = 2f0,
+               image_resolution::Tuple{Int, Int} = (540,540),
+               samples_per_side::Int = 0,
                renderer_type::Type{<:Renderer} = PathTracer,
+               pt_n::Int = 10,
+               pt_max_depth::Int = 2,
+               pt_roulette_depth::Int = 3,
                α::Float32 = 0.75f0,
                γ::Float32 = 1f0,
                use_threads::Bool = true,
@@ -121,9 +129,9 @@ function demo(;output_file::String = "demo.jpg",
     io = disable_output ? devnull : stdout
     println(io, "\n-> RENDERING")
     print(io, "Loading scene...")
-    renderer = load_scene(renderer_type)
+    renderer = load_scene(renderer_type, pt_n, pt_max_depth, pt_roulette_depth)
     println(io, " done!")
-    image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance, disable_output=disable_output)
+    image_tracer = load_tracer(image_resolution, camera_type, camera_position, camera_orientation, screen_distance, samples_per_side, disable_output=disable_output)
     rendering!(image_tracer, renderer, use_threads=use_threads, disable_output=disable_output)
     print(io, "Saving pfm image...")
     input_file = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
