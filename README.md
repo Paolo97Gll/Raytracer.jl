@@ -159,7 +159,7 @@ optional arguments:
 <details><summary>Show usage</summary>
 
 ```text
-usage: raytracer_cli.jl demo image [-t CAMERA_TYPE]
+usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
                         [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
                         [-R RENDERER] [-a ALPHA] [-g GAMMA]
@@ -168,21 +168,22 @@ usage: raytracer_cli.jl demo image [-t CAMERA_TYPE]
 Render a demo image of Raytracer.jl.
 
 optional arguments:
+  --force               force overwrite
   --version             show version information and exit
   -h, --help            show this help message and exit
 
 generation:
   -t, --camera_type CAMERA_TYPE
-                        choose camera type ('perspective' or
-                        'orthogonal') (default: "perspective")
+                        choose camera type ("perspective" or
+                        "orthogonal") (default: "perspective")
   -p, --camera_position CAMERA_POSITION
-                        camera position in the scene as 'X,Y,Z'
-                        (default: "-1,0,0")
+                        camera position in the scene as "X,Y,Z"
+                        (default: "-3,0,0")
   -o, --camera_orientation CAMERA_ORIENTATION
-                        camera orientation as 'angX,angY,angZ'
+                        camera orientation as "angX,angY,angZ"
                         (default: "0,0,0")
   -d, --screen_distance SCREEN_DISTANCE
-                        only for 'perspective' camera: distance
+                        only for "perspective" camera: distance
                         between camera and screen (type: Float32,
                         default: 2.0)
 
@@ -191,19 +192,19 @@ rendering:
                         resolution of the rendered image (default:
                         "540:540")
   -R, --renderer RENDERER
-                        type of renderer to use (`OnOff` or `Flat`)
-                        (default: "OnOff")
+                        type of renderer to use ("onoff", "flat" or
+                        "path") (default: "path")
 
 tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float32, default: 1.0)
+                        (type: Float32, default: 0.75)
   -g, --gamma GAMMA     gamma value for the tone mapping process
                         (type: Float32, default: 1.0)
 
 files:
   -O, --output_file OUTPUT_FILE
                         output LDR file name (the HDR file will have
-                        the same name, but with 'pfm' extension)
+                        the same name, but with "pfm" extension)
                         (default: "demo.jpg")
 ```
 
@@ -232,13 +233,13 @@ optional arguments:
 
 frame generation:
   -t, --camera_type CAMERA_TYPE
-                        choose camera type ('perspective' or
-                        'orthogonal') (default: "perspective")
+                        choose camera type ("perspective" or
+                        "orthogonal") (default: "perspective")
   -p, --camera_position CAMERA_POSITION
-                        camera position in the scene as 'X,Y,Z'
-                        (default: "-1,0,0")
+                        camera position in the scene as "X,Y,Z"
+                        (default: "-3,0,0")
   -d, --screen_distance SCREEN_DISTANCE
-                        only for 'perspective' camera: distance
+                        only for "perspective" camera: distance
                         between camera and screen (type: Float32,
                         default: 2.0)
 
@@ -247,12 +248,12 @@ frame rendering:
                         resolution of the rendered image (default:
                         "540:540")
   -R, --renderer RENDERER
-                        type of renderer to use (`OnOff` or `Flat`)
-                        (default: "OnOff")
+                        type of renderer to use ("onoff", "flat" or
+                        "path") (default: "path")
 
 frame tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float32, default: 1.0)
+                        (type: Float32, default: 0.75)
   -g, --gamma GAMMA     gamma value for the tone mapping process
                         (type: Float32, default: 1.0)
 
