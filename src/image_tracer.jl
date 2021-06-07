@@ -18,10 +18,11 @@ on the desired ranges.
 struct ImageTracer
     image::HdrImage
     camera::Camera
+    samples_per_side::Int
     rng::PCG
-
-    ImageTracer(image::HdrImage, camera::Camera, rng::PCG = PCG()) = new(image, camera, rng)
 end
+
+ImageTracer(image::HdrImage, camera::Camera; samples_per_side::Int = 0 ,rng::PCG = PCG()) = ImageTracer(image, camera, samples_per_side, rng)
 
 
 """
@@ -35,7 +36,7 @@ corner is placed at `(0, 0)`. The values of `u_pixel` and `v_pixel` are floating
 through the pixel's center.
 """
 function fire_ray(tracer::ImageTracer,
-                  col::Integer, row::Integer; 
+                  col::Int, row::Int; 
                   u_pixel::Float32 = 0.5f0, 
                   v_pixel::Float32 = 0.5f0)
     size_col, size_raw = size(tracer.image)
@@ -55,19 +56,26 @@ instance containing the color to assign to that pixel in the image.
 """
 
 function fire_all_rays_loop(tracer::ImageTracer, ind::CartesianIndex{2}, renderer::Renderer)
-    # TODO implement antialiasing: need to modify imagetracer since it need a pcg inside and other parameters
-    ray = fire_ray(tracer, Tuple(ind)...)
-    tracer.image.pixel_matrix[ind] = renderer(ray)
+    if tracer.samples_per_side > 0
+        cum_color = BLACK
+        for inter_pixel_row in 0:tracer.samples_per_side-1
+            for inter_pixel_col in 0:tracer.samples_per_side-1
+                u_pixel = (inter_pixel_col + rand(tracer.rng, Float32)) / tracer.samples_per_side
+                v_pixel = (inter_pixel_row + rand(tracer.rng, Float32)) / tracer.samples_per_side
+                ray = fire_ray(tracer, Tuple(ind)..., u_pixel=u_pixel, v_pixel=v_pixel)
+                cum_color += renderer(ray)
+            end
+        end
+        tracer.image.pixel_matrix[ind] = cum_color * (1 / tracer.samples_per_side^2)
+    else
+        ray = fire_ray(tracer, Tuple(ind)...)
+        tracer.image.pixel_matrix[ind] = renderer(ray)
+    end
 end
 
 function fire_all_rays!(tracer::ImageTracer, renderer::Renderer; use_threads::Bool = true, enable_progress_bar::Bool = true)
     indices = CartesianIndices(tracer.image.pixel_matrix)
     p = Progress(length(indices), color=:white, enabled=enable_progress_bar)
-    # for ind ∈ indices
-    #     fire_all_rays_loop(tracer, ind, renderer)
-    #     next!(p)
-    # end
-    # FIXME find a more clean way to do this
     if use_threads
         Threads.@threads for ind ∈ indices
             fire_all_rays_loop(tracer, ind, renderer)
