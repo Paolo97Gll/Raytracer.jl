@@ -11,7 +11,7 @@ using Documenter, LinearAlgebra, StaticArrays
 
 using Raytracer
 using Raytracer:
-    NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, VEC_X, VEC_Y, VEC_Z,
+    NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, VEC_X, VEC_Y, VEC_Z, ORIGIN,
     average_luminosity, clamp, luminosity, norm², γ_correction
 
 
