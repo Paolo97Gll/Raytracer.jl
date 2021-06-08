@@ -154,24 +154,24 @@ end
 end
 
 @testset "Tone mapping" begin
-    @testset "normalize_image" begin
+    @testset "normalize" begin
         img = HdrImage([RGB(  5f0,   10f0,   15f0)
                         RGB(500f0, 1000f0, 1500f0)], 2, 1)
 
-        img = normalize_image(img, 1000f0, luminosity=100f0)
+        img = normalize(img, 1000f0, luminosity=100f0)
         @test all(img .≈ [RGB(0.5f2, 1.0f2, 1.5f2), RGB(0.5f4, 1.0f4, 1.5f4)])
     end
 
-    @testset "clamp_image" begin
+    @testset "clamp" begin
         img = HdrImage([RGB(0.5f1, 1.0f1, 1.5f1)
                         RGB(0.5f3, 1.0f3, 1.5f3)], 2, 1)
-        img = clamp_image(img)
+        img = clamp(img)
         @test all(0 <= col <= 1 for pix ∈ img for col ∈ pix)
     end
 
-    @testset "average_luminosity" begin
+    @testset "luminosity" begin
         image = HdrImage([RGB(  5f0,   10f0,   15f0) RGB(500f0, 1000f0, 1500f0)])
-        @test average_luminosity(image) ≈ 100f0
+        @test luminosity(image) ≈ 100f0
     end
 
 end

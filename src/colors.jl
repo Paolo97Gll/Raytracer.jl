@@ -205,7 +205,7 @@ end
 Return the mean value between the maximum component and the minumum component of a color:
 
 ```math
-\frac{max(c) + min(c)}{2}
+\frac{\text{max}(c) + \text{min}(c)}{2}
 ```
 
 # Examples
@@ -228,7 +228,7 @@ Return a clamped `RGB{T}` color, with each component `x` obtained with the formu
 
 # Examples
 
-```jldoctest
+```julia
 julia> clamp(RGB(1f0, 2f0, 3f0))
 RGB color with eltype Float32
 R: 0.5, G: 0.6666667, B: 0.75
@@ -242,12 +242,12 @@ clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 Return a `RGB{T}` color, with each component `x` corrected with the formula:
 
 ```math
-x^{\frac{1}{\gamma}}
+x^{1 / \gamma}
 ```
 
 # Examples
 
-```jldoctest
+```julia
 julia> c = RGB(1f0, 2f0, 3f0);
 
 julia> γ_correction(c, 1f0)
@@ -281,11 +281,58 @@ end
 
 one(c::RGB) = one(typeof(c))
 
+"""
+    BLACK
+
+A `RGB{Float32}` representing a black color.
+"""
 const BLACK = zero(RGB{Float32})
+
+"""
+    WHITE
+
+A `RGB{Float32}` representing a white color.
+"""
 const WHITE = one(RGB{Float32})
+
+"""
+    RED
+
+A `RGB{Float32}` representing a red color.
+"""
 const RED = RGB(1f0, 0f0, 0f0)
+
+"""
+    GREEN
+
+A `RGB{Float32}` representing a green color.
+"""
 const GREEN = RGB(0f0, 1f0, 0f0)
+
+"""
+    BLUE
+
+A `RGB{Float32}` representing a blue color.
+"""
 const BLUE = RGB(0f0, 0f0, 1f0)
+
+"""
+    CYAN
+
+A `RGB{Float32}` representing a cyan color.
+"""
 const CYAN = RGB(0f0, 1f0, 1f0)
+
+"""
+    MAGENTA
+
+A `RGB{Float32}` representing a magenta color.
+"""
 const MAGENTA = RGB(1f0, 0f0, 1f0)
+
+"""
+    YELLOW
+
+A `RGB{Float32}` representing a yellow color.
+"""
 const YELLOW = RGB(1f0, 1f0, 0f0)

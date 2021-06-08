@@ -1,5 +1,6 @@
 .vscode/
 *.ipynb
+docs/build
 
 # PFM
 *.pfm

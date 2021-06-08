@@ -9,9 +9,9 @@
 
 
 """
-    Vec <: StaticArrays.FieldVector{3, Float32}
+    struct Vec <: StaticArrays.FieldVector{3, Float32}
 
-A vector in 3D space with fields `x`, `y`, and `z`.
+A vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
 
 For inherited properties and constructors see `StaticArrays.FieldVector`.
 """
@@ -20,6 +20,12 @@ struct Vec <: FieldVector{3, Float32}
     y::Float32
     z::Float32
 end
+
+@doc """
+    Vec(x::Float32, y::Float32, z::Float32)
+
+Constructor for a [`Vec`](@ref) instance.
+""" Vec(::Float32, ::Float32, ::Float32)
 
 similar_type(::Type{<:Vec}, ::Type{Float32}, s::Size{(3,)}) = Vec
 
@@ -51,9 +57,10 @@ norm²(v::Vec) = sum(el -> el^2, v)
 #####################################################################
 
 """
-    Normal{V} <: StaticArrays.FieldVector{3, Float32}
+    struct Normal{V} <: StaticArrays.FieldVector{3, Float32}
 
-A pseudo-vector in 3D space with fields `x`, `y`, and `z`. The parameter `V` tells if the normal is normalized or not.
+A pseudo-vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
+The parameter `V` tells if the normal is normalized or not.
 
 For inherited properties and constructors see `StaticArrays.FieldVector`.
 """
@@ -63,18 +70,20 @@ struct Normal{V} <: FieldVector{3, Float32}
     z::Float32
 end
 
+@doc """
+    Normal{V}(x::Float32, y::Float32, z::Float32)
+
+Constructor for a [`Normal`](@ref) instance.
+""" Normal{V}(::Float32, ::Float32, ::Float32)
+
 """
     Normal(x, y, z)
 
-Construct a non-normalized [`Normal{false}`](@ref) with given coordinates.
+Construct a non-normalized [`Normal{false}`](@ref) with given coordinates. All values are converted in `Float32`.
 
 # Examples
 
 ```jldoctest
-julia> Normal(1, 2, 3)
-Normal with eltype Float32, not normalized
-x = 1.0, y = 2.0, z = 3.0
-
 julia> Normal(1.2, 3.3, 5)
 Normal with eltype Float32, not normalized
 x = 1.2, y = 3.3, z = 5.0
@@ -97,9 +106,9 @@ function show(io::IO, ::MIME"text/plain", n::Normal{V}) where {V}
 end
 
 """
-    normalize(n::Normal)
+    normalize(n::Normal{V}) where {V}
 
-Normalize `n` and return a `Normal`. If `n` is already normalized, no normalization is computed and `n` is returned.
+Normalize `n` and return a [`Normal{true}`](@ref). If `V` is `true`, no normalization is computed and `n` is returned.
 
 # Examples
 
@@ -124,9 +133,9 @@ Compute the squared norm of a [`Normal{true}`](@ref). Since `n` is already norma
 norm(::Normal{true}) = 1f0
 
 """
-    norm²(n::Normal)
+    norm²(n::Normal{V}) where {V}
 
-Compute the squared norm of a [`Normal`](@ref). If `n` is already normalized, `1f0` is returned.
+Compute the squared norm of a [`Normal`](@ref). If `V` is `true`, `1f0` is returned.
 
 # Examples
 
@@ -148,7 +157,7 @@ norm²(::Normal{true}) = 1f0
 
 
 """
-    Point
+    struct Point
 
 A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, Float32}`.
 """
@@ -161,18 +170,20 @@ struct Point
     end
 end
 
+@doc """
+    Point(p::AbstractVector)
+
+Constructor for a [`Point`](@ref) instance.
+""" Point(::AbstractVector)
+
 """
     Point(x, y, z)
 
-Construct a `Point` with given coordinates.
+Construct a [`Point`](@ref) with given coordinates. All values are converted in `Float32`.
 
 # Examples
 
 ```jldoctest
-julia> Point(1, 2, 3)
-Point with eltype Float32
-x = 1.0, y = 2.0, z = 3.0
-
 julia> Point(1.2, 3.3, 5)
 Point with eltype Float32
 x = 1.2, y = 3.3, z = 5.0
@@ -285,7 +296,7 @@ x = 6.0, y = 12.0, z = 18.0
     convert(::Type{Vec}, p::Point)
     convert(::Type{Normal}, p::Point)
 
-Convert `p` into the specified type.
+Convert a [`Point`](@ref) into the specified type ([`Vec`](@ref) or [`Normal{false}`](@ref)).
 """
 convert(::Type{Vec}, p::Point) = Vec(p.v)
 convert(::Type{Normal}, p::Point) = Normal{false}(p.v)
@@ -295,25 +306,84 @@ convert(::Type{Normal}, p::Point) = Normal{false}(p.v)
 
 
 """
-    const Vec2D = SVector{2, Float32}
+    Vec2D
 
 Alias to `SVector{2, Float32}`, used for uv mapping on shapes.
 """
 const Vec2D = SVector{2, Float32}
 
 
+#####################################################################
+
+
+"""
+    VEC_X
+
+A unitary [`Vec`](@ref) along the x-axis.
+"""
 const VEC_X = Vec(1f0, 0f0, 0f0)
+
+"""
+    VEC_Y
+
+A unitary [`Vec`](@ref) along the y-axis.
+"""
 const VEC_Y = Vec(0f0, 1f0, 0f0)
+
+"""
+    VEC_Z
+
+A unitary [`Vec`](@ref) along the z-axis.
+"""
 const VEC_Z = Vec(0f0, 0f0, 1f0)
 
+"""
+    NORMAL_X
+
+A unitary and normalized [`Normal{true}`](@ref) along the x-axis.
+"""
 const NORMAL_X = Normal{true}(1f0, 0f0, 0f0)
+
+"""
+    NORMAL_Y
+
+A unitary and normalized [`Normal{true}`](@ref) along the y-axis.
+"""
 const NORMAL_Y = Normal{true}(0f0, 1f0, 0f0)
+
+"""
+    NORMAL_Z
+
+A unitary and normalized [`Normal{true}`](@ref) along the z-axis.
+"""
 const NORMAL_Z = Normal{true}(0f0, 0f0, 1f0)
 
+"""
+    NORMAL_X_false
+
+A unitary and non-normalized [`Normal{false}`](@ref) along the x-axis.
+"""
 const NORMAL_X_false = Normal{false}(1f0, 0f0, 0f0)
+
+"""
+    NORMAL_Y_false
+
+A unitary and non-normalized [`Normal{false}`](@ref) along the y-axis.
+"""
 const NORMAL_Y_false = Normal{false}(0f0, 1f0, 0f0)
+
+"""
+    NORMAL_Z_false
+
+A unitary and non-normalized [`Normal{false}`](@ref) along the z-axis.
+"""
 const NORMAL_Z_false = Normal{false}(0f0, 0f0, 1f0)
 
+"""
+    ORIGIN
+
+A [`Point`](@ref) representing the origin of the frame of reference.
+"""
 const ORIGIN = Point(0f0, 0f0, 0f0)
 
 
@@ -323,7 +393,7 @@ const ORIGIN = Point(0f0, 0f0, 0f0)
 """
     create_onb_from_z(input_normal::Normal)
 
-Create an orthonormal base from the z-axis using the
+Create an orthonormal base from a input [`Normal`](@ref) representing the z-axis using the
 [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) algorithm.
 
 # Examples
@@ -358,8 +428,8 @@ function create_onb_from_z(input_normal::Normal)
 end
 
 """
-    normalized_dot(a, b)
+    normalized_dot(v1::AbstractVector, v2::AbstractVector)
 
-Normalize `a` and `b` and then compute the dot product.
+Normalize `v1` and `v2` and then compute the dot product.
 """
 normalized_dot(v1::AbstractVector, v2::AbstractVector) = normalize(v1) ⋅ normalize(v2)
