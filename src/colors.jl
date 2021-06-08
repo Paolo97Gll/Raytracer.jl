@@ -228,7 +228,7 @@ Return a clamped `RGB{T}` color, with each component `x` obtained with the formu
 
 # Examples
 
-```jldoctest
+```julia
 julia> clamp(RGB(1f0, 2f0, 3f0))
 RGB color with eltype Float32
 R: 0.5, G: 0.6666667, B: 0.75
@@ -247,7 +247,7 @@ x^{\frac{1}{\gamma}}
 
 # Examples
 
-```jldoctest
+```julia
 julia> c = RGB(1f0, 2f0, 3f0);
 
 julia> γ_correction(c, 1f0)

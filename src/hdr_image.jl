@@ -137,7 +137,7 @@ the result of [`luminosity(::HdrImage; ::Float32)`](@ref).
 
 # Examples
 
-```jldoctest
+```julia
 julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
@@ -160,7 +160,7 @@ function to each pixel.
 
 # Examples
 
-```jldoctest
+```julia
 julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
@@ -185,7 +185,7 @@ the R, G, and B values of the colors in the image are all in the range ``[0, 1]`
 
 # Examples
 
-```jldoctest
+```julia
 julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
