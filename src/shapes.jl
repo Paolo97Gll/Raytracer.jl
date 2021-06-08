@@ -226,9 +226,12 @@ Return the parameter `t` at which `ray` first hits the bounding box. If no hit e
 """
 function ray_intersection(ray::Ray, aabb::AABB)
     dir = ray.dir
-    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir)))
-    isempty(overlap) && return typemax(Float32)
-    t = overlap.first
+    o = ray.origin
+    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
+    isempty(overlap) && return Inf32 
+    t1, t2 = overlap.first, overlap.last
+    ray.tmin < t1 < ray.tmax && return t1
+    ray.tmin < t2 < ray.tmax && return t2
 end
 
 #######
@@ -247,7 +250,7 @@ end
 function get_uv(::Type{Cube}, point::Point)
     x, y, z = point
     abs_point = point.v .|> abs |> Point
-    maxval, index = findmax(abs_point)
+    maxval, index = findmax(abs_point.v)
 
     @assert 1 <= index <= 3
 
@@ -267,7 +270,7 @@ function get_uv(::Type{Cube}, point::Point)
         offset = (ispos ? 1 : 3, 1)
     end
 
-    @.((offset + 0.5f0 * ((uc, uv) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
+    @.((offset + 0.5f0 * ((uc, uc) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
 end
 
 # UNUSED, STORED HERE IF NEDDED IN FUTURE
@@ -284,13 +287,13 @@ end
 #     error("Invalid uv coordinate for a Cube: got $uv")
 # end
 
-function get_normal(::Type{Cube}, point::Point, ::Ray)
+function get_normal(::Type{Cube}, point::Point, ray::Ray)
     abs_point = point.v .|> abs |> Point
-    _, index = findmax(abs_point)
+    _, index = findmax(abs_point.v)
 
     @assert 1 <= index <= 3
 
-    s = sign(point[index])
+    s = -sign(point[index] * ray.dir[index])
 
     @assert s != 0
 
