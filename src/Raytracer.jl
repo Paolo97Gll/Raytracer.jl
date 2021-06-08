@@ -7,6 +7,7 @@
 
 """
     Raytracer
+
 Raytracing package for the generation of photorealistic images in Julia.
 """
 module Raytracer
@@ -122,7 +123,7 @@ export # Colors
 
 
 include("colors.jl")
-include("hdr_image.jl")
+include("hdrimage.jl")
 
 include("pcg.jl")
 
@@ -131,11 +132,12 @@ include("transformations.jl")
 include("ray.jl")
 include("cameras.jl")
 include("materials.jl")
+include("lights.jl")
+include("hitrecord.jl")
 include("shapes.jl")
 include("world.jl")
-include("lights.jl")
 include("renderers.jl")
-include("image_tracer.jl")
+include("imagetracer.jl")
 
 include("user_utils.jl")
 

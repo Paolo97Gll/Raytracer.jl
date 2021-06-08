@@ -3,11 +3,20 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # World containing a collection of shapes
-# TODO write docstrings
 
 
+"""
+    World
+
+Alias of `Vector{Shape}`, to store a list of [`Shape`](@ref).
+"""
 const World = Vector{Shape}
 
+"""
+    ray_intersection(ray::Ray, world::World)
+
+Intersect a [`Ray`](@ref) with each [`Shape`](@ref) in [`World`](@ref) and return the nearest hit point.
+"""
 function ray_intersection(ray::Ray, world::World)
     hit = nothing
     for shape ∈ world
@@ -23,6 +32,11 @@ function ray_intersection(ray::Ray, world::World)
     hit
 end
 
+"""
+    is_point_visible(world::World, point::Point, observer_pos::Point)
+
+Tells if a particular [`Point`](@ref) in a [`World`](@ref) filled with [`Shape`](@ref) is visible from the observer position.
+"""
 function is_point_visible(world::World, point::Point, observer_pos::Point)
     direction = point - observer_pos
     dir_norm = norm(direction)
