@@ -99,7 +99,7 @@ end
         ray = Ray(Point(0f0, 0f0, 2f0), -VEC_Z)
         shape = Cube()
         intersect = ray_intersection(ray, shape)
-        @test intersect ≈ HitRecord(Point(0f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(3//8, 1//2), 1.5f0, ray, Material())
+        @test intersect ≈ HitRecord(Point(0f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(7//8, 1//2), 1.5f0, ray, Material())
     end
 
     @testset "from_behind" begin
@@ -120,7 +120,7 @@ end
         ray = Ray(Point(10f0, 0f0, 2f0), -VEC_Z)
         shape = Cube(transformation = translation(Vec(10f0, 0f0, 0f0)))
         intersect = ray_intersection(ray, shape)
-        @test intersect ≈ HitRecord(Point(10f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(3//8, 1//2), 1.5f0, ray, Material())
+        @test intersect ≈ HitRecord(Point(10f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(7//8, 1//2), 1.5f0, ray, Material())
     end
 
     @testset "transposed_from_behind" begin
