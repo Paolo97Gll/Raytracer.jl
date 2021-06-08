@@ -13,8 +13,16 @@
 """
     HitRecord
 
-A struct representing the result of an intersection between
-a [`Ray`](@ref) and a [`Shape`](@ref).
+A struct representing the result of an intersection between a [`Ray`](@ref) and a [`Shape`](@ref).
+
+# Members
+
+- `world_point::Point`: a [`Point`](@ref) representing the world coordinates of the hit point.
+- `normal::Normal`: a [`Normal`](@ref) representing the orientation of the normal to the surface where the hit happened.
+- `surface_point::Vec2D`: a [`Vec2D`](@ref) representing the position of the hit point on the surface of the object.
+- `t::Float32`: distance from the origin of the ray where the hit happened.
+- `ray::Ray`: a [`Ray`](@ref) representing the the ray that hit the surface.
+- `material::Material`: a [`Material`](@ref) representing the material of the point where the hit happened.
 """
 struct HitRecord
     world_point::Point
@@ -35,6 +43,11 @@ function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
     end
 end
 
+"""
+    ≈(hr1::HitRecord, hr2::HitRecord)
+
+Check if two [`HitRecord`](@ref) represent the same hit event or not.
+"""
 function (≈)(hr1::HitRecord, hr2::HitRecord)
     sp1, sp2 = hr1.surface_point, hr2.surface_point
     hr1.world_point     ≈  hr2.world_point     &&
@@ -75,6 +88,10 @@ end
     Sphere <: Shape
 
 A type representing a sphere.
+
+# Members
+
+- `transformation::Transformation`
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation()

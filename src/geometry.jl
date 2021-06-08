@@ -67,6 +67,18 @@ end
     Normal(x, y, z)
 
 Construct a non-normalized [`Normal{false}`](@ref) with given coordinates.
+
+# Examples
+
+```jldoctest
+julia> Normal(1, 2, 3)
+Normal with eltype Float32, not normalized
+x = 1.0, y = 2.0, z = 3.0
+
+julia> Normal(1.2, 3.3, 5)
+Normal with eltype Float32, not normalized
+x = 1.2, y = 3.3, z = 5.0
+```
 """
 Normal(x, y, z) = Normal{false}(map(x -> convert(Float32, x), (x, y, z)))
 
@@ -119,9 +131,7 @@ Compute the squared norm of a [`Normal`](@ref). If `n` is already normalized, `1
 # Examples
 
 ```jldoctest
-julia> n = Normal(1, 2, 3)
-Normal with eltype Float32, not normalized
-x = 1.0, y = 2.0, z = 3.0
+julia> n = Normal(1, 2, 3);
 
 julia> norm²(n)
 14.0f0
@@ -155,6 +165,18 @@ end
     Point(x, y, z)
 
 Construct a `Point` with given coordinates.
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3)
+Point with eltype Float32
+x = 1.0, y = 2.0, z = 3.0
+
+julia> Point(1.2, 3.3, 5)
+Point with eltype Float32
+x = 1.2, y = 3.3, z = 5.0
+```
 """
 Point(x, y, z) = Point(SVector(map(x -> convert(Float32, x), (x, y, z))))
 
@@ -186,9 +208,7 @@ Check if two points are close.
 # Examples
 
 ```jldoctest
-julia> p = Point(1, 2, 3)
-Point with eltype Float32
-x = 1.0, y = 2.0, z = 3.0
+julia> p = Point(1, 2, 3);
 
 julia> p ≈ Point(1, 2, 3)
 true
@@ -303,18 +323,15 @@ const ORIGIN = Point(0f0, 0f0, 0f0)
 """
     create_onb_from_z(input_normal::Normal)
 
-Create an orthonormal base from the z-axis using the [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) algorithm.
+Create an orthonormal base from the z-axis using the
+[Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) algorithm.
 
 # Examples
 
 ```jldoctest
-julia> n = Normal(0,0,5)
-Normal with eltype Float32, not normalized
-x = 0.0, y = 0.0, z = 5.0
+julia> n = Normal(0,0,5);
 
-julia> nn = normalize(Normal(0,0,5))
-Normal with eltype Float32, normalized
-x = 0.0, y = 0.0, z = 1.0
+julia> nn = normalize(Normal(0,0,5));
 
 julia> create_onb_from_z(n)
 (Vec(1.0, -0.0, -0.0), Vec(-0.0, 1.0, -0.0), Vec(0.0, 0.0, 1.0))

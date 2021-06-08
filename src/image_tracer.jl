@@ -3,17 +3,26 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Trace utility to generate an image by shooting light rays through each of its pixels
-# TODO write docstrings
 
 
 """
-    ImageTracer{T}
+    ImageTracer
 
-Agent struct filling an [`HdrImage`](@ref) with the information collected by a [`Camera`](@ref).
+Trace an image by shooting light rays through each of its pixels.
 
-To fill an image store it into `ImageTracer` along with the desired
-camera and apply [`fire_all_rays`](@ref) to it. Alternatively apply iteratively [`fire_ray`](@ref)
+To fill an image store it into `ImageTracer` along with the desired camera and apply [`fire_all_rays!`](@ref)
+to it. Alternatively apply iteratively [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref)
 on the desired ranges.
+
+# Members
+
+- `image::HdrImage`: a [`HdrImage`](@ref) in which save the rendered image.
+- `camera::Camera`: a [`Camera`](@ref) holding the observer informations.
+- `samples_per_side::Int`: the number of samples per side of a pixel for antialiasing algorithm.
+- `rng::PCG`: a [`PCG`](@ref) random number generator for antialiasing algorithm.
+
+If `samples_per_side` is larger than zero, antialiasing will be applied to each pixel in the image,
+using the random number generator `rng`.
 """
 struct ImageTracer
     image::HdrImage
@@ -22,21 +31,34 @@ struct ImageTracer
     rng::PCG
 end
 
-ImageTracer(image::HdrImage, camera::Camera; samples_per_side::Int = 0 ,rng::PCG = PCG()) = ImageTracer(image, camera, samples_per_side, rng)
+"""
+    ImageTracer(image::HdrImage, camera::Camera
+                ; samples_per_side::Int = 0,
+                  rng::PCG = PCG())
 
+Construct a ImageTracer.
+
+If `samples_per_side` is not specified (aka is 0), antialiasing will be disabled and `rng` is ignored.
+"""
+function ImageTracer(image::HdrImage, camera::Camera;
+                     samples_per_side::Int = 0,
+                     rng::PCG = PCG())
+    ImageTracer(image, camera, samples_per_side, rng)
+end
 
 """
-    fire_ray(tracer, col, row; u_pixel= 0.5, v_pixel = 0.5)
+    fire_ray(tracer::ImageTracer, col::Int, row::Int
+             ; u_pixel::Float32 = 0.5f0,
+               v_pixel::Float32 = 0.5f0)
 
-Shoot a [`Ray`](@ref) through the pixel `(col, row)`
+Shoot a [`Ray`](@ref) through the pixel ``(col, row)``.
 
 The parameters `col` and `row` are measured in the same way as they are in [`HdrImage`](@ref): the bottom left
-corner is placed at `(0, 0)`. The values of `u_pixel` and `v_pixel` are floating-point numbers in the range
-`[0, 1]`: they specify where the ray should cross the pixel; passing 0.5 to both means that the ray will pass
+corner is placed at ``(0, 0)``. The values of `u_pixel` and `v_pixel` are floating-point numbers in the range
+``[0, 1]``: they specify where the ray should cross the pixel; passing 0.5 to both means that the ray will pass
 through the pixel's center.
 """
-function fire_ray(tracer::ImageTracer,
-                  col::Int, row::Int;
+function fire_ray(tracer::ImageTracer, col::Int, row::Int;
                   u_pixel::Float32 = 0.5f0,
                   v_pixel::Float32 = 0.5f0)
     size_col, size_raw = size(tracer.image)
@@ -44,16 +66,6 @@ function fire_ray(tracer::ImageTracer,
     v = 1f0 - (row - 1f0 + v_pixel) / size_raw
     fire_ray(tracer.camera, u, v)
 end
-
-"""
-    fire_all_rays!(tracer, func)
-
-Fire a [`Ray`](@ref) accross each pixel of the image
-
-For each pixel in the image contained into `tracer` (instance of [`ImageTracer`](@ref)), fire one ray. Then,
-pass it to the function `func`, which must accept a `Ray` as its only parameter and must return a `[RGB](@ref)`
-instance containing the color to assign to that pixel in the image.
-"""
 
 function fire_all_rays_loop(tracer::ImageTracer, ind::CartesianIndex{2}, renderer::Renderer)
     if tracer.samples_per_side > 0
@@ -73,7 +85,20 @@ function fire_all_rays_loop(tracer::ImageTracer, ind::CartesianIndex{2}, rendere
     end
 end
 
-function fire_all_rays!(tracer::ImageTracer, renderer::Renderer; use_threads::Bool = true, enable_progress_bar::Bool = true)
+"""
+    fire_all_rays!(tracer::ImageTracer, renderer::Renderer
+                   ; use_threads::Bool = true,
+                     enable_progress_bar::Bool = true)
+
+Fire a [`Ray`](@ref) accross each pixel of the image contained in `tracer`.
+
+For each pixel in the image contained into `tracer`, fire one ray. Then, pass it to the `renderer`.
+
+See also:
+"""
+function fire_all_rays!(tracer::ImageTracer, renderer::Renderer;
+                        use_threads::Bool = true,
+                        enable_progress_bar::Bool = true)
     indices = CartesianIndices(tracer.image.pixel_matrix)
     p = Progress(length(indices), color=:white, enabled=enable_progress_bar)
     if use_threads
