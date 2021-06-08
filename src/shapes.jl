@@ -257,20 +257,20 @@ function get_uv(::Type{Cube}, point::Point)
     ispos = point[index] > 0
 
     if index == 1 
-        uc = ispos ? -z : z
+        uc = ispos ? z : -z
         vc = y
         offset = (ispos ? 2 : 0, 1)  
     elseif index == 2
         uc = x;
-        vc = ispos ? -z : z
+        vc = ispos ? z : -z
         offset = (1, ispos ? 2 : 0)
     else 
-        uc = ispos ? x : -x
+        uc = ispos ? -x : x
         vc = y
-        offset = (ispos ? 1 : 3, 1)
+        offset = (ispos ? 3 : 1, 1)
     end
 
-    @.((offset + 0.5f0 * ((uc, uc) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
+    @.((offset + 0.5f0 * ((uc, vc) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
 end
 
 # UNUSED, STORED HERE IF NEDDED IN FUTURE
