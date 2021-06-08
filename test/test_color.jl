@@ -16,14 +16,14 @@
     @testset "subtraction" begin
         @test c1 - c2 == RGB(0.6f0, 1.5f0, 2.4f0)
     end
-    
+
     @testset "scalar multiplication" begin
         a = 2
         @test a * c1 == RGB(2f0, 4f0, 6f0)
         @test c1 * a == RGB(2f0, 4f0, 6f0)
         @test a * c1 == c1 * a
     end
-    
+
     @testset "elementwise ≈" begin
         a = 0
         for i in 1:10
@@ -31,7 +31,7 @@
         end
         @test RGB(a, 2f0 * a, 3f0 * a) ≈ c1
     end
-    
+
     @testset "elementwise multiplication" begin
         @test c1 * c2 == RGB(1f0 * 0.4f0, 2f0 * 0.5f0, 3f0 * 0.6f0)
     end
@@ -49,7 +49,7 @@ end
         @test firstindex(c) === 1
         @test lastindex(c) === 3
     end
-    
+
     @testset "get index" begin
         # linear indexing
         @test r == c[begin]
@@ -58,7 +58,7 @@ end
         @test b == c[end]
         @test b == c[3]
         @test_throws BoundsError c[4]
-        
+
         # cartesian indexing
         @test r == c[CartesianIndex(1)]
         @test g == c[CartesianIndex(2)]
@@ -66,14 +66,14 @@ end
         @test_throws BoundsError c[CartesianIndex(4)]
     end
 
-    @testset "iterability" begin    
+    @testset "iterability" begin
         @test all(i == j for (i, j) in zip((r, g, b), c))
     end
 
     @testset "splat operator" begin
         cc = RGB(c...)
         @test cc === c
-    end 
+    end
 end
 
 
@@ -100,7 +100,7 @@ end
 
 @testset "color manipulation" begin
     c = RGB(1f0, 2f0, 3f0)
-    
+
     @test luminosity(c) ≈ 2f0
     @test clamp(c) ≈ RGB(1f0/2f0, 2f0/3f0, 3f0/4f0)
     @test γ_correction(c, 1f0) ≈ c

@@ -9,7 +9,7 @@
 mutable struct PCG <: AbstractRNG
     state::UInt64
     inc::UInt64
-    
+
     function PCG(state::UInt64 = UInt64(42), inc::UInt64 = UInt64(54))
         self = new(UInt64(0), (inc << UInt64(1)) | UInt64(1))
         rand(self)
@@ -23,7 +23,7 @@ function Base.rand(r::PCG)
     rand(r, Sampler(r, UInt32, Val(1)))
 end
 
-function Base.rand(r::PCG, ::Random.SamplerType{UInt32}) 
+function Base.rand(r::PCG, ::Random.SamplerType{UInt32})
     oldstate = r.state
     r.state = UInt64(oldstate * UInt64(6364136223846793005) + r.inc)
     xorshifted = UInt32(((oldstate >> UInt64(18)) ⊻ oldstate) >> UInt64(27) & typemax(UInt32))

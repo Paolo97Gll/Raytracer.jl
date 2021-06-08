@@ -2,7 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# Implementation of HdrImage for the manipulation and elaboration of and HDR image 
+# Implementation of HdrImage for the manipulation and elaboration of and HDR image
 # TODO write docstrings
 
 
@@ -39,7 +39,7 @@ Construct an `HdrImage` wrapping a matrix obtained from `reshape`.
 
 # Examples
 ```jldoctest
-julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.), 
+julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
 julia> a = HdrImage(arr, 3, 2)
@@ -93,7 +93,7 @@ copy(bc::Broadcasted{Style{HdrImage}}) = copy(convert(Broadcasted{Broadcast.Defa
 # Tone mapping
 
 
-function average_luminosity(image::HdrImage; δ::Float32 = eps(Float32)) 
+function average_luminosity(image::HdrImage; δ::Float32 = eps(Float32))
     10^(sum(map(x -> log10(δ + luminosity(x)), image))/length(image))
 end
 

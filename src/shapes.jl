@@ -176,7 +176,7 @@ end
 A type representing an Axis-Aligned Bounding Box
 """
 Base.@kwdef struct AABB
-    p_M::Point = Point(1f0, 1f0, 1f0) 
+    p_M::Point = Point(1f0, 1f0, 1f0)
     p_m::Point = Point(0f0, 0f0, 0f0)
 end
 
@@ -187,7 +187,7 @@ Return the parameter `t` at which `ray` first hits the bounding box. If no hit e
 """
 function ray_intersection(ray::Ray, aabb::AABB)
     dir = ray.dir
-    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir))) 
+    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir)))
     isempty(overlap) && return typemax(Float32)
     t = overlap.first
 end

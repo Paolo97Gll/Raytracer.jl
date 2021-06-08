@@ -13,7 +13,7 @@
     sinvm = SMatrix{4, 4, Float32}(invm)
 
     @testset "constructor" begin
-        def_t = Transformation() 
+        def_t = Transformation()
         @test def_t.m == def_t.invm == sI
         @test isconsistent(def_t)
 
@@ -30,7 +30,7 @@
         @test isconsistent(t3)
 
         t4 = Transformation(sm, invm)
-        @test t4.m == m && t4.invm == invm 
+        @test t4.m == m && t4.invm == invm
         @test isconsistent(t4)
 
         t5 = Transformation(m, sinvm)
@@ -54,8 +54,8 @@
     @testset "operations" begin
         prod = t1 * t2
 
-        @test isconsistent(prod) 
-        
+        @test isconsistent(prod)
+
         @test prod.m    == t1.m * t2.m
         @test prod.invm == t2.invm * t1.invm
 
@@ -68,7 +68,7 @@
     end
 
     @testset "methods" begin
-        t = t1 * t2 
+        t = t1 * t2
         invt = inv(t)
         @test t.m == invt.invm && t.invm == invt.m
 

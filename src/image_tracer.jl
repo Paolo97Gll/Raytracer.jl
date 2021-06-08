@@ -11,8 +11,8 @@
 
 Agent struct filling an [`HdrImage`](@ref) with the information collected by a [`Camera`](@ref).
 
-To fill an image store it into `ImageTracer` along with the desired 
-camera and apply [`fire_all_rays`](@ref) to it. Alternatively apply iteratively [`fire_ray`](@ref) 
+To fill an image store it into `ImageTracer` along with the desired
+camera and apply [`fire_all_rays`](@ref) to it. Alternatively apply iteratively [`fire_ray`](@ref)
 on the desired ranges.
 """
 struct ImageTracer
@@ -36,8 +36,8 @@ corner is placed at `(0, 0)`. The values of `u_pixel` and `v_pixel` are floating
 through the pixel's center.
 """
 function fire_ray(tracer::ImageTracer,
-                  col::Int, row::Int; 
-                  u_pixel::Float32 = 0.5f0, 
+                  col::Int, row::Int;
+                  u_pixel::Float32 = 0.5f0,
                   v_pixel::Float32 = 0.5f0)
     size_col, size_raw = size(tracer.image)
     u = (col - 1f0 + u_pixel) / size_col

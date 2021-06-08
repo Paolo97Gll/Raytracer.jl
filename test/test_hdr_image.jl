@@ -32,7 +32,7 @@ c8 = RGB(22f0, 23f0, 24f0)
         image = HdrImage(img_width, img_height)
         @test image.pixel_matrix == rgb_zeros
         @test all(image.pixel_matrix .=== rgb_zeros)
-        
+
         # convenience alias
         image = HdrImage(img_width, img_height)
         @test image.pixel_matrix == rgb_zeros
@@ -97,7 +97,7 @@ end
 
         # test exceptions
         @test_throws BoundsError image[7]
-        
+
         # cartesian indexing
         @test c1 == image[1,1]
         @test c2 == image[2,1]
@@ -168,7 +168,7 @@ end
         img = clamp_image(img)
         @test all(0 <= col <= 1 for pix ∈ img for col ∈ pix)
     end
-    
+
     @testset "average_luminosity" begin
         image = HdrImage([RGB(  5f0,   10f0,   15f0) RGB(500f0, 1000f0, 1500f0)])
         @test average_luminosity(image) ≈ 100f0

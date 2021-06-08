@@ -26,7 +26,7 @@
 
     @testset "transform" begin
         cam = OrthogonalCamera(transformation = translation(-VEC_Y * 2f0) * rotationZ(π/2))
-    
+
         ray = fire_ray(cam, 0.5f0, 0.5f0)
         @test ray(1f0) ≈ Point(0f0, -2f0, 0f0)
     end
@@ -54,7 +54,7 @@ end
 
     @testset "transform" begin
         cam = PerspectiveCamera(transformation = translation(-VEC_Y * 2f0) * rotationZ(π/2))
-    
+
         ray = fire_ray(cam, 0.5f0, 0.5f0)
         @test ray(1f0) ≈ Point(0f0, -2f0, 0f0)
     end

@@ -26,7 +26,7 @@ A basic bichrome renderer that checks whether a [`Ray`](@ref) has collided or no
 
 This renderer returns its field `off_color` when the given [`Ray`](@ref) is `nothing`, else it returns its field `on_color`.
 """
-struct OnOffRenderer <: Renderer 
+struct OnOffRenderer <: Renderer
     world::World
     on_color::RGB{Float32}
     off_color::RGB{Float32}
@@ -73,10 +73,10 @@ end
 A path-tracing algorithm that considers the optical path from the observer to a light source.
 
 Its fields are:
-- a `background_color` field, storing the value to return if the given [`Ray`](@ref) doesn't hit anything, 
-- a [`PCG`](@ref) random number generator to appropriately scatter rays, 
+- a `background_color` field, storing the value to return if the given [`Ray`](@ref) doesn't hit anything,
+- a [`PCG`](@ref) random number generator to appropriately scatter rays,
 - an 'n` field indicating how many scattered rays should be generated,
-- a `max_depth` field indicating the maximum number of scatters a ray should be subjected to before stopping, 
+- a `max_depth` field indicating the maximum number of scatters a ray should be subjected to before stopping,
 - a `roulette_depth` field indicating the depth at which the russian roulette algorithm should start (if > 'max_depth` then it will never start).
 """
 struct PathTracer <: Renderer
@@ -136,6 +136,6 @@ function (pt::PathTracer)(ray::Ray)
             cum_radiance += hit_color * new_radiance
         end
     end
-    
+
     emitted_radiance + cum_radiance * (1f0 / pt.n)
 end

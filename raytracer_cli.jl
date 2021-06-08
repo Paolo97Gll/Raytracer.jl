@@ -298,7 +298,7 @@ function parse_commandline()
             arg_type = String
             default = "demo"
     end
-    
+
     parse_args(s)
 end
 
@@ -334,7 +334,7 @@ function demoimage(options::Dict{String, Any})
             exit(1)
         end
     end
-    
+
     Raytracer.demo(
         output_file = options["output_file"],
         camera_type = options["camera_type"],
@@ -412,7 +412,7 @@ function demoanimation(options::Dict{String, Any})
         demoanimation_loop(elem, length(θ_list), options)
         next!(p)
     end
-    
+
     print("Generating animation...")
     padding = trunc(Int, log10(length(θ_list))) + 1
     run(pipeline(

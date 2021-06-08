@@ -9,12 +9,12 @@
 
 A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
 
-A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation 
+A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation
 significantly increases performance at the cost of memory space.
 
 Members:
 - `m` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the transformation. Default value is the identity matrix.
-- `invm` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the inverse transformation. 
+- `invm` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the inverse transformation.
   Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
 
 # Examples
@@ -36,7 +36,7 @@ Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
 struct Transformation
     m::SMatrix{4, 4, Float32}
     invm::SMatrix{4, 4, Float32}
-    
+
     function Transformation(m::SMatrix{4, 4, Float32} = SMatrix{4, 4, Float32}(I(4)),
                             invm::SMatrix{4, 4, Float32} = inv(m))
         new(m, invm)
@@ -136,7 +136,7 @@ end
 
 
 ##########
-# Inverse 
+# Inverse
 
 
 """
@@ -144,10 +144,10 @@ end
 
 Return the inverse [`Transformation`](@ref).
 
-Returns a `Transformation` which has the `m` and `invm` fields swapped. 
+Returns a `Transformation` which has the `m` and `invm` fields swapped.
 
 #Examples
-```jldoctest; setup = :(using LinearAlgebra: Diagonal) 
+```jldoctest; setup = :(using LinearAlgebra: Diagonal)
 julia> t = Transformation(Diagonal([1, 2, 3, 1]))
 4x4 Transformation:
 Matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
@@ -199,7 +199,7 @@ let rotation_matrices = Dict(
 
     for (ax, mat) ∈ pairs(rotation_matrices)
         quote
-            function $(Symbol(:rotation, ax))(θ::Real) 
+            function $(Symbol(:rotation, ax))(θ::Real)
                 m = $mat
                 Transformation(m, transpose(m))
             end
@@ -211,14 +211,14 @@ let rotation_matrices = Dict(
             rotation$ax(θ)
 
         Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
-        
+
         If an `AbstractVector` is provided as argument it must have a size = (3,)
-        
+
         # Examples
         ```jldoctest
         julia> rotation$ax(π/4)
         $(replace(repr(MIME("text/plain"), mat), "Raytracer." => "" ))
-        ```            
+        ```
         """
         @doc docmsg(:X, rotationX(π/4)) rotationX
         @doc docmsg(:Y, rotationY(π/4)) rotationY
@@ -271,7 +271,7 @@ Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
 ```
 """
 function translation(v::AbstractVector)
-    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'translate' requires an argument of size = (3,)")) 
+    size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'translate' requires an argument of size = (3,)"))
 
     mat = Diagonal(ones(eltype(v), 4)) |> MMatrix{4, 4}
     mat⁻¹ = copy(mat)
@@ -280,7 +280,7 @@ function translation(v::AbstractVector)
     Transformation(mat, mat⁻¹)
 end
 
-translation(x::Real, y::Real, z::Real) = translation([x,y,z]) 
+translation(x::Real, y::Real, z::Real) = translation([x,y,z])
 
 
 ##########
@@ -344,13 +344,13 @@ Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
 ```
 """
 function scaling(x::Real, y::Real, z::Real)
-    Transformation(Diagonal(        [x, y, z, true]), 
+    Transformation(Diagonal(        [x, y, z, true]),
                    Diagonal(true ./ [x, y, z, true])) # NOTE: the use of true is to avoid unwanted promotions
 end
 
 scaling(s::Real) = scaling(s, s, s)
 
-function scaling(v::AbstractVector) 
+function scaling(v::AbstractVector)
     size(v) == (3,) || raise(ArgumentError("argument 'v' has size = $(size(v)) but 'scaling' requires an argument of size = (3,)"))
     scaling(v...)
 end

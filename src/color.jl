@@ -144,7 +144,7 @@ julia> c1 * c2 ≈ RGB(0f0, 0f0, 0f0)
 false
 ```
 """
-(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r &&  
+(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r &&
                         c1.g ≈ c2.g &&
                         c1.b ≈ c2.b
 
@@ -188,18 +188,18 @@ iterate(c::RGB, state = 1) = state > 3 ? nothing : (c[state], state +1)
 # the following: `materialize(broadcasted(combine_styles(map(broadcastable, xs)), f, xs...))`
 # Let's analyze what each of these functions does and why each of the following methods is needed
 
-# Let's start with broadcastable: broadcasting maps its arguments so that each argument is transformed 
+# Let's start with broadcastable: broadcasting maps its arguments so that each argument is transformed
 # into a type supporting indexing and the method `axes`, and thus being able to be converted into an
 # array-like type. We'll trick the broadcasting process into thinking this is the case for `RGB` so that
 # `broadcastable` will return its argument when it is applied to an `RGB`
 
-axes(::RGB) = (OneTo(3),) 
+axes(::RGB) = (OneTo(3),)
 
 broadcastable(c::RGB) = c
 broadcastable(::Type{RGB}) = RGB # broadcastable is also applied to types
 
 # Then the result of the previous mapping is passed onto the function `combine_styles`, which
-# relies on calls to the constructor of `BroadcastStyle`. We need to create a `BroadcastStyle` 
+# relies on calls to the constructor of `BroadcastStyle`. We need to create a `BroadcastStyle`
 # exclusive to `RGB` so that we can then specialize other methods that are fed `BroadcastStyle`s
 
 struct RGBBroadcastStyle <: BroadcastStyle end

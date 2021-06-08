@@ -47,7 +47,7 @@ end
 
 @testset "Normal" begin
     v1, v2, v3 = (sv1, vv2, vv3) .|> Normal
-    
+
     @testset "constructor" begin
         @test v1 == sv1
         @test v2 == sv2
@@ -83,7 +83,7 @@ end
     end
 
     @testset "operations" begin
-        @test p1 ≈ Point(vv3 ./ 10)  
+        @test p1 ≈ Point(vv3 ./ 10)
 
         @test p1 - p2 == Vec(sv1 - sv2)
 
@@ -103,7 +103,7 @@ end
             normal = Normal(rand(pcg, Float32, 3)) |> normalize
 
             e1, e2, e3 = create_onb_from_z(normal)
-            
+
             # Verify that the z axis is aligned with the normal
             @assert e3 ≈ normal
 

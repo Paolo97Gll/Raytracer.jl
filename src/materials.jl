@@ -136,5 +136,5 @@ end
 
 Base.@kwdef struct Material
     brdf::BRDF = DiffuseBRDF()
-    emitted_radiance::Pigment = UniformPigment(BLACK) 
+    emitted_radiance::Pigment = UniformPigment(BLACK)
 end

@@ -50,7 +50,7 @@ Parameters `u` and `v` are bound between `0` and `1`:
     (0, 0)                            (1, 0)
 """
 function fire_ray(camera::OrthogonalCamera, u::Float32, v::Float32)
-    camera.transformation * Ray(Point(-1f0, (1f0 - 2u) * camera.aspect_ratio, 2v - 1f0), 
+    camera.transformation * Ray(Point(-1f0, (1f0 - 2u) * camera.aspect_ratio, 2v - 1f0),
                                 VEC_X,
                                 tmin = 1f0)
 end
