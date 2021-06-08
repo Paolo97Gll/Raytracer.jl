@@ -20,7 +20,7 @@ using Raytracer
     include("test_colors.jl")
 end
 @testset "HDR Image" begin
-    include("test_hdr_image.jl")
+    include("test_hdrimage.jl")
 end
 
 
@@ -41,9 +41,6 @@ end
 @testset "Cameras" begin
     include("test_cameras.jl")
 end
-@testset "ImageTracer" begin
-    include("test_image_tracer.jl")
-end
 @testset "Materials" begin
     include("test_materials.jl")
 end
@@ -55,6 +52,9 @@ end
 end
 @testset "Renderers" begin
     include("test_renderers.jl")
+end
+@testset "ImageTracer" begin
+    include("test_imagetracer.jl")
 end
 
 
