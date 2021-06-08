@@ -115,7 +115,7 @@ export # Colors
 # Includes
 
 
-include("color.jl")
+include("colors.jl")
 include("hdr_image.jl")
 
 include("pcg.jl")
