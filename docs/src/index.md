@@ -23,7 +23,7 @@ Modules = [Raytracer]
 Pages   = ["geometry.jl"]
 ```
 
-## Camera documentation
+## Cameras documentation
 
 ```@autodocs
 Modules = [Raytracer]
