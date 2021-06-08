@@ -20,7 +20,7 @@ using Raytracer:
 
 
 @testset "Color" begin
-    include("test_color.jl")
+    include("test_colors.jl")
 end
 @testset "HDR Image" begin
     include("test_hdr_image.jl")
