@@ -139,3 +139,36 @@ function (pt::PathTracer)(ray::Ray)
 
     emitted_radiance + cum_radiance * (1f0 / pt.n)
 end
+
+struct PointLightRenderer <: Renderer
+    world::World
+    lights::Lights
+    background_color::RGB{Float32}
+    ambient_color::RGB{Float32}
+end
+
+function (plr::PointLightRenderer)(ray::Ray)
+    hit_record = ray_intersection(ray, plr.world)
+    isnothing(hit_record) && return plr.background_color
+
+    hit_material = hit_record.material
+
+    result_color = plr.ambient_color
+    for cur_light ∈ plr.lights
+        is_point_visible(plr.world, cur_light.position, hit_record.world_point) || continue
+
+        distance_vec = hit_record.world_point - cur_light.position
+        distance = norm(distance_vec)
+        in_dir = distance_vec * (1f0 / distance)
+        cos_theta = max(0f0, normalized_dot(-ray.dir, hit_record.normal))
+
+        distance_factor = cur_light.linear_radius > 0 ? (cur_light.linear_radius / distance)^2 : 1f0
+
+        emitted_color = hit_material.emitted_radiance[hit_record.surface_point]
+        brdf_color = at(hit_material.brdf, hit_record.normal, in_dir, -ray.dir, hit_record.surface_point)
+
+        result_color += (emitted_color + brdf_color) * cur_light.color * cos_theta * distance_factor
+    end
+
+    return result_color
+end
