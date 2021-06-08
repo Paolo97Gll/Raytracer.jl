@@ -151,7 +151,7 @@ function parse_commandline()
             help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
             default = "path"
-            range_tester = x -> (x ∈ ["onoff", "flat", "path"])
+            range_tester = x -> (x ∈ ["onoff", "flat", "path", "pointlight"])
         "--antialiasing", "-A"
             help = "number of samples per pixel (must be a perfect square)"
             arg_type = Int
@@ -236,7 +236,7 @@ function parse_commandline()
             help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
             arg_type = String
             default = "path"
-            range_tester = x -> (x ∈ ["onoff", "flat", "path"])
+            range_tester = x -> (x ∈ ["onoff", "flat", "path", "pointlight"])
         "--antialiasing", "-A"
             help = "number of samples per pixel (must be a perfect square)"
             arg_type = Int
@@ -447,6 +447,8 @@ function parse_item(::Type{Renderer}, x::AbstractString)
         return FlatRenderer
     elseif x == "path"
         return PathTracer
+    elseif x == "pointlight"
+        return PointLightRenderer
     else
         error("No parsing is available from string \"$x\" to any subtype of `Renderer`.")
     end

@@ -164,7 +164,7 @@ function (plr::PointLightRenderer)(ray::Ray)
 
         distance_factor = cur_light.linear_radius > 0 ? (cur_light.linear_radius / distance)^2 : 1f0
 
-        emitted_color = hit_material.emitted_radiance[hit_record.surface_point]
+        emitted_color = hit_material.emitted_radiance(hit_record.surface_point)
         brdf_color = at(hit_material.brdf, hit_record.normal, in_dir, -ray.dir, hit_record.surface_point)
 
         result_color += (emitted_color + brdf_color) * cur_light.color * cos_theta * distance_factor
