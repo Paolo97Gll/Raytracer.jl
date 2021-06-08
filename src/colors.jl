@@ -205,7 +205,7 @@ end
 Return the mean value between the maximum component and the minumum component of a color:
 
 ```math
-\frac{max(c) + min(c)}{2}
+\frac{\text{max}(c) + \text{min}(c)}{2}
 ```
 
 # Examples
@@ -242,7 +242,7 @@ clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 Return a `RGB{T}` color, with each component `x` corrected with the formula:
 
 ```math
-x^{\frac{1}{\gamma}}
+x^{1 / \gamma}
 ```
 
 # Examples
