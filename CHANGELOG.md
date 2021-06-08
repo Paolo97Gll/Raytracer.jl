@@ -16,6 +16,8 @@
 
 ### New package features
 
+- Add `PointLightRenderer` renderer with relative `PointLight` composite type and `Lights` alias ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20))
+
 - Add `PathTracer` renderer ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
 
 - Add the implementation of an OrthoNormal Basis (ONB) creation algorithm based on [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
