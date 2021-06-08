@@ -60,6 +60,7 @@ export # Rendering
     RGB,
         luminosity, clamp, γ_correction,
     HdrImage,
+        luminosity, clamp, γ_correction,
     Camera,
         PerspectiveCamera, OrthogonalCamera,
         aperture_deg,

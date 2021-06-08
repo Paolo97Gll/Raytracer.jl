@@ -16,7 +16,7 @@ function tonemapping(input_file::String,
     print(io, "Loading input file '$(input_file)'...")
     image = load(input_file) |> HdrImage
     print(io, " done!\nApplying tone mapping... ")
-    image = normalize_image(image, α) |> clamp_image
+    image = normalize(image, α) |> clamp
     image = γ_correction(image, γ)
     print(io, " done!\nSaving final image to '$(output_file)'...")
     save(output_file, image.pixel_matrix)
