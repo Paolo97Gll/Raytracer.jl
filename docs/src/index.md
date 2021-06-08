@@ -2,9 +2,37 @@
 
 Welcome!
 
-## All documentation
+## Colors documentation
 
 ```@autodocs
 Modules = [Raytracer]
-Pages   = ["cameras.jl", "colors.jl", "geometry.jl", "hdr_image.jl", "image_tracer.jl"]
+Pages   = ["colors.jl"]
+```
+
+## HDR image documentation
+
+```@autodocs
+Modules = [Raytracer]
+Pages   = ["hdr_image.jl"]
+```
+
+## Geometry documentation
+
+```@autodocs
+Modules = [Raytracer]
+Pages   = ["geometry.jl"]
+```
+
+## Camera documentation
+
+```@autodocs
+Modules = [Raytracer]
+Pages   = ["cameras.jl"]
+```
+
+## Image tracer documentation
+
+```@autodocs
+Modules = [Raytracer]
+Pages   = ["image_tracer.jl"]
 ```
