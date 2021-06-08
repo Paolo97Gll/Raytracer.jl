@@ -195,8 +195,8 @@ rendering:
                         resolution of the rendered image (default:
                         "540:540")
   -R, --renderer RENDERER
-                        type of renderer to use ("onoff", "flat" or
-                        "path") (default: "path")
+                        type of renderer to use ("onoff", "flat",
+                        "path" or "pointlight") (default: "path")
   -A, --antialiasing ANTIALIASING
                         number of samples per pixel (must be a perfect
                         square) (type: Int64, default: 0)
@@ -267,8 +267,8 @@ frame rendering:
                         resolution of the rendered image (default:
                         "540:540")
   -R, --renderer RENDERER
-                        type of renderer to use ("onoff", "flat" or
-                        "path") (default: "path")
+                        type of renderer to use ("onoff", "flat",
+                        "path" or "pointlight") (default: "path")
   -A, --antialiasing ANTIALIASING
                         number of samples per pixel (must be a perfect
                         square) (type: Int64, default: 0)
