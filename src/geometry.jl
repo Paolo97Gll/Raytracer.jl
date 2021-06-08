@@ -341,10 +341,8 @@ function create_onb_from_z(input_normal::Normal)
 end
 
 """
-    normalized_dot(a::Vec, b::Vec)
-    normalized_dot(a::Normal, b::Normal)
+    normalized_dot(a, b)
 
 Normalize `a` and `b` and then compute the dot product.
 """
-normalized_dot(v1::Vec, v2::Vec) = normalize(v1) ⋅ normalize(v2)
-normalized_dot(n1::Normal, n2::Normal) = normalize(n1) ⋅ normalize(n2)
+normalized_dot(v1::AbstractVector, v2::AbstractVector) = normalize(v1) ⋅ normalize(v2)
