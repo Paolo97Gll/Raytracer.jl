@@ -91,7 +91,7 @@ function ray_intersection(ray::Ray, s::S) where {S <: Shape}
     isnothing(t) && return nothing
     hit_point = inv_ray(t)
     world_point = s.transformation * hit_point
-    normal = s.transformation * get_normal(S, hit_point) 
+    normal = s.transformation * get_normal(S, hit_point, inv_ray) 
     surface_point = get_uv(S, hit_point)
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
@@ -126,9 +126,9 @@ end
 
 function get_t(::Type{Sphere}, ray::Ray)
     # compute intersection
-    origin_vec = convert(Vec, inv_ray.origin)
-    a = norm²(inv_ray.dir)
-    b = 2f0 * origin_vec ⋅ inv_ray.dir
+    origin_vec = convert(Vec, ray.origin)
+    a = norm²(ray.dir)
+    b = 2f0 * origin_vec ⋅ ray.dir
     c = norm²(origin_vec) - 1f0
     Δ = b^2 - 4f0 * a * c
     Δ < 0 && return nothing
@@ -136,9 +136,9 @@ function get_t(::Type{Sphere}, ray::Ray)
     t_1 = (-b - sqrt_Δ) / (2f0 * a)
     t_2 = (-b + sqrt_Δ) / (2f0 * a)
     # nearest point
-    if (t_1 > inv_ray.tmin) && (t_1 < inv_ray.tmax)
+    if (t_1 > ray.tmin) && (t_1 < ray.tmax)
         return t_1
-    elseif (t_2 > inv_ray.tmin) && (t_2 < inv_ray.tmax)
+    elseif (t_2 > ray.tmin) && (t_2 < ray.tmax)
         return t_2
     else
         return nothing
@@ -152,7 +152,7 @@ function get_uv(::Type{Sphere}, point::Point)
     Vec2D(u, v)
 end
 
-function get_normal(::Type{Sphere}, point::Point)
+function get_normal(::Type{Sphere}, point::Point, ray::Ray)
     normal = convert(Normal, point)
     (normal ⋅ ray.dir < 0) ? normal : -normal
 end
@@ -191,11 +191,11 @@ function get_t(::Type{Plane}, ray::Ray)
 end
 
 function get_uv(::Type{Plane}, point::Point)
-    hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
+    point.v[1:2] - floor.(point.v[1:2]) |> Vec2D
 end
 
-function get_normal(::Type{Plane}, point::Point)
-    -sign(inv_ray.dir.z) * NORMAL_Z
+function get_normal(::Type{Plane}, point::Point, ray::Ray)
+    -sign(ray.dir.z) * NORMAL_Z
 end
 
 # function quick_ray_intersection(ray::Ray, s::Plane)
@@ -284,7 +284,7 @@ end
 #     error("Invalid uv coordinate for a Cube: got $uv")
 # end
 
-function get_normal(::Type{Cube}, point::Point)
+function get_normal(::Type{Cube}, point::Point, ::Ray)
     abs_point = point.v .|> abs |> Point
     _, index = findmax(abs_point)
 
