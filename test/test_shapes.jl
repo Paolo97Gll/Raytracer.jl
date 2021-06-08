@@ -93,3 +93,54 @@ end
         @test intersect ≈ HitRecord(Point(1f0, 1f0, 0f0), NORMAL_Z_false, Vec2D(0f0, 0f0), 1f0, ray, Material())
     end
 end
+
+@testset "Cube" begin
+    @testset "from_above" begin
+        ray = Ray(Point(0f0, 0f0, 2f0), -VEC_Z)
+        shape = Cube()
+        intersect = ray_intersection(ray, shape)
+        @test intersect ≈ HitRecord(Point(0f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(3//8, 1//2), 1.5f0, ray, Material())
+    end
+
+    @testset "from_behind" begin
+        ray = Ray(Point(3f0, 0f0, 0f0), -VEC_X)
+        shape = Cube()
+        intersect = ray_intersection(ray, shape)
+        @test intersect ≈ HitRecord(Point(5f-1, 0f0, 0f0), NORMAL_X_false, Vec2D(5//8, 1//2), 2.5f0, ray, Material())
+    end
+
+    @testset "from_within" begin
+        ray = Ray(Point(0f0, 0f0, 0f0), VEC_X)
+        shape = Cube()
+        intersect = ray_intersection(ray, shape)
+        @test intersect ≈ HitRecord(Point(5f-1, 0f0, 0f0), -NORMAL_X_false, Vec2D(5//8, 1//2), 5f-1, ray, Material())
+    end
+
+    @testset "transposed_from_above" begin
+        ray = Ray(Point(10f0, 0f0, 2f0), -VEC_Z)
+        shape = Cube(transformation = translation(Vec(10f0, 0f0, 0f0)))
+        intersect = ray_intersection(ray, shape)
+        @test intersect ≈ HitRecord(Point(10f0, 0f0, 5f-1), NORMAL_Z_false, Vec2D(3//8, 1//2), 1.5f0, ray, Material())
+    end
+
+    @testset "transposed_from_behind" begin
+        ray = Ray(Point(13f0, 0f0, 0f0), -VEC_X)
+        shape = Cube(transformation = translation(Vec(10f0, 0f0, 0f0)))
+        intersect = ray_intersection(ray, shape)
+        @test intersect ≈ HitRecord(Point(10.5f0, 0f0, 0f0), NORMAL_X_false, Vec2D(5//8, 1//2), 2.5f0, ray, Material())
+    end
+
+    @testset "miss_transposed_from_above" begin
+        ray = Ray(Point(0f0, 0f0, 2f0), -VEC_Z)
+        shape = Cube(transformation = translation(Vec(10f0, 0f0, 0f0)))
+        intersect = ray_intersection(ray, shape)
+        @test intersect === nothing
+    end
+
+    @testset "miss_transposed_from_behind" begin
+        ray = Ray(Point(-10f0, 0f0, 0f0), -VEC_X)
+        shape = Cube(transformation = translation(Vec(10f0, 0f0, 0f0)))
+        intersect = ray_intersection(ray, shape)
+        @test intersect === nothing
+    end
+end
