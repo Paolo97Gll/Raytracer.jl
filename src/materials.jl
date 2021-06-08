@@ -83,7 +83,7 @@ Base.@kwdef struct DiffuseBRDF <: BRDF
 end
 
 function at(brdf::DiffuseBRDF, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)
-    brdf.pigment(uv) * brdf.reflectance / π
+    brdf.pigment(uv) * (brdf.reflectance / π)
 end
 
 function scatter_ray(::DiffuseBRDF, pcg::PCG, incoming_dir::Vec,
@@ -115,7 +115,7 @@ end
 function at(brdf::SpecularBRDF, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)
     θ_in = normalized_dot(normal, in_dir) |> acos
     θ_out = normalized_dot(normal, out_dir) |> acos
-    abs(θ_in - θ_out) < self.threshold_angle_rad < brdf.threshold_angle_rad ? brdf.pigment(uv) : BLACK
+    abs(θ_in - θ_out) < brdf.threshold_angle_rad < brdf.threshold_angle_rad ? brdf.pigment(uv) : BLACK
 end
 
 function scatter_ray(::SpecularBRDF, pcg::PCG, incoming_dir::Vec,
