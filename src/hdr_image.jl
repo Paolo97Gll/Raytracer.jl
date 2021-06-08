@@ -6,13 +6,19 @@
 
 
 """
-    HdrImage
+    struct HdrImage
 
 Wrapper of a `Matrix` of elements of type `RGB{Float32}`, used to represent an image in hdr format.
 """
 struct HdrImage
     pixel_matrix::Matrix{RGB{Float32}}
 end
+
+@doc """
+    HdrImage(pixel_matrix::Matrix{RGB{Float32}})
+
+Constructor for a [`HdrImage`](@ref) instance.
+""" HdrImage(::Matrix{RGB{Float32}})
 
 """
     HdrImage(img_width::Integer, img_height::Integer)
@@ -97,7 +103,7 @@ copy(bc::Broadcasted{Style{HdrImage}}) = copy(convert(Broadcasted{Broadcast.Defa
 @doc raw"""
     luminosity(image::HdrImage; δ::Float32 = eps(Float32))
 
-Return the average luminosity of `image` as the logaritmic mean of the [`luminosity(::RGB)`](@ref)
+Return the average luminosity an [`HdrImage`](@ref) as the logaritmic mean of the [`luminosity(::RGB)`](@ref)
 ``l_i`` of each pixel:
 
 ```math
@@ -124,7 +130,7 @@ end
     normalize(image::HdrImage, α::Float32
               ; luminosity::Float32 = average_luminosity(image))
 
-Normalize the image for a given luminosity.
+Normalize a [`HdrImage`](@ref) for a given luminosity.
 
 If the `luminosity` parameter is not specified, the image will be normalized according to
 the result of [`luminosity(::HdrImage; ::Float32)`](@ref).
@@ -149,7 +155,7 @@ end
 """
     clamp(image::HdrImage)
 
-Adjust the color levels of the brightest pixels in `image`, by applying the [`clamp(::RGB)`](@ref)
+Adjust the color levels of the brightest pixels of a [`HdrImage`](@ref), by applying the [`clamp(::RGB)`](@ref)
 function to each pixel.
 
 # Examples
@@ -170,7 +176,7 @@ clamp(image::HdrImage) = HdrImage(clamp.(image))
 """
     γ_correction(image::HdrImage, γ::Float32)
 
-Compute the γ correction of `image`, by applying the [`γ_correction(::RGB, ::Float32)`](@ref)
+Compute the γ correction of a [`HdrImage`](@ref), by applying the [`γ_correction(::RGB, ::Float32)`](@ref)
 function to each pixel.
 
 Before calling this function, you should apply a tone-mapping algorithm to the image and be sure that
@@ -183,7 +189,7 @@ the R, G, and B values of the colors in the image are all in the range ``[0, 1]`
 julia> arr = [RGB( 1.,  2.,  3.), RGB( 4.,  5.,  6.), RGB( 7.,  8.,  9.),
               RGB(10., 11., 12.), RGB(13., 14., 15.), RGB(16., 17., 18.)];
 
-julia> image = normalize(HdrImage(arr, 3, 2), 1f0) |> clamp
+julia> image = normalize(HdrImage(arr, 3, 2), 1f0) |> clamp;
 
 julia> γ_correction(image, 1f0)
 3x2 HdrImage:

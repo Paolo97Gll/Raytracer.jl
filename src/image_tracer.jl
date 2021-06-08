@@ -6,7 +6,7 @@
 
 
 """
-    ImageTracer
+    struct ImageTracer
 
 Trace an image by shooting light rays through each of its pixels.
 
@@ -23,6 +23,8 @@ on the desired ranges.
 
 If `samples_per_side` is larger than zero, antialiasing will be applied to each pixel in the image,
 using the random number generator `rng`.
+
+See also: [`fire_all_rays!`](@ref), [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref)
 """
 struct ImageTracer
     image::HdrImage
@@ -31,14 +33,20 @@ struct ImageTracer
     rng::PCG
 end
 
+@doc """
+    ImageTracer(image::HdrImage, camera::Camera, samples_per_side::Int, rng::PCG)
+
+Constructor for an [`ImageTracer`](@ref) instance.
+""" ImageTracer(::HdrImage, ::Camera, ::Int, ::PCG)
+
 """
     ImageTracer(image::HdrImage, camera::Camera
                 ; samples_per_side::Int = 0,
                   rng::PCG = PCG())
 
-Construct a ImageTracer.
+Construct a [`ImageTracer`](@ref).
 
-If `samples_per_side` is not specified (aka is 0), antialiasing will be disabled and `rng` is ignored.
+If `samples_per_side` is not specified, antialiasing will be disabled and `rng` is ignored.
 """
 function ImageTracer(image::HdrImage, camera::Camera;
                      samples_per_side::Int = 0,
@@ -51,12 +59,18 @@ end
              ; u_pixel::Float32 = 0.5f0,
                v_pixel::Float32 = 0.5f0)
 
-Shoot a [`Ray`](@ref) through the pixel ``(col, row)``.
+Shoot a [`Ray`](@ref) through the pixel `(col, row)` of the image contained in an [`ImageTracer`], using its
+camera informations.
+
+The function use the `fire_ray` function of the associated camera.
 
 The parameters `col` and `row` are measured in the same way as they are in [`HdrImage`](@ref): the bottom left
 corner is placed at ``(0, 0)``. The values of `u_pixel` and `v_pixel` are floating-point numbers in the range
 ``[0, 1]``: they specify where the ray should cross the pixel; passing 0.5 to both means that the ray will pass
 through the pixel's center.
+
+See also: [`fire_ray(::OrthogonalCamera, ::Float32, ::Float32)`](@ref),
+[`fire_ray(::PerspectiveCamera, ::Float32, ::Float32)`](@ref), [`fire_all_rays!`](@ref)
 """
 function fire_ray(tracer::ImageTracer, col::Int, row::Int;
                   u_pixel::Float32 = 0.5f0,
@@ -90,11 +104,18 @@ end
                    ; use_threads::Bool = true,
                      enable_progress_bar::Bool = true)
 
-Fire a [`Ray`](@ref) accross each pixel of the image contained in `tracer`.
+Render an image with informations stored in an [`ImageTracer`](@ref) using the specified [`Renderer`](@ref).
 
-For each pixel in the image contained into `tracer`, fire one ray. Then, pass it to the `renderer`.
+This function apply iteratively [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref) for
+each pixel in the image contained in `tracer` using its camera, and then render the point using `renderer`.
 
-See also:
+If `use_threads` is `true`, the function will use the `Threads.@threads` macro to parallelize the computation.
+
+If `enable_progress_bar` is `true`, the function will display a progress bar during the computation; this is thread safe.
+
+See also: [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref),
+[`fire_ray(::OrthogonalCamera, ::Float32, ::Float32)`](@ref),
+[`fire_ray(::PerspectiveCamera, ::Float32, ::Float32)`](@ref)
 """
 function fire_all_rays!(tracer::ImageTracer, renderer::Renderer;
                         use_threads::Bool = true,

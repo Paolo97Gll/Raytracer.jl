@@ -281,11 +281,58 @@ end
 
 one(c::RGB) = one(typeof(c))
 
+"""
+    BLACK
+
+A RGB{Float32} representing a black color.
+"""
 const BLACK = zero(RGB{Float32})
+
+"""
+    WHITE
+
+A RGB{Float32} representing a white color.
+"""
 const WHITE = one(RGB{Float32})
+
+"""
+    RED
+
+A RGB{Float32} representing a red color.
+"""
 const RED = RGB(1f0, 0f0, 0f0)
+
+"""
+    GREEN
+
+A RGB{Float32} representing a green color.
+"""
 const GREEN = RGB(0f0, 1f0, 0f0)
+
+"""
+    BLUE
+
+A RGB{Float32} representing a blue color.
+"""
 const BLUE = RGB(0f0, 0f0, 1f0)
+
+"""
+    CYAN
+
+A RGB{Float32} representing a cyan color.
+"""
 const CYAN = RGB(0f0, 1f0, 1f0)
+
+"""
+    MAGENTA
+
+A RGB{Float32} representing a magenta color.
+"""
 const MAGENTA = RGB(1f0, 0f0, 1f0)
+
+"""
+    YELLOW
+
+A RGB{Float32} representing a yellow color.
+"""
 const YELLOW = RGB(1f0, 1f0, 0f0)
