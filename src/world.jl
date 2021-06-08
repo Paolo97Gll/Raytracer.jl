@@ -27,7 +27,7 @@ function is_point_visible(world::World, point::Point, observer_pos::Point)
     direction = point - observer_pos
     dir_norm = norm(direction)
 
-    ray = Ray(observer_pos, direction, 1f-2 / dir_norm, 1f0)
+    ray = Ray(observer_pos, direction, 1f-2 / dir_norm, 1f0, 0)
 
     return !any(shape -> quick_ray_intersection(ray, shape), world)
 end
