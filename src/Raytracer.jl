@@ -14,7 +14,6 @@ module Raytracer
 
 ##########
 # Imports
-# TODO since only import allows adding methods to a function, use import only when needed, otherwise use using
 
 
 import Base:
@@ -43,9 +42,9 @@ import StaticArrays:
     similar_type
 
 import LinearAlgebra:
-    (⋅), (×), 
+    (⋅), (×),
     Diagonal, I,
-    inv, norm, normalize 
+    inv, norm, normalize
 
 using Random
 import Random:
@@ -58,9 +57,10 @@ using Intervals, ProgressMeter
 # Exports
 
 export # Rendering
-    RGB, 
+    RGB,
+        luminosity, clamp, γ_correction,
     HdrImage,
-    Camera, 
+    Camera,
         PerspectiveCamera, OrthogonalCamera,
         aperture_deg,
         fire_ray,
@@ -68,25 +68,27 @@ export # Rendering
         fire_all_rays!,
     Ray,
     HitRecord,
-    Pigment, 
+    Pigment,
         UniformPigment,
         CheckeredPigment,
         ImagePigment,
-    BRDF, 
+    BRDF,
         DiffuseBRDF, SpecularBRDF,
-    Material, 
-    Renderer, 
+    Material,
+    Renderer,
         OnOffRenderer, FlatRenderer, PathTracer
 
 export # Scene
-    Normal, Vec, 
+    Normal, Vec,
         normalize,
+        norm,
         norm²,
         create_onb_from_z,
     Point,
+        convert,
     Vec2D,
     Transformation,
-        isconsistent, 
+        isconsistent,
         rotationX, rotationY, rotationZ,
         scaling, translation,
     Shape,
@@ -105,8 +107,8 @@ export # image tools
 
 export # Colors
     BLACK, WHITE,
-    RED, GREEN, BLUE, 
-    CYAN, MAGENTA, YELLOW 
+    RED, GREEN, BLUE,
+    CYAN, MAGENTA, YELLOW
 
 
 ###########
