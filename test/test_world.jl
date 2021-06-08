@@ -23,4 +23,21 @@
         @test intersection2 !== nothing
         @test intersection2.world_point ≈ Point(9f0, 0f0, 0f0)
     end
+
+    @testset "QuickRayIntersection" begin
+        world = World()
+
+        sphere1 = Sphere(transformation=translation(VEC_X * 2))
+        sphere2 = Sphere(transformation=translation(VEC_X * 8))
+        push!(world, sphere1)
+        push!(world, sphere2)
+
+        @test !is_point_visible(world, Point(10.0, 0.0, 0.0), ORIGIN)
+        @test !is_point_visible(world, Point(5.0, 0.0, 0.0), ORIGIN)
+        @test is_point_visible(world, Point(5.0, 0.0, 0.0), Point(4.0, 0.0, 0.0))
+        @test is_point_visible(world, Point(0.5, 0.0, 0.0), ORIGIN)
+        @test is_point_visible(world, Point(0.0, 10.0, 0.0), ORIGIN)
+        @test is_point_visible(world, Point(0.0, 0.0, 10.0), ORIGIN)
+
+    end
 end
