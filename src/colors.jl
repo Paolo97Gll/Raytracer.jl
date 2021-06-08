@@ -114,9 +114,7 @@ false
 
 
 length(::RGB) = 3
-
 firstindex(::RGB) = 1
-
 lastindex(c::RGB) = 3
 
 # Since there is no standard that specifies the order in which the colors
@@ -239,7 +237,7 @@ R: 0.5, G: 0.6666667, B: 0.75
 clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 
 @doc raw"""
-    γ_correction(c::RGB, γ::Number)
+    γ_correction(c::RGB, γ::Float32)
 
 Return a `RGB{T}` color, with each component `x` corrected with the formula:
 
@@ -250,24 +248,22 @@ x^{\frac{1}{\gamma}}
 # Examples
 
 ```jldoctest
-julia> c = RGB(1f0, 2f0, 3f0)
+julia> c = RGB(1f0, 2f0, 3f0);
+
+julia> γ_correction(c, 1f0)
 RGB color with eltype Float32
 R: 1.0, G: 2.0, B: 3.0
 
-julia> γ_correction(c, 1)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> γ_correction(c, 0.8)
+julia> γ_correction(c, 0.8f0)
 RGB color with eltype Float32
 R: 1.0, G: 2.3784142, B: 3.948222
 
-julia> γ_correction(c, 2.4)
+julia> γ_correction(c, 2.4f0)
 RGB color with eltype Float32
 R: 1.0, G: 1.3348398, B: 1.580522
 ```
 """
-γ_correction(c::RGB{T}, γ::Number) where {T} = RGB{T}(map(x -> x^(1f0 / γ), c)...)
+γ_correction(c::RGB{T}, γ::Float32) where {T} = RGB{T}(map(x -> x^(1f0 / γ), c)...)
 
 eltype(::RGB{T}) where {T} = T
 
