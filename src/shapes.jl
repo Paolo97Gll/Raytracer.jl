@@ -230,3 +230,70 @@ function ray_intersection(ray::Ray, aabb::AABB)
     isempty(overlap) && return typemax(Float32)
     t = overlap.first
 end
+
+#######
+# Cube
+
+Base.@kwdef struct Cube <: Shape
+    transformation::Transformation = Transformation()
+    material::Material = Material()
+end
+
+function get_t(::Type{Cube}, ray::Ray)
+    t = ray_intersection(ray, AABB(Point(fill(5f-1, 3)), Point(fill(-5f-1, 3))))
+    ray.tmin < t < ray.tmax ? t : nothing
+end
+
+function get_uv(::Type{Cube}, point::Point)
+    x, y, z = point
+    abs_point = point.v .|> abs |> Point
+    maxval, index = findmax(abs_point)
+
+    @assert 1 <= index <= 3
+
+    ispos = point[index] > 0
+
+    if index == 1 
+        uc = ispos ? -z: z
+        vc = y
+        offset = (ispos ? 2 : 0, 1)  
+    elseif index == 2
+        uc = x;
+        vc = ispos ? -z : z
+        offset = (1, ispos ? 2 : 0)
+    else 
+        uc = ispos ? x : -x
+        vc = y
+        offset = (ispos ? 1 : 3, 1)
+    end
+
+    @.((offset + 0.5f0 * ((uc, uv) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
+end
+
+# UNUSED, STORED HERE IF NEDDED IN FUTURE
+# function get_xyz(::Type{Cube}, uv::Vec2D)
+#     ucvc = uv .* (4f0, 3f0)
+#     offset = ucvc .|> floor .|> Int |> Tuple
+#     uc, vc = (ucvc - offset) * 2 - 1f0
+#     offset == (2, 1) && return Vec( 1f0,   vc,  -uc) # positive x
+#     offset == (0, 1) && return Vec(-1f0,   vc,   uc) # negative x
+#     offset == (1, 2) && return Vec(  uc,  1f0,  -vc) # positive y
+#     offset == (1, 0) && return Vec(  uc, -1f0,   vc) # negative y
+#     offset == (1, 1) && return Vec(  uc,   vc,  1f0) # positive z
+#     offset == (3, 1) && return Vec( -uc,   vc, -1f0) # negative z
+#     error("Invalid uv coordinate for a Cube: got $uv")
+# end
+
+function get_normal(::Type{Cube}, point::Point)
+    abs_point = point.v .|> abs |> Point
+    _, index = findmax(abs_point)
+
+    @assert 1 <= index <= 3
+
+    s = sign(point[index])
+
+    @assert s != 0
+
+    [i == index ? s * 1f0 : 0f0 for i ∈ 1:3] |> Normal{true}
+end
+
