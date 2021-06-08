@@ -225,6 +225,7 @@ convert(::Type{Normal}, p::Point) = Normal{false}(p.v)
 #####################################################################
 
 
+# TODO docstring
 const Vec2D = SVector{2, Float32}
 
 const VEC_X = Vec(1f0, 0f0, 0f0)
