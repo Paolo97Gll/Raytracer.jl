@@ -82,14 +82,13 @@ function load_scene(renderer_type::Type{<:Renderer},
                         material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{6}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)),
                                                                reflectance = 1f0)))]
         sky = [Sphere(transformation = translation([0f0, 0f0, 0f0]) * scaling(100),
-                      material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(BLACK)),
-                                          emitted_radiance = UniformPigment(WHITE)))]
+                      material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(WHITE * 1f-2))))]
         other_spheres = [Sphere(transformation = translation([0.5f0, 0.7f0, 0.1f0]),
                                 material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(RGB(0.2f0, 0.7f0, 0.8f0))))),
                          Sphere(transformation = translation([-0.2f0, -0.8f0, -0.8f0]) * scaling(0.5f0),
                                 material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.6f0, 0.2f0, 0.3f0)))))]
         append!(world, ground, sky, other_spheres)
-        lights = Lights([PointLight(position=Point(10f0, 0, 0))])
+        lights = Lights([PointLight(position=Point(0, 0, 10f0))])
         return PointLightRenderer(world, lights, BLACK, WHITE * 1f-3)
     else
         error("`Renderer` subtype $renderer_type is not supported by this function.")
