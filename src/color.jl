@@ -10,7 +10,7 @@
 
 
 """
-    (+)(c1::RGB, c2::RGB)
+    +(c1::RGB, c2::RGB)
 
 Return the elementwise sum of two colors.
 
@@ -33,7 +33,7 @@ R: 5.0, G: 7.0, B: 9.0
 (+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
 
 """
-    (-)(c1::RGB, c2::RGB)
+    -(c1::RGB, c2::RGB)
 
 Return the elementwise difference of two colors.
 
@@ -56,10 +56,10 @@ R: -3.0, G: -3.0, B: -3.0
 (-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
 
 """
-    (*)(scalar::Number, c::RGB{T}) where {T}
-    (*)(c::RGB, scalar::Number)
+    *(scalar::Number, c::RGB)
+    *(c::RGB, scalar::Number)
 
-Return a RGB{T} color with each component multiplied by `scalar`.
+Return a `RGB{T}` color with each component multiplied by `scalar`.
 
 # Examples
 
@@ -99,7 +99,7 @@ Note that the eltype of RGB is mantained.
 (*)(c::RGB, scalar::Number) = scalar * c
 
 """
-    (*)(c1::RGB, c2::RGB)
+    *(c1::RGB, c2::RGB)
 
 Return the elementwise product of two colors.
 
@@ -122,7 +122,7 @@ R: 4.0, G: 10.0, B: 18.0
 (*)(c1::RGB, c2::RGB) = RGB(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
 
 """
-    (≈)(c1::RGB, c2::RGB)
+    ≈(c1::RGB, c2::RGB)
 
 Check if two colors are close.
 
@@ -244,7 +244,7 @@ end
 @doc raw"""
     luminosity(c::RGB)
 
-Return the luminosity of a color, computed as the mean value between the maximum component and the minumum component:
+Return the mean value between the maximum component and the minumum component of a color:
 
 ```math
 \frac{max(c) + min(c)}{2}
@@ -253,20 +253,16 @@ Return the luminosity of a color, computed as the mean value between the maximum
 # Examples
 
 ```jldoctest
-julia> c = RGB(1f0, 2f0, 3f0)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> luminosity(c)
+julia> luminosity(RGB(1f0, 2f0, 3f0))
 2.0f0
 ```
 """
 luminosity(c::RGB) = (max(c...) + min(c...)) / 2
 
 @doc raw"""
-    clamp(c::RGB{T}) where {T}
+    clamp(c::RGB)
 
-Return a clamped RGB{T} color, with each component `x` obtained with the formula:
+Return a clamped `RGB{T}` color, with each component `x` obtained with the formula:
 
 ```math
 \frac{x}{1 + x}
@@ -275,11 +271,7 @@ Return a clamped RGB{T} color, with each component `x` obtained with the formula
 # Examples
 
 ```jldoctest
-julia> c = RGB(1f0, 2f0, 3f0)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> clamp(c)
+julia> clamp(RGB(1f0, 2f0, 3f0))
 RGB color with eltype Float32
 R: 0.5, G: 0.6666667, B: 0.75
 ```
@@ -287,9 +279,9 @@ R: 0.5, G: 0.6666667, B: 0.75
 clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 
 @doc raw"""
-    γ_correction(c::RGB{T}, γ::Number) where {T}
+    γ_correction(c::RGB, γ::Number)
 
-Compute the γ correction of a color. Return a RGB{T} color, with each component `x` obtained with the formula:
+Return a `RGB{T}` color, with each component `x` corrected with the formula:
 
 ```math
 x^{\frac{1}{\gamma}}
