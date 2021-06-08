@@ -23,8 +23,6 @@ on the desired ranges.
 
 If `samples_per_side` is larger than zero, antialiasing will be applied to each pixel in the image,
 using the random number generator `rng`.
-
-See also: [`fire_all_rays!`](@ref), [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref)
 """
 struct ImageTracer
     image::HdrImage
@@ -62,15 +60,15 @@ end
 Shoot a [`Ray`](@ref) through the pixel `(col, row)` of the image contained in an [`ImageTracer`], using its
 camera informations.
 
-The function use the `fire_ray` function of the associated camera.
+The function use the `fire_ray` function of the associated camera ([`fire_ray(::OrthogonalCamera, ::Float32, ::Float32)`](@ref),
+    [`fire_ray(::PerspectiveCamera, ::Float32, ::Float32)`](@ref))
 
 The parameters `col` and `row` are measured in the same way as they are in [`HdrImage`](@ref): the bottom left
 corner is placed at ``(0, 0)``. The values of `u_pixel` and `v_pixel` are floating-point numbers in the range
 ``[0, 1]``: they specify where the ray should cross the pixel; passing 0.5 to both means that the ray will pass
 through the pixel's center.
 
-See also: [`fire_ray(::OrthogonalCamera, ::Float32, ::Float32)`](@ref),
-[`fire_ray(::PerspectiveCamera, ::Float32, ::Float32)`](@ref), [`fire_all_rays!`](@ref)
+See also: [`fire_all_rays!`](@ref)
 """
 function fire_ray(tracer::ImageTracer, col::Int, row::Int;
                   u_pixel::Float32 = 0.5f0,
@@ -113,9 +111,7 @@ If `use_threads` is `true`, the function will use the `Threads.@threads` macro t
 
 If `enable_progress_bar` is `true`, the function will display a progress bar during the computation; this is thread safe.
 
-See also: [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref),
-[`fire_ray(::OrthogonalCamera, ::Float32, ::Float32)`](@ref),
-[`fire_ray(::PerspectiveCamera, ::Float32, ::Float32)`](@ref)
+See also: [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref)
 """
 function fire_all_rays!(tracer::ImageTracer, renderer::Renderer;
                         use_threads::Bool = true,
