@@ -11,7 +11,7 @@
 """
     Vec <: StaticArrays.FieldVector{3, Float32}
 
-A vector in 3D space with field `x`, `y`, and `z`.
+A vector in 3D space with fields `x`, `y`, and `z`.
 
 For inherited properties and constructors see `StaticArrays.FieldVector`.
 """
@@ -53,7 +53,7 @@ norm²(v::Vec) = sum(el -> el^2, v)
 """
     Normal{V} <: StaticArrays.FieldVector{3, Float32}
 
-A pseudo-vector in 3D space with field `x`, `y`, and `z`. The parameter `V` tells if the normal is normalized or not.
+A pseudo-vector in 3D space with fields `x`, `y`, and `z`. The parameter `V` tells if the normal is normalized or not.
 
 For inherited properties and constructors see `StaticArrays.FieldVector`.
 """
@@ -181,7 +181,7 @@ end
 """
     ≈(p1::Point, p2::Point)
 
-Check if two colors are close.
+Check if two points are close.
 
 # Examples
 
@@ -245,7 +245,7 @@ x = 5.0, y = 7.0, z = 9.0
 (+)(p::Point, v::Vec) = Point(p.v + v)
 
 """
-    +(p::Point, s...)
+    *(p::Point, s...)
 
 Multiplication operator. `x * y * z * ...`` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
@@ -277,7 +277,7 @@ convert(::Type{Normal}, p::Point) = Normal{false}(p.v)
 """
     const Vec2D = SVector{2, Float32}
 
-Alias to `SVector{2, Float32}` used for uv mapping on shapes.
+Alias to `SVector{2, Float32}`, used for uv mapping on shapes.
 """
 const Vec2D = SVector{2, Float32}
 
@@ -304,8 +304,6 @@ const ORIGIN = Point(0f0, 0f0, 0f0)
     create_onb_from_z(input_normal::Normal)
 
 Create an orthonormal base from the z-axis using the [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) algorithm.
-
-As first, `input_normal` is notmalized.
 
 # Examples
 
