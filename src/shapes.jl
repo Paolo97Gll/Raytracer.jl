@@ -79,6 +79,32 @@ function show(io::IO, ::MIME"text/plain", s::T) where {T <: Shape}
     end
 end
 
+"""
+    ray_intersection(ray, s)
+
+Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
+if none exists, return `nothing`.
+"""
+function ray_intersection(ray::Ray, s::S) where {S <: Shape}
+    inv_ray = inv(s.transformation) * ray
+    t = get_t(S, inv_ray)
+    isnothing(t) && return nothing
+    hit_point = inv_ray(t)
+    world_point = s.transformation * hit_point
+    normal = s.transformation * get_normal(S, hit_point) 
+    surface_point = get_uv(S, hit_point)
+    HitRecord(world_point, normal, surface_point, t, ray, s.material)
+end
+
+"""
+    quick_ray_intersection(ray, s)
+
+Return whether the ray intersects the given [`Shape`](@ref).
+"""
+function quick_ray_intersection(ray::Ray, s::S) where {S <: Shape}
+    inv_ray = inv(s.transformation) * ray
+    !isnothing(get_t(S, inv_ray))
+end
 
 #########
 # Sphere
@@ -98,56 +124,50 @@ Base.@kwdef struct Sphere <: Shape
     material::Material = Material()
 end
 
-@doc """
-    ray_intersection(ray, s)
-
-Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
-if none exists, return `nothing`.
-""" ray_intersection
-
-function ray_intersection(ray::Ray, s::Sphere)
-    inv_ray = inv(s.transformation) * ray
+function get_t(::Type{Sphere}, ray::Ray)
     # compute intersection
     origin_vec = convert(Vec, inv_ray.origin)
     a = norm²(inv_ray.dir)
     b = 2f0 * origin_vec ⋅ inv_ray.dir
     c = norm²(origin_vec) - 1f0
     Δ = b^2 - 4f0 * a * c
-    Δ < 0f0 && return nothing
+    Δ < 0 && return nothing
     sqrt_Δ = sqrt(Δ)
     t_1 = (-b - sqrt_Δ) / (2f0 * a)
     t_2 = (-b + sqrt_Δ) / (2f0 * a)
     # nearest point
     if (t_1 > inv_ray.tmin) && (t_1 < inv_ray.tmax)
-        hit_t = t_1
+        return t_1
     elseif (t_2 > inv_ray.tmin) && (t_2 < inv_ray.tmax)
-        hit_t = t_2
+        return t_2
     else
         return nothing
     end
-    hit_point = inv_ray(hit_t)
-    # generate HitRecord
-    world_point = s.transformation * hit_point
-    normal = convert(Normal, hit_point)
-    normal = s.transformation * ((normal ⋅ ray.dir < 0f0) ? normal : -normal)
-    u = atan(hit_point[2], hit_point[1]) / (2f0 * π)
-    u = u >= 0f0 ? u : u+1f0
-    v = acos(clamp(hit_point[3], -1f0, 1f0)) / π
-    surface_point = Vec2D(u, v)
-    HitRecord(world_point, normal, surface_point, hit_t, ray, s.material)
 end
 
-function quick_ray_intersection(ray::Ray, s::Sphere)
-    inv_ray = inv(s.transformation) * ray
-    origin_vec = convert(Vec, inv_ray.origin)
-    a = norm²(inv_ray.dir)
-    b = 2f0 * origin_vec ⋅ inv_ray.dir
-    c = norm²(origin_vec) - 1f0
-    Δ = b^2 - 4f0 * a * c
-    Δ < 0f0 && return false
-    sqrt_Δ = sqrt(Δ)
-    (inv_ray.tmin < (-b-sqrt_Δ)/(2f0*a) < inv_ray.tmax) || (inv_ray.tmin < (-b+sqrt_Δ)/(2f0*a) < inv_ray.tmax)
+function get_uv(::Type{Sphere}, point::Point)
+    u = atan(point[2], point[1]) / (2f0 * π)
+    u = u >= 0 ? u : u+1f0
+    v = acos(clamp(point[3], -1f0, 1f0)) / π
+    Vec2D(u, v)
 end
+
+function get_normal(::Type{Sphere}, point::Point)
+    normal = convert(Normal, point)
+    (normal ⋅ ray.dir < 0) ? normal : -normal
+end
+
+# function quick_ray_intersection(ray::Ray, s::Sphere)
+#     inv_ray = inv(s.transformation) * ray
+#     origin_vec = convert(Vec, inv_ray.origin)
+#     a = norm²(inv_ray.dir)
+#     b = 2f0 * origin_vec ⋅ inv_ray.dir
+#     c = norm²(origin_vec) - 1f0
+#     Δ = b^2 - 4f0 * a * c
+#     Δ < 0f0 && return false
+#     sqrt_Δ = sqrt(Δ)
+#     (inv_ray.tmin < (-b-sqrt_Δ)/(2f0*a) < inv_ray.tmax) || (inv_ray.tmin < (-b+sqrt_Δ)/(2f0*a) < inv_ray.tmax)
+# end
 
 
 ########
@@ -164,23 +184,25 @@ Base.@kwdef struct Plane <: Shape
     material::Material = Material()
 end
 
-function ray_intersection(ray::Ray, s::Plane)
-    inv_ray = inv(s.transformation) * ray
-    abs(inv_ray.dir.z) < 1f-5 && return nothing
-    t = -inv_ray.origin.v[3] / inv_ray.dir.z
-    inv_ray.tmin < t < inv_ray.tmax || return nothing
-    hit_point = inv_ray(t)
-    world_point = s.transformation * hit_point
-    normal = -sign(inv_ray.dir.z) * NORMAL_Z
-    surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
-    HitRecord(world_point, normal, surface_point, t, ray, s.material)
+function get_t(::Type{Plane}, ray::Ray)
+    abs(ray.dir.z) < 1f-5 && return nothing
+    t = -ray.origin.v[3] / ray.dir.z
+    ray.tmin < t < ray.tmax ? t : nothing
 end
 
-function quick_ray_intersection(ray::Ray, s::Plane)
-    inv_ray = inv(s.transformation) * ray
-    inv_ray.dir.z < 1f-5 && return false
-    inv_ray.tmin < (-inv_ray.origin.v[3] / inv_ray.dir.z) < inv_ray.tmax
+function get_uv(::Type{Plane}, point::Point)
+    hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
 end
+
+function get_normal(::Type{Plane}, point::Point)
+    -sign(inv_ray.dir.z) * NORMAL_Z
+end
+
+# function quick_ray_intersection(ray::Ray, s::Plane)
+#     inv_ray = inv(s.transformation) * ray
+#     inv_ray.dir.z < 1f-5 && return false
+#     inv_ray.tmin < (-inv_ray.origin.v[3] / inv_ray.dir.z) < inv_ray.tmax
+# end
 
 
 #######
