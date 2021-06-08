@@ -254,7 +254,7 @@ function get_uv(::Type{Cube}, point::Point)
     ispos = point[index] > 0
 
     if index == 1 
-        uc = ispos ? -z: z
+        uc = ispos ? -z : z
         vc = y
         offset = (ispos ? 2 : 0, 1)  
     elseif index == 2
