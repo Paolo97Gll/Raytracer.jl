@@ -94,7 +94,9 @@ export # Scene
     Shape,
         Sphere, Plane,
         ray_intersection,
-    World
+    World,
+    PointLight,
+    Lights
 
 export # Random number generation
     PCG
@@ -127,6 +129,7 @@ include("cameras.jl")
 include("materials.jl")
 include("shapes.jl")
 include("world.jl")
+include("lights.jl")
 include("renderers.jl")
 include("image_tracer.jl")
 
