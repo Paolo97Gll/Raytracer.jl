@@ -76,7 +76,7 @@ export # Rendering
         DiffuseBRDF, SpecularBRDF,
     Material,
     Renderer,
-        OnOffRenderer, FlatRenderer, PathTracer
+        OnOffRenderer, FlatRenderer, PathTracer, PointLightRenderer
 
 export # Scene
     Normal, Vec,
@@ -95,6 +95,7 @@ export # Scene
         Sphere, Plane,
         ray_intersection,
     World,
+        is_point_visible,
     PointLight,
     Lights
 
