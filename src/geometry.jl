@@ -3,7 +3,6 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Implementation of the geometry required by the renderer (manipulation of 3D scenes, cameras, rays, ...)
-# TODO write docstrings
 
 
 #####################################################################
@@ -200,16 +199,66 @@ false
 """
 (≈)(p1::Point, p2::Point) = p1.v ≈ p2.v
 
-# TODO docstring
+"""
+    -(p1::Point, p2::Point)
+
+Return the elementwise difference of two [`Point`](@ref) as an instance of [`Vec`](@ref).
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3) - Point(4, 5, 6)
+Vec with eltype Float32
+x = -3.0, y = -3.0, z = -3.0
+```
+"""
 (-)(p1::Point, p2::Point) = Vec(p1.v - p2.v)
 
-# TODO docstring
+"""
+    -(p::Point, v::Vec)
+
+Return the elementwise difference between a [`Point`](@ref) and a [`Vec`](@ref) as an instance of `Point`.
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3) - Vec(4, 5, 6)
+Point with eltype Float32
+x = -3.0, y = -3.0, z = -3.0
+```
+"""
 (-)(p::Point, v::Vec) = Point(p.v - v)
 
-# TODO docstring
+"""
+    +(p::Point, v::Vec)
+
+Return the elementwise sum between a [`Point`](@ref) and a [`Vec`](@ref) as an instance of `Point`.
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3) + Vec(4, 5, 6)
+Point with eltype Float32
+x = 5.0, y = 7.0, z = 9.0
+```
+"""
 (+)(p::Point, v::Vec) = Point(p.v + v)
 
-# TODO docstring
+"""
+    +(p::Point, s...)
+
+Multiplication operator. `x * y * z * ...`` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+Return a [`Point`](@ref).
+
+# Examples
+
+```jldoctest
+julia> Point(1, 2, 3) * 2 * 3
+Point with eltype Float32
+x = 6.0, y = 12.0, z = 18.0
+```
+"""
 (*)(p::Point, s...) = (*)(p.v, s...) |> Point
 
 """
@@ -225,7 +274,11 @@ convert(::Type{Normal}, p::Point) = Normal{false}(p.v)
 #####################################################################
 
 
-# TODO docstring
+"""
+    const Vec2D = SVector{2, Float32}
+
+Alias to `SVector{2, Float32}` used for uv mapping on shapes.
+"""
 const Vec2D = SVector{2, Float32}
 
 

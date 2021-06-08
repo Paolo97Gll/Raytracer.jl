@@ -17,15 +17,7 @@ Return the elementwise sum of two colors.
 # Examples
 
 ```jldoctest
-julia> c1 = RGB(1f0, 2f0, 3f0)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> c2 = RGB(4f0, 5f0, 6f0)
-RGB color with eltype Float32
-R: 4.0, G: 5.0, B: 6.0
-
-julia> c1 + c2
+julia> RGB(1f0, 2f0, 3f0) + RGB(4f0, 5f0, 6f0)
 RGB color with eltype Float32
 R: 5.0, G: 7.0, B: 9.0
 ```
@@ -40,15 +32,7 @@ Return the elementwise difference of two colors.
 # Examples
 
 ```jldoctest
-julia> c1 = RGB(1f0, 2f0, 3f0)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> c2 = RGB(4f0, 5f0, 6f0)
-RGB color with eltype Float32
-R: 4.0, G: 5.0, B: 6.0
-
-julia> c1 - c2
+julia> RGB(1f0, 2f0, 3f0) - RGB(4f0, 5f0, 6f0)
 RGB color with eltype Float32
 R: -3.0, G: -3.0, B: -3.0
 ```
@@ -64,33 +48,21 @@ Return a `RGB{T}` color with each component multiplied by `scalar`.
 # Examples
 
 ```jldoctest
-julia> scalar = 2.0
-2.0
-
-julia> c = RGB(4f0, 5f0, 6f0)
-RGB color with eltype Float32
-R: 4.0, G: 5.0, B: 6.0
-
-julia> scalar * c
+julia> c = 2.0 * RGB(4f0, 5f0, 6f0)
 RGB color with eltype Float32
 R: 8.0, G: 10.0, B: 12.0
 
-julia> c * scalar
-RGB color with eltype Float32
-R: 8.0, G: 10.0, B: 12.0
+julia> RGB(4f0, 5f0, 6f0) * 2.0 == c
+true
 ```
 
 ```jldoctest
-julia> scalar = 2.0
-2.0
-
-julia> c = RGB(4.0, 5.0, 6.0)
-RGB color with eltype Float64
-R: 4.0, G: 5.0, B: 6.0
-
-julia> scalar * c
+julia> c = 2.0 * RGB(4.0, 5.0, 6.0)
 RGB color with eltype Float64
 R: 8.0, G: 10.0, B: 12.0
+
+julia> RGB(4.0, 5.0, 6.0) * 2.0 == c
+true
 ```
 
 Note that the eltype of RGB is mantained.
@@ -106,15 +78,7 @@ Return the elementwise product of two colors.
 # Examples
 
 ```jldoctest
-julia> c1 = RGB(1f0, 2f0, 3f0)
-RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
-
-julia> c2 = RGB(4f0, 5f0, 6f0)
-RGB color with eltype Float32
-R: 4.0, G: 5.0, B: 6.0
-
-julia> c1 * c2
+julia> RGB(1f0, 2f0, 3f0) * RGB(4f0, 5f0, 6f0)
 RGB color with eltype Float32
 R: 4.0, G: 10.0, B: 18.0
 ```
@@ -129,18 +93,14 @@ Check if two colors are close.
 # Examples
 
 ```jldoctest
-julia> c1 = RGB(1f0, 2f0, 3f0)
+julia> c = RGB(1f0, 2f0, 3f0) * RGB(4f0, 5f0, 6f0)
 RGB color with eltype Float32
-R: 1.0, G: 2.0, B: 3.0
+R: 4.0, G: 10.0, B: 18.0
 
-julia> c2 = RGB(4f0, 5f0, 6f0)
-RGB color with eltype Float32
-R: 4.0, G: 5.0, B: 6.0
-
-julia> c1 * c2 ≈ RGB(4f0, 10f0, 18f0)
+julia> c ≈ RGB(4f0, 10f0, 18f0)
 true
 
-julia> c1 * c2 ≈ RGB(0f0, 0f0, 0f0)
+julia> c ≈ RGB(0f0, 0f0, 0f0)
 false
 ```
 """
