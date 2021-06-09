@@ -98,6 +98,7 @@ export # Scene
     Shape,
         Sphere, Plane,
         ray_intersection,
+        quick_ray_intersection,
     World,
         is_point_visible,
     PointLight,
