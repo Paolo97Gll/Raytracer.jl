@@ -28,9 +28,9 @@ There are two main steps in the image generation. We offer high-level API and a 
 
 We provide:
 
-- A package with both high-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/high-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/high-level)) and low-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/low-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/low-level)) API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations in the documentation: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
+- A package with both high-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/high-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/high-level)) and low-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/low-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/low-level)) API. It's possible to use the package's features directly from the REPL or in more complex scripts. Quickstart: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
 
-- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations in the documentation: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
+- A CLI tool ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/cli), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/cli)). Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. Quickstart: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
 
 ## Contributing
 
