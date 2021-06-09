@@ -1,116 +1,43 @@
-# Raytracer.jl Documentation
+# Raytracer.jl
 
 Raytracing package for the generation of photorealistic images in Julia.
 
-## Colors and images
+## Brief description
 
-### Colors
+Coming soon!
 
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["colors.jl"]
+## Overview
+
+Coming soon!
+
+## Installation
+
+### Package
+
+The package is still under development and is not available in the official registry. To add this package to your work environment, open julia and type the following commands:
+
+```julia
+import Pkg
+Pkg.add(url="https://github.com/Samuele-Colombo/FileIO.jl")
+Pkg.add(url="https://github.com/Samuele-Colombo/ImagePFM.jl")
+Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
 ```
 
-### HDR image
+We use a [custom version of FileIO](https://github.com/Samuele-Colombo/FileIO.jl) that provides load/save functionalities for pfm files: this integration is done by the package [ImagePFM](https://github.com/Samuele-Colombo/ImagePFM.jl). If FileIO is already present (e.g. the original package), it will be overwritten by this custom version.
 
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["hdrimage.jl"]
+### CLI tool
+
+To use it, clone this repository:
+
+```shell
+git clone https://github.com/Paolo97Gll/Raytracer.jl.git
+cd Raytracer.jl
 ```
 
-## Geometry
+Then, open julia REPL and type the following commands to update your environment:
 
-### Geometry
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["geometry.jl"]
-```
-
-### Transformations
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["transformations.jl"]
-```
-
-## Scene
-
-### Ray
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["ray.jl"]
-```
-
-### Cameras
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["cameras.jl"]
-```
-
-### Lights
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["lights.jl"]
-```
-
-### Material
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["materials.jl"]
-```
-
-### Shapes
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["shapes.jl"]
-```
-
-### World
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["world.jl"]
-```
-
-### HitRecord
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["hitrecord.jl"]
-```
-
-## Rendering
-
-### PCG
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["pcg.jl"]
-```
-
-### Renderer
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["renderers.jl"]
-```
-
-### Image tracer
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["imagetracer.jl"]
-```
-
-## User utilities
-
-```@autodocs
-Modules = [Raytracer]
-Pages   = ["user_utils.jl"]
+```julia
+import Pkg
+Pkg.activate(".")
+Pkg.instantiate()
 ```
