@@ -2,7 +2,7 @@
 
 [![julia-version](https://img.shields.io/badge/julia_version-v1.6-9558B2?style=flat&logo=julia)](https://julialang.org/)
 [![package-version](https://img.shields.io/badge/package_version-v0.2.0-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
-[![status](https://img.shields.io/badge/project_status-beta-ba8a11?style=flat)]()
+[![status](https://img.shields.io/badge/project_status-beta-ba8a11?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl)
 [![doc-stable](https://img.shields.io/badge/docs-stable-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/stable)
 [![doc-dev](https://img.shields.io/badge/docs-dev-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/dev)
 
@@ -10,37 +10,28 @@ Raytracing package for the generation of photorealistic images in Julia.
 
 Julia version required: ≥1.6
 
-## Table of Contents
+## Brief description
 
-- [Raytracer.jl](#raytracerjl)
-  - [Table of Contents](#table-of-contents)
-  - [Package](#package)
-  - [Command line tool](#command-line-tool)
-  - [Contributing](#contributing)
-  - [License](#license)
+Coming soon!
 
-## Package
+## Package and CLI tool
 
-The package offer a series of API to manage the generation and rendering of a photorealistic image.
+We provide:
 
-See documentation at: <https://paolo97gll.github.io/Raytracer.jl>
+- A package with both high-level and low-level API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations: [latest release](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [master branch](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
 
-## Command line tool
-
-A command line tool `raytracer_cli.jl` is available to use high-level API of the main package.
-
-See documentation at: <https://paolo97gll.github.io/Raytracer.jl>
+- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations: [latest release](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [master branch](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
 
 ## Contributing
 
-To contribute to package development, clone this repository:
+To contribute to the package development, clone this repository:
 
 ```shell
 git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then open julia and type the following commands to update your environment:
+Then open julia REPL and type the following commands to update your environment:
 
 ```julia
 import Pkg
@@ -54,4 +45,4 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-The code is released under a MIT license. See the file [LICENSE.md](./LICENSE.md).
+The code is released under an MIT license. See the file [LICENSE.md](./LICENSE.md).
