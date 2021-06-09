@@ -331,12 +331,12 @@ end
 function demoimage(options::Dict{String, Any})
     printstyled("Raytracer.jl demo image\n\n", bold=true)
     println("Renderer: $(options["renderer"])")
-    println("Number of threads: $(Threads.nthreads())\n")
+    println("Number of threads: $(Threads.nthreads())")
 
     options["output_file"] = normpath(options["output_file"])
 
     if !options["force"] && isfile(options["output_file"])
-        print("Image ./$(options["output_file"]) existing: overwrite? [y|n] ")
+        print("\nImage ./$(options["output_file"]) existing: overwrite? [y|n] ")
         if readline() != "y"
             println("Aborting.")
             exit(1)
@@ -436,9 +436,17 @@ end
 
 
 function docs(options::Dict{String, Any})
-    printstyled("Raytracer.jl documentation\n\n", bold=true)
-    println("Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable")
-    println("Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev")
+    printstyled("Raytracer.jl documentation\n", bold=true)
+    println("\nDocumentation home")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev")
+    println("\nCLI")
+    println("Quickstart")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli")
+    println("Full doc")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable/cli")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev/cli")
 end
 
 
