@@ -11,20 +11,18 @@ See [CLI tool installation](@ref cli_tool_installation).
 ## Usage
 
 !!! note
-    _You must call this tool from the repo main folder!_ It will not work if called by another folder.
+    You _must_ call this tool from the repo main folder! It will not work if called by another folder.
 
 The menu tree is:
 
-```text
-raytracer_cli.jl
-├── tonemapping
-├── demo
-│   ├── image
-│   └── animation
-└── docs
-```
+- [`raytracer_cli.jl`](@id raytracer_cli)
+  - [`tonemapping`](@id raytracer_cli_tonemapping)
+  - [`demo`](@id raytracer_cli_demo)
+    - [`image`](@id raytracer_cli_demo_image)
+    - [`animation`](@id raytracer_cli_demo_animation)
+  - [`docs`](@id raytracer_cli_docs)
 
-### `raytracer_cli.jl`
+### [`raytracer_cli.jl`](@id raytracer_cli)
 
 ```text
 usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo|docs}
@@ -41,7 +39,7 @@ optional arguments:
   -h, --help   show this help message and exit
 ```
 
-### `raytracer_cli.jl tonemapping`
+### [`raytracer_cli.jl tonemapping`](@id raytracer_cli_tonemapping)
 
 We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
 
@@ -66,7 +64,7 @@ files:
   output_file        output file name
 ```
 
-### `raytracer_cli.jl demo`
+### [`raytracer_cli.jl demo`](@id raytracer_cli_demo)
 
 ```text
 usage: raytracer_cli.jl demo [--version] [-h] {image|animation}
@@ -82,7 +80,7 @@ optional arguments:
   -h, --help  show this help message and exit
 ```
 
-### `raytracer_cli.jl demo image`
+### [`raytracer_cli.jl demo image`](@id raytracer_cli_demo_image)
 
 ```text
 usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
@@ -150,7 +148,7 @@ files:
                         (default: "demo.jpg")
 ```
 
-### `raytracer_cli.jl demo animation`
+### [`raytracer_cli.jl demo animation`](@id raytracer_cli_demo_animation)
 
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
@@ -228,7 +226,7 @@ files:
                         extension (default: "demo")
 ```
 
-### `raytracer_cli.jl docs`
+### [`raytracer_cli.jl docs`](@id raytracer_cli_docs)
 
 ```text
 usage: raytracer_cli.jl docs [--version] [-h]
