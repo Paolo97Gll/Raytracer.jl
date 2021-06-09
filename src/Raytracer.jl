@@ -139,6 +139,8 @@ include("world.jl")
 include("renderers.jl")
 include("imagetracer.jl")
 
+include("interpreter.jl")
+
 include("user_utils.jl")
 
 
