@@ -10,38 +10,33 @@ Raytracing package for the generation of photorealistic images in Julia.
 
 Julia version required: ≥1.6
 
+_Note: we refer to **stable** documentation for the latest tag, and **dev** documentation for the current code in the master branch._
+
 ## Brief description
 
-Coming soon!
+The main purpose of this package is to generate photorealistic images given an input scene.
+
+The input scene is composed by a list of shapes (spheres, planes, ...) of various materials (for now diffusive or reflective) with different colors, each one with in a particular position in the 3D space. The observer is represented by a camera, that can do a perspective or an orthogonal projection. The camera will see the scene through a screen, characterized by its aspect ratio, distance from the camera and resolution. The image can be rendered with different [backwards ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Reversed_direction_of_traversal_of_scene_by_the_rays) algorithms: a [path tracer](https://en.wikipedia.org/wiki/Path_tracing) (the default renderer), a point-light tracer, a flat renderer and an on-off renderer; this process can be parallelized using multiple threads. Each of these aspects can be managed, tuned and modified using the low-level API of the package (see [below](#-Package-and-CLI-tool)).
+
+There are two main steps in the image generation. We offer high-level API and a CLI tool (see [below](#-Package-and-CLI-tool)) for these steps.
+
+- The _generation of an HDR (high dynamic range) image_ in the [PFM format](http://www.pauldebevec.com/Research/HDR/PFM/). In this step, the scene is loaded along with the informations about the observer (position, orientation, type of the camera, ...) and the choosen renderer. Then the image is rendered using the choosen algorithm.
+
+- The _conversion of this image to an LDR (low dynamic range) image_, such as jpg or png, using a [tone mapping](https://en.wikipedia.org/wiki/Tone_mapping) process.
 
 ## Package and CLI tool
 
 We provide:
 
-- A package with both high-level and low-level API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations: [latest release (stable)](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [master branch (dev)](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
+- A package with both high-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/high-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/high-level)) and low-level ([stable](https://paolo97gll.github.io/Raytracer.jl/stable/api/low-level), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/api/low-level)) API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations in the documentation: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
 
-- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations: [latest release (stable)](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [master branch (dev)](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
+- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations in the documentation: [stable](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [dev](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
 
 ## Contributing
 
-To contribute to the package development, clone this repository:
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
 
-```shell
-git clone https://github.com/Paolo97Gll/Raytracer.jl.git
-cd Raytracer.jl
-```
-
-Then open julia REPL and type the following commands to update your environment:
-
-```julia
-import Pkg
-Pkg.activate(".")
-Pkg.instantiate()
-```
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+See contributing instructions [here](https://paolo97gll.github.io/Raytracer.jl/stable/devs/collab).
 
 ## License
 
