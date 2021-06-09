@@ -1,13 +1,13 @@
 # Collaboration instructions
 
-To contribute to package development, clone this repository:
+To contribute to the package development, clone this repository:
 
 ```shell
 git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then open julia and type the following commands to update your environment:
+Then open julia REPL and type the following commands to update your environment:
 
 ```julia
 import Pkg

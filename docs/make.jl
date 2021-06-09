@@ -5,7 +5,7 @@
 # Generate documentation
 
 
-push!(LOAD_PATH,"../src/")
+push!(LOAD_PATH, "../src/")
 
 
 using Pkg

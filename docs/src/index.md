@@ -14,7 +14,7 @@ Coming soon!
 
 ### Package
 
-The package is still under development and is not available in the official registry. To add this package to your work environment, open julia and type the following commands:
+The package is still under development and is not available in the official registry. To add this package to your work environment, open julia REPL and type the following commands:
 
 ```julia
 import Pkg
