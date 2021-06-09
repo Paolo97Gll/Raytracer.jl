@@ -1,8 +1,8 @@
 # CLI tool
 
-A command line tool `raytracer_cli.jl` is available to manage through this package the generation and rendering of photorealistic images.
+The CLI tool is `raytracer_cli.jl` and is placed in the home of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang.
 
-This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run these commands also from the REPL.
+This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run these commands also from the REPL, by calling the same functions called by the tool.
 
 ## Installation
 
@@ -232,6 +232,8 @@ files:
 
 ```text
 usage: raytracer_cli.jl docs [--version] [-h]
+
+Show the documentation link.
 
 optional arguments:
   --version   show version information and exit
