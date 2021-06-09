@@ -9,7 +9,7 @@ using Test
 
 using Documenter, LinearAlgebra, StaticArrays
 
-using Raytracer
+using Raytracer, Raytracer.Interpreter
 
 
 ##############
@@ -55,6 +55,10 @@ end
 end
 @testset "ImageTracer" begin
     include("test_imagetracer.jl")
+end
+
+@testset "Interpreter" begin
+    include("test_interpreter.jl")
 end
 
 
