@@ -9,6 +9,8 @@
     Shape
 
 An abstract type representing a shape.
+
+See also: [`Sphere`](@ref), [`Plane`](@ref)
 """
 abstract type Shape end
 
@@ -30,7 +32,7 @@ end
 """
     struct Sphere <: Shape
 
-A type representing a sphere.
+A [`Shape`](@ref) representing a sphere.
 
 This is a unitary sphere centered in the origin. A generic sphere can be specified by applying a [`Transformation`](@ref).
 
@@ -123,7 +125,7 @@ end
 """
     struct Plane <: Shape
 
-A type representing an infinite plane.
+A [`Shape`](@ref) representing an infinite plane.
 
 # Members
 
