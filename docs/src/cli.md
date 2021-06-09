@@ -264,6 +264,8 @@ julia raytracer_cli.jl demo image
 
 It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image). You can change the output file name, the LDR extension and other rendering parameters using the command options.
 
+### Demo animation
+
 To create a demo animation, use the command `demo animation`:
 
 ```shell
@@ -275,7 +277,3 @@ To enable multithreading, e.g. use 8 threads, use:
 ```shell
 julia --threads 8 raytracer_cli.jl demo animation
 ```
-
-### Demo animation
-
-Coming soon!
