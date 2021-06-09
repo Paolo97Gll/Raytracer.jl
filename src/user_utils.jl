@@ -108,7 +108,7 @@ function demo_load_scene(renderer_type::Type{<:Renderer},
         other_spheres = [Sphere(transformation = translation([0.5f0, 0.7f0, 0.1f0]),
                                 material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(RGB(0.2f0, 0.7f0, 0.8f0))))),
                          Sphere(transformation = translation([-0.2f0, -0.8f0, -0.8f0]) * scaling(0.5f0),
-                                material = Material(brdf = SpecularBRDF(pigment = UniformPigment(RGB(0.6f0, 0.2f0, 0.3f0)))))]
+                                material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(RGB(0.6f0, 0.2f0, 0.3f0)))))]
         append!(world, ground, sky, other_spheres)
         lights = Lights([PointLight(position=Point(0, 0, 10f0))])
         return PointLightRenderer(world, lights, BLACK, WHITE * 1f-3)
