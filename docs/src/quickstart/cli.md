@@ -1,3 +1,3 @@
-# Basic CLI usage
+# Basic CLI tool usage
 
 Coming soon!

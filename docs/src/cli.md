@@ -1,4 +1,4 @@
-# CLI tool
+# [CLI tool](@id cli_tool)
 
 The CLI tool is `raytracer_cli.jl` and is placed in the home of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang.
 
@@ -149,6 +149,8 @@ files:
 ```
 
 ### [`raytracer_cli.jl demo animation`](@id raytracer_cli_demo_animation)
+
+This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to be installed on the local machine and to be in the PATH. It generates an H264 mp4 video containing the animation. For now, the generation of animations is available only with the CLI tool.
 
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
