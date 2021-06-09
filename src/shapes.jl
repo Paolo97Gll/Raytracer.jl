@@ -2,64 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# Implementation of the abstract type Shape and the derivative concrete types,
-# such as Sphere or Plane
-# TODO write docstrings
-
-
-################################################################
-
-
-"""
-    HitRecord
-
-A struct representing the result of an intersection between a [`Ray`](@ref) and a [`Shape`](@ref).
-
-# Members
-
-- `world_point::Point`: a [`Point`](@ref) representing the world coordinates of the hit point.
-- `normal::Normal`: a [`Normal`](@ref) representing the orientation of the normal to the surface where the hit happened.
-- `surface_point::Vec2D`: a [`Vec2D`](@ref) representing the position of the hit point on the surface of the object.
-- `t::Float32`: distance from the origin of the ray where the hit happened.
-- `ray::Ray`: a [`Ray`](@ref) representing the the ray that hit the surface.
-- `material::Material`: a [`Material`](@ref) representing the material of the point where the hit happened.
-"""
-struct HitRecord
-    world_point::Point
-    normal::Normal
-    surface_point::Vec2D
-    t::Float32
-    ray::Ray
-    material::Material
-end
-
-function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
-    print(io, T)
-    fns = fieldnames(T)
-    n = maximum(fns .|> String .|> length)
-    for fieldname ∈ fns
-        println(io)
-        print(io, " ↳ ", rpad(fieldname, n), " = ", getfield(hr, fieldname))
-    end
-end
-
-"""
-    ≈(hr1::HitRecord, hr2::HitRecord)
-
-Check if two [`HitRecord`](@ref) represent the same hit event or not.
-"""
-function (≈)(hr1::HitRecord, hr2::HitRecord)
-    sp1, sp2 = hr1.surface_point, hr2.surface_point
-    hr1.world_point     ≈  hr2.world_point     &&
-    hr1.normal          ≈  hr2.normal          &&
-    findall(isnan, sp1) == findall(isnan, sp2) &&
-    filter(!isnan, sp1) ≈  filter(!isnan, sp2) &&
-    hr1.t               ≈  hr2.t               &&
-    hr1.ray             ≈  hr2.ray
-end
-
-
-################################################################
+# Implementation of the abstract type Shape and the derivative concrete types
 
 
 """
@@ -111,13 +54,18 @@ end
 
 
 """
-    Sphere <: Shape
+    struct Sphere <: Shape
 
 A type representing a sphere.
 
+This is a unitary sphere centered in the origin. A generic sphere can be specified by applying a [`Transformation`](@ref).
+
 # Members
 
-- `transformation::Transformation`
+- `transformation::Transformation`: the `Transformation` associated with the sphere.
+- `material::Material`: the [`Material`](@ref) of the spere.
+
+See also: [`ray_intersection(::Ray, ::Sphere)`](@ref)
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation()
@@ -125,6 +73,28 @@ Base.@kwdef struct Sphere <: Shape
 end
 
 function get_t(::Type{Sphere}, ray::Ray)
+@doc """
+    Sphere(transformation::Transformation, material::Material)
+
+Constructor for a [`Sphere`](@ref) instance.
+""" Sphere(::Transformation, ::Material)
+
+@doc """
+    Sphere(transformation::Transformation = Transformation(),
+           material::Material = Material())
+
+Constructor for a [`Sphere`](@ref) instance.
+""" Sphere(; ::Transformation, ::Material)
+
+"""
+    ray_intersection(ray::Ray, s::Sphere)
+
+Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Sphere`](@ref).
+
+If none exists, return `nothing`.
+"""
+function ray_intersection(ray::Ray, s::Sphere)
+    inv_ray = inv(s.transformation) * ray
     # compute intersection
     origin_vec = convert(Vec, ray.origin)
     a = norm²(ray.dir)
@@ -157,27 +127,21 @@ function get_normal(::Type{Sphere}, point::Point, ray::Ray)
     (normal ⋅ ray.dir < 0) ? normal : -normal
 end
 
-# function quick_ray_intersection(ray::Ray, s::Sphere)
-#     inv_ray = inv(s.transformation) * ray
-#     origin_vec = convert(Vec, inv_ray.origin)
-#     a = norm²(inv_ray.dir)
-#     b = 2f0 * origin_vec ⋅ inv_ray.dir
-#     c = norm²(origin_vec) - 1f0
-#     Δ = b^2 - 4f0 * a * c
-#     Δ < 0f0 && return false
-#     sqrt_Δ = sqrt(Δ)
-#     (inv_ray.tmin < (-b-sqrt_Δ)/(2f0*a) < inv_ray.tmax) || (inv_ray.tmin < (-b+sqrt_Δ)/(2f0*a) < inv_ray.tmax)
-# end
-
-
 ########
 # Plane
 
 
 """
-    Plane <: Shape
+    struct Plane <: Shape
 
 A type representing an infinite plane.
+
+# Members
+
+- `transformation::Transformation`: the `Transformation` associated with the plane.
+- `material::Material`: the [`Material`](@ref) of the spere.
+
+See also: [`ray_intersection(::Ray, ::Plane)`](@ref)
 """
 Base.@kwdef struct Plane <: Shape
     transformation::Transformation = Transformation()
@@ -196,21 +160,25 @@ end
 
 function get_normal(::Type{Plane}, point::Point, ray::Ray)
     -sign(ray.dir.z) * NORMAL_Z
-end
+@doc """
+    Plane(transformation::Transformation, material::Material)
 
-# function quick_ray_intersection(ray::Ray, s::Plane)
-#     inv_ray = inv(s.transformation) * ray
-#     inv_ray.dir.z < 1f-5 && return false
-#     inv_ray.tmin < (-inv_ray.origin.v[3] / inv_ray.dir.z) < inv_ray.tmax
-# end
+Constructor for a [`Plane`](@ref) instance.
+""" Plane(::Transformation, ::Material)
 
+@doc """
+    Plane(transformation::Transformation = Transformation(),
+           material::Material = Material())
+
+Constructor for a [`Plane`](@ref) instance.
+""" Plane(; ::Transformation, ::Material)
 
 #######
 # AABB
 
 
 """
-    AABB
+    struct AABB
 
 A type representing an Axis-Aligned Bounding Box
 """
@@ -220,9 +188,9 @@ Base.@kwdef struct AABB
 end
 
 """
-    ray_intersection(ray, aabb)
+    ray_intersection(ray::Ray, aabb::AABB)
 
-Return the parameter `t` at which `ray` first hits the bounding box. If no hit exists, return `Inf32`.
+Return the parameter `t` at which [`Ray`](@ref) first hits the [`AABB`](@ref). If no hit exists, return `Inf32`.
 """
 function ray_intersection(ray::Ray, aabb::AABB)
     dir = ray.dir

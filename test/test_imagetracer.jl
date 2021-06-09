@@ -2,7 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# Unit test file forimage_tracer.jl
+# Unit test file for imagetracer.jl
 
 
 image = HdrImage(4, 2)

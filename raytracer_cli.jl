@@ -39,7 +39,7 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
     elseif parameter ∈ ["--image_resolution", "-r"]
         @error "the parameter $(parameter) (\"$(value)\") must be composed of 2 positive Int values divided by a ':' (e.g., \"540:540\")"
     elseif parameter ∈ ["--renderer", "-R"]
-        @error "the parameter $(parameter) (\"$(value)\") must be \"onoff\", \"flat\" or \"path\""
+        @error "the parameter $(parameter) (\"$(value)\") must be \"onoff\", \"flat\", \"path\" or \"pointlight\""
     elseif parameter ∈ ["--antialiasing", "-A"]
         @error "the parameter $(parameter) (\"$(value)\") must be a perfect square (e.g., 4, 9 or 16)"
     elseif parameter ∈ ["--delta_theta", "-D"]
@@ -148,7 +148,7 @@ function parse_commandline()
             default = "540:540"
             range_tester = x -> length(Tuple(parse.(Int, split(x, ":")))) == 2
         "--renderer", "-R"
-            help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
+            help = "type of renderer to use (\"onoff\", \"flat\", \"path\" or \"pointlight\")"
             arg_type = String
             default = "path"
             range_tester = x -> (x ∈ ["onoff", "flat", "path", "pointlight"])
@@ -233,7 +233,7 @@ function parse_commandline()
             default = "540:540"
             range_tester = x -> length(Tuple(parse.(Int, split(x, ":")))) == 2
         "--renderer", "-R"
-            help = "type of renderer to use (\"onoff\", \"flat\" or \"path\")"
+            help = "type of renderer to use (\"onoff\", \"flat\", \"path\" or \"pointlight\")"
             arg_type = String
             default = "path"
             range_tester = x -> (x ∈ ["onoff", "flat", "path", "pointlight"])

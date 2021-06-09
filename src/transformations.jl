@@ -4,20 +4,41 @@
 
 # Implementation of transformations (generics, translations, rotations, ...)
 
+
 """
-    Transformation
+    struct Transformation
 
 A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
 
 A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation
 significantly increases performance at the cost of memory space.
 
-Members:
-- `m` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the transformation. Default value is the identity matrix.
-- `invm` ([`StaticArrays.SMatrix`](@ref)`{4, 4, Float32}`): the homogeneous matrix representation of the inverse transformation.
-  Default value is the inverse of `m` calculated through the [`Base.inv`](@ref) function.
+# Members
+
+- `m::SMatrix{4, 4, Float32}`: the homogeneous matrix representation of the transformation.
+- `invm::SMatrix{4, 4, Float32}`: the homogeneous matrix representation of the inverse transformation.
+"""
+struct Transformation
+    m::SMatrix{4, 4, Float32}
+    invm::SMatrix{4, 4, Float32}
+
+    function Transformation(m::SMatrix{4, 4, Float32} = SMatrix{4, 4, Float32}(I(4)),
+                            invm::SMatrix{4, 4, Float32} = inv(m))
+        new(m, invm)
+    end
+end
+
+@doc """
+    Transformation(m::SMatrix{4, 4, Float32} = SMatrix{4, 4, Float32}(I(4)),
+                   invm::SMatrix{4, 4, Float32} = inv(m))
+
+Constructor for a [`Transformation`](@ref) instance.
+
+If no parameter is specified, then an identity transformation is returned.
+If only the direct matrix is specified, then the inverse matrix is automatically computed.
 
 # Examples
+
 ```jldoctest
 julia> Transformation()
 4x4 Transformation:
@@ -32,26 +53,18 @@ Inverse matrix of type StaticArrays.SMatrix{4, 4, Float32, 16}:
  0.0f0  0.0f0  1.0f0  0.0f0
  0.0f0  0.0f0  0.0f0  1.0f0
 ```
-"""
-struct Transformation
-    m::SMatrix{4, 4, Float32}
-    invm::SMatrix{4, 4, Float32}
-
-    function Transformation(m::SMatrix{4, 4, Float32} = SMatrix{4, 4, Float32}(I(4)),
-                            invm::SMatrix{4, 4, Float32} = inv(m))
-        new(m, invm)
-    end
-end
+""" Transformation(::SMatrix{4, 4, Float32}, invm::SMatrix{4, 4, Float32})
 
 """
-    Transformation(m)
-    Transformation(m, invm)
+    Transformation(m::AbstractMatrix)
+    Transformation(m::AbstractMatrix, invm::AbstractMatrix)
 
-Construct a `Transformation` instance from `m` and `invm`. The elements of the matrix will be casted to `Float32`.
+Construct a [`Transformation`](@ref) instance from `m` and `invm`. The elements of the matrix will be casted to `Float32`.
 
-If any argument is an [`AbstractMatrix`](@ref) it will be implicitly casted to a [`StaticArrays.SMatrix`](@ref) to increase performance.
+If any argument is an `AbstractMatrix`, it will be implicitly casted to a `StaticArrays.SMatrix` to increase performance.
 
 # Examples
+
 ```jldoctest; setup = :(import StaticArrays)
 julia> Transformation(StaticArrays.SMatrix{4,4}([1 0 0 0; 0 2 0 0; 0 0 4 0; 0 0 0 1]))
 4x4 Transformation:
@@ -115,9 +128,9 @@ eltype(::Transformation) = Float32
 eltype(::Type{Transformation}) = Float32
 
 """
-    isconsistent(t)
+    isconsistent(t::Transformation)
 
-Return `true` if `t.m * t.invm` is similar to the identity matrix.
+Return `true` if `t.m * t.invm` is similar to the identity matrix and so the [`Transformation`](@ref) is consistent.
 
 Mainly used for testing and to verify matrices haven't been mutated.
 """
@@ -140,13 +153,14 @@ end
 
 
 """
-    inv(t)
+    inv(t::Transformation)
 
 Return the inverse [`Transformation`](@ref).
 
 Returns a `Transformation` which has the `m` and `invm` fields swapped.
 
-#Examples
+# Examples
+
 ```jldoctest; setup = :(using LinearAlgebra: Diagonal)
 julia> t = Transformation(Diagonal([1, 2, 3, 1]))
 4x4 Transformation:
@@ -208,11 +222,11 @@ let rotation_matrices = Dict(
 
     # docstrings
     let docmsg = (ax, mat) -> """
-            rotation$ax(θ)
+            rotation$ax(θ::Real)
 
         Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
 
-        If an `AbstractVector` is provided as argument it must have a size = (3,)
+        If an `AbstractVector` is provided as argument it must have a `size = (3,)`.
 
         # Examples
         ```jldoctest
@@ -232,14 +246,15 @@ end
 
 
 """
-    translation(x, y, z)
-    translation(v)
+    translation(v::AbstractVector)
+    translation(x::Real, y::Real, z::Real)
 
 Return a [`Transformation`](@ref) that translates a 3D vector field of the given coordinates.
 
-If an `AbstractVector` is provided as argument it must have a size = (3,)
+If an `AbstractVector` is provided as argument it must have a `size = (3,)`.
 
 # Examples
+
 ```jldoctest
 julia> translation(1, 2, 3)
 4x4 Transformation:
@@ -288,16 +303,17 @@ translation(x::Real, y::Real, z::Real) = translation([x,y,z])
 
 
 """
-    scaling(x, y, z)
+    scaling(x::Real, y::Real, z::Real)
     scaling(s::Real)
     scaling(v::AbstractVector)
 
 Return a [`Transformation`](@ref) that scales a 3D vector field of a given factor for each axis.
 
 If a single `Real` is provided as argument then the scaling is considered uniform.
-If an `AbstractVector` is provided as argument it must have a size = (3,)
+If an `AbstractVector` is provided as argument it must have a `size = (3,)`.
 
 # Examples
+
 ```jldoctest
 julia> scaling(1, 2, 3)
 4x4 Transformation:

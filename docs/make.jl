@@ -18,4 +18,4 @@ using Documenter
 
 makedocs(
     sitename="Raytracer.jl"
-    )
+)

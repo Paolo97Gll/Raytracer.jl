@@ -205,7 +205,7 @@ end
 Return the mean value between the maximum component and the minumum component of a color:
 
 ```math
-\frac{\text{max}(c) + \text{min}(c)}{2}
+\frac{\mathrm{max}(c) + \mathrm{min}(c)}{2}
 ```
 
 # Examples
