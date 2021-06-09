@@ -303,6 +303,10 @@ function parse_commandline()
             default = "demo"
     end
 
+    # docs
+
+    s["docs"].description = "Show the documentation link."
+
     parse_args(s)
 end
 
