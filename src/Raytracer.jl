@@ -1,77 +1,145 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   Raytracer.jl
-# description:
-#   Main package file.
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Main package file
 
 
 """
     Raytracer
+
 Raytracing package for the generation of photorealistic images in Julia.
 """
 module Raytracer
 
+
+##########
+# Imports
+
+
 import Base:
-    Matrix, OneTo, print_matrix,
     (+), (-), (*), (≈),
-    size, zero, one, fill!, eltype, convert,
-    length, firstindex, lastindex, getindex, setindex!, iterate, axes,
-    show, write,
-    readline, read, rand
+    Matrix, OneTo,
+    axes, clamp, convert, eltype, fill!, firstindex, getindex, iterate,
+    lastindex, length, one, print_matrix, rand, read, readline, setindex!, show,
+    size, write, zero
+
 import Base.Broadcast:
-    BroadcastStyle, Style, Broadcasted, combine_eltypes,
-    broadcastable, copy, similar
-import ColorTypes:
+    BroadcastStyle, Broadcasted, Style,
+    broadcastable, combine_eltypes, copy, similar
+
+using ColorTypes:
     RGB, Fractional
+
 import FileIO:
     save, load
+
 import ImagePFM:
     _read
-import StaticArrays:
-    SVector, MMatrix, FieldVector,
-    SMatrix, @SMatrix,
-    similar_type, Size
-import LinearAlgebra:
-    (⋅), (×), 
-    norm, normalize, inv, I, Diagonal
-using Random:
-    Sampler, SamplerTrivial, Random.CloseOpen01
-using ProgressMeter, Intervals, Random
 
-export
-    RGB, HdrImage, 
-    normalize_image, clamp_image, γ_correction, norm²,
-    save, load,
-    Vec, Point, Normal, Transformation, Vec2D,
-    rotationX, rotationY, rotationZ,
-    translation, scaling, 
-    isconsistent,
-    Ray, OrthogonalCamera, PerspectiveCamera,
-    fire_ray, aperture_deg,
-    ImageTracer, fire_all_rays!,
-    Shape, Sphere, Plane,
-    HitRecord, World,
-    ray_intersection,
-    PCG,
-    Pigment, UniformPigment, CheckeredPigment, ImagePigment,
-    BRDF, DiffuseBRDF, Material,
-    Renderer, OnOffRenderer, FlatRenderer, PathTracer,
-    create_onb_from_z,
-    tonemapping, demo
+import StaticArrays:
+    @SMatrix,
+    FieldVector, MMatrix, SMatrix, SVector, Size,
+    similar_type
+
+import LinearAlgebra:
+    (⋅), (×),
+    Diagonal, I,
+    inv, norm, normalize
+
+using Random
+import Random:
+    Random.CloseOpen01, Sampler, SamplerTrivial
+
+using Intervals, ProgressMeter
+
+
+##########
+# Exports
+
+export # Rendering
+    RGB,
+        luminosity, clamp, γ_correction,
+    HdrImage,
+        luminosity, clamp, γ_correction,
+    Camera,
+        PerspectiveCamera, OrthogonalCamera,
+        aperture_deg,
+        fire_ray,
+    ImageTracer,
+        fire_all_rays!,
+    Ray,
+    HitRecord,
+    Pigment,
+        UniformPigment,
+        CheckeredPigment,
+        ImagePigment,
+    BRDF,
+        DiffuseBRDF, SpecularBRDF,
+    Material,
+    Renderer,
+        OnOffRenderer, FlatRenderer, PathTracer, PointLightRenderer
+
+export # Scene
+    Normal, Vec,
+        normalize,
+        norm,
+        norm²,
+        create_onb_from_z,
+        NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, VEC_X, VEC_Y, VEC_Z,
+    Point,
+        convert,
+        ORIGIN,
+    Vec2D,
+    Transformation,
+        isconsistent,
+        rotationX, rotationY, rotationZ,
+        scaling, translation,
+    Shape,
+        Sphere, Plane,
+        ray_intersection,
+    World,
+        is_point_visible,
+    PointLight,
+    Lights
+
+export # Random number generation
+    PCG
+
+export # High level API
+    demo, tonemapping
+
+export # image tools
+    clamp_image, normalize_image, γ_correction, load, save
+
+export # Colors
+    BLACK, WHITE,
+    RED, GREEN, BLUE,
+    CYAN, MAGENTA, YELLOW
+
+
+###########
+# Includes
+
+
+include("colors.jl")
+include("hdrimage.jl")
 
 include("pcg.jl")
-include("color.jl")
-include("hdr_image.jl")
+
 include("geometry.jl")
+include("transformations.jl")
 include("ray.jl")
 include("cameras.jl")
-include("image_tracer.jl")
 include("materials.jl")
-include("shape.jl")
+include("lights.jl")
+include("hitrecord.jl")
+include("shapes.jl")
+include("world.jl")
 include("renderers.jl")
+include("imagetracer.jl")
+
 include("user_utils.jl")
+
 
 end # module Raytracer

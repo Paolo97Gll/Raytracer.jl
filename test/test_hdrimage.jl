@@ -1,25 +1,21 @@
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
-# (C) 2021 Samuele Colombo, Paolo Galli
-#
-# file:
-#   test_hdr_image.jl
-# description:
-#   Unit tests for hdr_image.jl
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Unit test file for hdrimage.jl
 
 
-# testset variables
-c1 = RGB(1., 2., 3.)
-c2 = RGB(4., 5., 6.)
-c3 = RGB(7., 8., 9.)
-c4 = RGB(10., 11., 12.)
-c5 = RGB(13., 14., 15.)
-c6 = RGB(16., 17., 18.)
-c7 = RGB(19., 20., 21.)
-c8 = RGB(22., 23., 24.)
+c1 = RGB( 1f0,  2f0,  3f0)
+c2 = RGB( 4f0,  5f0,  6f0)
+c3 = RGB( 7f0,  8f0,  9f0)
+c4 = RGB(10f0, 11f0, 12f0)
+c5 = RGB(13f0, 14f0, 15f0)
+c6 = RGB(16f0, 17f0, 18f0)
+c7 = RGB(19f0, 20f0, 21f0)
+c8 = RGB(22f0, 23f0, 24f0)
 
 
-@testset "Constructors" begin
+@testset "constructors" begin
     # test constructor from matrix
     @testset "from matrix" begin
         rgb_pixel_matrix = [c1 c3 c5
@@ -31,14 +27,14 @@ c8 = RGB(22., 23., 24.)
     # test custom constructors
     @testset "size constructor given type" begin
         img_width, img_height = 3, 2
-        rgb_zeros = zeros(RGB{Float64}, img_width, img_height)
+        rgb_zeros = zeros(RGB{Float32}, img_width, img_height)
 
-        image = HdrImage{RGB{Float64}}(img_width, img_height)
+        image = HdrImage(img_width, img_height)
         @test image.pixel_matrix == rgb_zeros
         @test all(image.pixel_matrix .=== rgb_zeros)
-        
+
         # convenience alias
-        image = HdrImage(RGB{Float64}, img_width, img_height)
+        image = HdrImage(img_width, img_height)
         @test image.pixel_matrix == rgb_zeros
         @test all(image.pixel_matrix .=== rgb_zeros)
     end
@@ -51,14 +47,13 @@ c8 = RGB(22., 23., 24.)
         @test all(image.pixel_matrix .=== rgb_zeros)
 
         # test correct defaulting
-        @test image.pixel_matrix == HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix
-        @test all(image.pixel_matrix .=== HdrImage{RGB{Float32}}(img_width, img_height).pixel_matrix)
-        @test all(image.pixel_matrix .!== HdrImage{RGB{Float64}}(img_width, img_height).pixel_matrix)
+        @test image.pixel_matrix == HdrImage(img_width, img_height).pixel_matrix
+        @test all(image.pixel_matrix .=== HdrImage(img_width, img_height).pixel_matrix)
     end
 
     @testset "array and size" begin
         img_width, img_height = 3, 2
-        arr = collect(RGB(1., 2., 3.) .+ 3.0i for i ∈ 0:img_width*img_height-1)
+        arr = collect(RGB(1f0, 2f0, 3f0) .+ 3f0i for i ∈ 0:img_width*img_height-1)
         image = HdrImage(arr, img_width, img_height)
         @test image.pixel_matrix == reshape(arr, img_width, img_height)
         @test all(image.pixel_matrix .=== reshape(arr, img_width, img_height))
@@ -67,7 +62,7 @@ c8 = RGB(22., 23., 24.)
     @testset "array and shape" begin
         img_width, img_height = 3, 2
         shape = (img_width, img_height)
-        arr = collect(RGB(1., 2., 3.) .+ 3.0i for i ∈ 0:img_width*img_height-1)
+        arr = collect(RGB(1f0, 2f0, 3f0) .+ 3f0i for i ∈ 0:img_width*img_height-1)
         image = HdrImage(arr, shape)
         @test image.pixel_matrix == reshape(arr, shape)
         @test all(image.pixel_matrix .=== reshape(arr, shape))
@@ -75,7 +70,7 @@ c8 = RGB(22., 23., 24.)
 end
 
 
-@testset "Iterations" begin
+@testset "iterations" begin
     # testset variables
     rgb_pixel_matrix = [c1 c3 c5
                         c2 c4 c6]
@@ -102,7 +97,7 @@ end
 
         # test exceptions
         @test_throws BoundsError image[7]
-        
+
         # cartesian indexing
         @test c1 == image[1,1]
         @test c2 == image[2,1]
@@ -121,7 +116,7 @@ end
 
     # test set value
     @testset "set value" begin
-        _image = HdrImage{RGB{Float64}}(1, 2)
+        _image = HdrImage(1, 2)
         _image[1] = c1
         _image[2] = c2
         @test _image.pixel_matrix == [c1 c2]
@@ -137,10 +132,10 @@ end
 @testset "Broadcasting" begin
     a = 2
     rgb_pixel_matrix_1 = [c1 c3
-                        c2 c4]
+                          c2 c4]
     img_1 = HdrImage(rgb_pixel_matrix_1)
     rgb_pixel_matrix_2 = [c5 c7
-                        c6 c8]
+                          c6 c8]
     img_2 = HdrImage(rgb_pixel_matrix_2)
 
     # testing equivalence to custom defined methods
@@ -159,24 +154,24 @@ end
 end
 
 @testset "Tone mapping" begin
-    @testset "normalize_image" begin
-        img = HdrImage([RGB(  5.0,   10.0,   15.0)
-                        RGB(500.0, 1000.0, 1500.0)], 2, 1)
+    @testset "normalize" begin
+        img = HdrImage([RGB(  5f0,   10f0,   15f0)
+                        RGB(500f0, 1000f0, 1500f0)], 2, 1)
 
-        img = normalize_image(img, 1000.0, luminosity=100.0)
-        @test all(img .≈ [RGB(0.5e2, 1.0e2, 1.5e2), RGB(0.5e4, 1.0e4, 1.5e4)])
+        img = normalize(img, 1000f0, luminosity=100f0)
+        @test all(img .≈ [RGB(0.5f2, 1.0f2, 1.5f2), RGB(0.5f4, 1.0f4, 1.5f4)])
     end
 
-    @testset "clamp_image" begin
-        img = HdrImage([RGB(0.5e1, 1.0e1, 1.5e1)
-                        RGB(0.5e3, 1.0e3, 1.5e3)], 2, 1)
-        img = clamp_image(img)
+    @testset "clamp" begin
+        img = HdrImage([RGB(0.5f1, 1.0f1, 1.5f1)
+                        RGB(0.5f3, 1.0f3, 1.5f3)], 2, 1)
+        img = clamp(img)
         @test all(0 <= col <= 1 for pix ∈ img for col ∈ pix)
     end
-    
-    @testset "average_luminosity" begin
-        image = HdrImage([RGB(  5.0,   10.0,   15.0) RGB(500.0, 1000.0, 1500.0)])
-        @test average_luminosity(image) ≈ 100.
+
+    @testset "luminosity" begin
+        image = HdrImage([RGB(  5f0,   10f0,   15f0) RGB(500f0, 1000f0, 1500f0)])
+        @test luminosity(image) ≈ 100f0
     end
 
 end
@@ -189,13 +184,13 @@ end
         rgb_pixel_matrix = [c1 c4
                             c2 c5
                             c3 c6]
-        image = HdrImage{RGB{Float32}}(rgb_pixel_matrix)
+        image = HdrImage(rgb_pixel_matrix)
         # compact
         show(io, image)
         @test String(take!(io)) == " (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
         # extended
         show(io, "text/plain", image)
-        @test String(take!(io)) == "3x2 HdrImage{RGB{Float32}}:\n (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
+        @test String(take!(io)) == "3x2 HdrImage:\n (1.0 2.0 3.0)  (10.0 11.0 12.0)\n (4.0 5.0 6.0)  (13.0 14.0 15.0)\n (7.0 8.0 9.0)  (16.0 17.0 18.0)"
     end
 end
 
@@ -209,7 +204,7 @@ end
 
     # test eltype
     @testset "eltype" begin
-        @test eltype(image) == RGB{Float64}
+        @test eltype(image) == RGB{Float32}
     end
 
     # test fill!
