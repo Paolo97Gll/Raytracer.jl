@@ -151,9 +151,10 @@ function unread_char!(stream::InputStream, ch::Char):
 end
 
 """Keep reading characters until a non-whitespace character is found"""
-function skip_whitespaces(stream::InputStream):
+function skip_whitespaces_and_comments(stream::InputStream):
     ch = readchar!(stream)
-    while isspace(ch)
+    while isspace(ch) || ch == '#'
+        ch == '#' && while read_char!(stream) in ['\n', '\r'] || isnothing
         ch = readchar!(stream)
         isnothing(ch) && return
     end
