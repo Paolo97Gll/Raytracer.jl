@@ -24,6 +24,58 @@ function Base.print(io::IO, loc::SourceLocation)
 end
 
 
+########
+# Token
+
+# @enum TokenEnum begin
+#     LiteralNumber
+#     LiteralString
+#     Keyword
+#     Identifier
+#     SymbolToken
+#     StopToken
+# end
+
+@enum Keyword
+    somekeyword
+end
+
+# const ValueUnion = Union{Float32, String, Keyword, Nothing}
+
+# struct Token{TOK}
+#     loc::SourceLocation
+#     value::ValueUnion
+#     function Token{TOK}(loc::SourceLocation, value::ValueUnion) where {TOK}
+#         TOK::TokenEnum
+#         new{TOK}(loc, value)
+#     end
+# end
+
+struct Identifier
+    name::String
+end
+
+struct LiteralString
+    value::String
+end
+
+struct LiteralNumber
+    value::Float32
+end
+
+struct SymbolToken
+    symbol::Symbol
+end
+
+struct StopToken end
+
+const Tokens = Union{LiteralNumber, LiteralString, Keyword, Identifier, SymbolToken, StopToken}
+
+struct Token 
+    loc::SourceLocation
+    value::Tokens
+end
+
 
 #############
 # Exceptions
