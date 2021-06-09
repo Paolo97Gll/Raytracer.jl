@@ -15,12 +15,12 @@ See [CLI tool installation](@ref cli_tool_installation).
 
 The menu tree is:
 
-- [`raytracer_cli.jl`](@id raytracer_cli)
-  - [`tonemapping`](@id raytracer_cli_tonemapping)
-  - [`demo`](@id raytracer_cli_demo)
-    - [`image`](@id raytracer_cli_demo_image)
-    - [`animation`](@id raytracer_cli_demo_animation)
-  - [`docs`](@id raytracer_cli_docs)
+- [`raytracer_cli.jl`](@ref raytracer_cli)
+  - [`tonemapping`](@ref raytracer_cli_tonemapping)
+  - [`demo`](@ref raytracer_cli_demo)
+    - [`image`](@ref raytracer_cli_demo_image)
+    - [`animation`](@ref raytracer_cli_demo_animation)
+  - [`docs`](@ref raytracer_cli_docs)
 
 ### [`raytracer_cli.jl`](@id raytracer_cli)
 
