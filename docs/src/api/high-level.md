@@ -1,4 +1,4 @@
-# High-level API
+# [High-level API](@id high_level_api)
 
 ```@autodocs
 Modules = [Raytracer]

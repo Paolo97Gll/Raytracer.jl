@@ -4,7 +4,14 @@ A command line tool `raytracer_cli.jl` is available to manage through this packa
 
 This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run these commands also from the REPL.
 
+## Installation
+
+See [CLI tool installation](@ref cli_tool_installation).
+
 ## Usage
+
+!!! note
+    _You must call this tool from the repo main folder!_ It will not work if called by another folder.
 
 The menu tree is:
 
@@ -247,7 +254,7 @@ You can also change the default values of `alpha` and/or `gamma` to obtain a bet
 julia raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
 ```
 
-### Demo
+### Demo image
 
 You can use the `demo image` command to render a demo image:
 
@@ -268,3 +275,7 @@ To enable multithreading, e.g. use 8 threads, use:
 ```shell
 julia --threads 8 raytracer_cli.jl demo animation
 ```
+
+### Demo animation
+
+Coming soon!

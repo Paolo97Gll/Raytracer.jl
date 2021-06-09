@@ -7,7 +7,7 @@ git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then open julia REPL and type the following commands to update your environment:
+Then open the julia REPL and type the following commands to update your environment:
 
 ```julia
 import Pkg

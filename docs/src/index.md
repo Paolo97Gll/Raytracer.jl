@@ -4,7 +4,15 @@ Raytracing package for the generation of photorealistic images in Julia.
 
 ## Brief description
 
-Coming soon!
+The main purpose of this package is to generate photorealistic images given an input scene.
+
+The input scene is composed by a list of shapes (spheres, planes, ...) of various materials (for now diffusive or reflective) with different colors, each one with in a particular position in the 3D space. The observer is represented by a camera, that can do a perspective or an orthogonal projection. The camera will see the scene through a screen, characterized by its aspect ratio, distance from the camera and resolution. The image can be rendered with different [backwards ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)#Reversed_direction_of_traversal_of_scene_by_the_rays) algorithms: a [path tracer](https://en.wikipedia.org/wiki/Path_tracing) (the default renderer), a point-light tracer, a flat renderer and an on-off renderer; this process can be parallelized using multiple threads. Each of these aspects can be managed, tuned and modified using the [low-level API](@ref low_level_api) of the package.
+
+There are two main steps in the image generation. We offer [high-level API](@ref high_level_api) and a CLI tool for these steps.
+
+- The _generation of an HDR (high dynamic range) image_ in the [PFM format](http://www.pauldebevec.com/Research/HDR/PFM/). In this step, the scene is loaded along with the informations about the observer (position, orientation, type of the camera, ...) and the choosen renderer. Then the image is rendered using the choosen algorithm.
+
+- The _conversion of this image to an LDR (low dynamic range) image_, such as jpg or png, using a [tone mapping](https://en.wikipedia.org/wiki/Tone_mapping) process.
 
 ## Overview
 
@@ -14,7 +22,9 @@ Coming soon!
 
 ### Package
 
-The package is still under development and is not available in the official registry. To add this package to your work environment, open julia REPL and type the following commands:
+The package is still under development and is not available in the official registry.
+
+To add this package to your main environment (_not recommended_), open the julia REPL and type the following commands:
 
 ```julia
 import Pkg
@@ -25,7 +35,17 @@ Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
 
 We use a [custom version of FileIO](https://github.com/Samuele-Colombo/FileIO.jl) that provides load/save functionalities for pfm files: this integration is done by the package [ImagePFM](https://github.com/Samuele-Colombo/ImagePFM.jl). If FileIO is already present (e.g. the original package), it will be overwritten by this custom version.
 
-### CLI tool
+You can also create a new environment (_recommended_). First create a new folder and `cd` into this folder: this will become the home of the new environment. Then open the julia REPL and type the following commands:
+
+```julia
+import Pkg
+Pkg.activate(".")
+Pkg.add(url="https://github.com/Samuele-Colombo/FileIO.jl")
+Pkg.add(url="https://github.com/Samuele-Colombo/ImagePFM.jl")
+Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
+```
+
+### [CLI tool](@id cli_tool_installation)
 
 To use it, clone this repository:
 
@@ -34,7 +54,7 @@ git clone https://github.com/Paolo97Gll/Raytracer.jl.git
 cd Raytracer.jl
 ```
 
-Then, open julia REPL and type the following commands to update your environment:
+Then, open the julia REPL and type the following commands to instantiate the environment:
 
 ```julia
 import Pkg
