@@ -5,7 +5,7 @@
 # Generate documentation
 
 using Pkg
-Pkg.activate(normpath(joinpath(@__DIR__, "..")))
+Pkg.activate(normpath(@__DIR__))
 
 using Documenter, Raytracer
 
