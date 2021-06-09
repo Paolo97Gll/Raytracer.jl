@@ -48,6 +48,7 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
         @error err.text
     end
 
+    println(stderr, "\n", usage_string(settings))
     exit(err_code)
 end
 
@@ -68,6 +69,9 @@ function parse_commandline()
         "demo"
             action = :command
             help = "show a demo of Raytracer.jl"
+        "docs"
+            action = :command
+            help = "show the documentation link"
     end
 
     # tonemapping
@@ -352,6 +356,7 @@ function demoimage(options::Dict{String, Any})
     )
 end
 
+
 function demoanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, options::Dict{String, Any})
     index, θ = elem
     filename = "$(options["output_file"])_$(lpad(repr(index), trunc(Int, log10(total_elem))+1, '0'))"
@@ -423,6 +428,13 @@ function demoanimation(options::Dict{String, Any})
     println(" done!")
 
     cd(curdir)
+end
+
+
+function docs(options::Dict{String, Any})
+    printstyled("Raytracer.jl documentation\n\n", bold=true)
+    println("Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable")
+    println("Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev")
 end
 
 

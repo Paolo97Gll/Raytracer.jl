@@ -11,21 +11,23 @@ The menu tree is:
 ```text
 raytracer_cli.jl
 ├── tonemapping
-└── demo
-    ├── image
-    └── animation
+├── demo
+│   ├── image
+│   └── animation
+└── docs
 ```
 
 ### `raytracer_cli.jl`
 
 ```text
-usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo}
+usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo|docs}
 
 Raytracing for the generation of photorealistic images in Julia.
 
 commands:
   tonemapping  apply tone mapping to a pfm image and save it to file
   demo         show a demo of Raytracer.jl
+  docs         show the documentation link
 
 optional arguments:
   --version    show version information and exit
@@ -217,6 +219,16 @@ files:
   -O, --output_file OUTPUT_FILE
                         name of output frames and animation without
                         extension (default: "demo")
+```
+
+### `raytracer_cli.jl docs`
+
+```text
+usage: raytracer_cli.jl docs [--version] [-h]
+
+optional arguments:
+  --version   show version information and exit
+  -h, --help  show this help message and exit
 ```
 
 ## Examples
