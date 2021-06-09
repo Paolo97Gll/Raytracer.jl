@@ -4,14 +4,16 @@
 
 # Generate documentation
 
-push!(LOAD_PATH,"../src/")
+using Pkg
+Pkg.activate(normpath(@__DIR__))
 
 using Documenter, Raytracer
+
 
 makedocs(
     sitename = "Raytracer.jl"
 )
 
 deploydocs(
-    repo = "github.com/Paolo97Gll/Raytracer.jl.git"
+    repo = "github.com/Paolo97Gll/Raytracer.jl.git",
 )
