@@ -18,9 +18,9 @@ Coming soon!
 
 We provide:
 
-- A package with both high-level and low-level API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations: [latest release](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [master branch](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
+- A package with both high-level and low-level API. It's possible to use the package's features directly from the REPL or in more complex scripts. More informations: [latest release (stable)](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/api), [master branch (dev)](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/api).
 
-- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations: [latest release](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [master branch](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
+- A CLI tool. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. More informations: [latest release (stable)](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli), [master branch (dev)](https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli).
 
 ## Contributing
 
