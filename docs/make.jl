@@ -26,8 +26,8 @@ makedocs(
         "ScieneLang" => "scienelang.md",
         "CLI tool" => "cli.md",
         "API" => [
-            "High level" => "api/high-level.md",
-            "Low level" => "api/low-level.md"
+            "High-level API" => "api/high-level.md",
+            "Low-level API" => "api/low-level.md"
         ],
         "For devs" => [
             "Collaboration instructions" => "devs/collab.md",
