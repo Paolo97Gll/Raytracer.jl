@@ -139,18 +139,6 @@ Base.@kwdef struct Plane <: Shape
     material::Material = Material()
 end
 
-function get_t(::Type{Plane}, ray::Ray)
-    abs(ray.dir.z) < 1f-5 && return nothing
-    t = -ray.origin.v[3] / ray.dir.z
-    ray.tmin < t < ray.tmax ? t : nothing
-end
-
-function get_uv(::Type{Plane}, point::Point)
-    point.v[1:2] - floor.(point.v[1:2]) |> Vec2D
-end
-
-function get_normal(::Type{Plane}, point::Point, ray::Ray)
-    -sign(ray.dir.z) * NORMAL_Z
 @doc """
     Plane(transformation::Transformation, material::Material)
 
@@ -163,6 +151,21 @@ Constructor for a [`Plane`](@ref) instance.
 
 Constructor for a [`Plane`](@ref) instance.
 """ Plane(; ::Transformation, ::Material)
+
+function get_t(::Type{Plane}, ray::Ray)
+    abs(ray.dir.z) < 1f-5 && return nothing
+    t = -ray.origin.v[3] / ray.dir.z
+    ray.tmin < t < ray.tmax ? t : nothing
+end
+
+function get_uv(::Type{Plane}, point::Point)
+    point.v[1:2] - floor.(point.v[1:2]) |> Vec2D
+end
+
+function get_normal(::Type{Plane}, point::Point, ray::Ray)
+    -sign(ray.dir.z) * NORMAL_Z
+end
+
 
 #######
 # AABB
