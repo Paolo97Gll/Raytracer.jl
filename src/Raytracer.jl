@@ -96,7 +96,7 @@ export # Scene
         rotationX, rotationY, rotationZ,
         scaling, translation,
     Shape,
-        Sphere, Plane, Cube, Cylinder
+        Sphere, Plane, Cube, Cylinder,
         get_t, get_uv, get_normal,
         ray_intersection, quick_ray_intersection,
     World,
