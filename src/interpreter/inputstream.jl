@@ -52,6 +52,9 @@ function Base.iterate(stream::InputStream, state::Int = 1)
     isa((token = read_token(stream)).value, StopToken) ? nothing : (token, state + 1)
 end
 
+Base.IteratorSize(::Type{InputStream}) = Base.SizeUnknown()
+
+
 """
     eof(stream::InputStream)
 

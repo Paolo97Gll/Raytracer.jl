@@ -6,8 +6,11 @@
 
 module Interpreter
 
+using Base:
+    SizeUnknown
+
 import Base:
-    show, print, eof, copy
+    show, print, eof, copy, IteratorSize
 
 export # Interpreter
     SourceLocation, 
