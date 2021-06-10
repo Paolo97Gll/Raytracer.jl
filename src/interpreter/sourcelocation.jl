@@ -17,11 +17,11 @@ Base.@kwdef mutable struct SourceLocation
 end
 
 function Base.show(io::IO, ::MIME"text/plain", loc::SourceLocation)
-    print(io, joinpath(".", relpath(loc.file_name)), ":", loc.line_num, ":", loc.col_num)
+    print(io, abspath(loc.file_name), ":", loc.line_num, ":", loc.col_num)
 end
 
 function Base.print(io::IO, loc::SourceLocation)
-    print(io, joinpath(".", relpath(loc.file_name)), ":", loc.line_num, ":", loc.col_num)
+    print(io, abspath(loc.file_name), ":", loc.line_num, ":", loc.col_num)
 end
 
 function Base.copy(loc::SourceLocation)
