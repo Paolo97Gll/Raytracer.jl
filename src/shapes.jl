@@ -241,20 +241,6 @@ function get_uv(::Type{Cube}, point::Point)
     @.((offset + 0.5f0 * ((uc, vc) / maxval + 1f0))/(4f0, 3f0)) |> Vec2D
 end
 
-# UNUSED, STORED HERE IF NEDDED IN FUTURE
-# function get_xyz(::Type{Cube}, uv::Vec2D)
-#     ucvc = uv .* (4f0, 3f0)
-#     offset = ucvc .|> floor .|> Int |> Tuple
-#     uc, vc = (ucvc - offset) * 2 - 1f0
-#     offset == (2, 1) && return Vec( 1f0,   vc,  -uc) # positive x
-#     offset == (0, 1) && return Vec(-1f0,   vc,   uc) # negative x
-#     offset == (1, 2) && return Vec(  uc,  1f0,  -vc) # positive y
-#     offset == (1, 0) && return Vec(  uc, -1f0,   vc) # negative y
-#     offset == (1, 1) && return Vec(  uc,   vc,  1f0) # positive z
-#     offset == (3, 1) && return Vec( -uc,   vc, -1f0) # negative z
-#     error("Invalid uv coordinate for a Cube: got $uv")
-# end
-
 function get_normal(::Type{Cube}, point::Point, ray::Ray)
     abs_point = point.v .|> abs |> Point
     _, index = findmax(abs_point.v)
