@@ -50,3 +50,11 @@ function Base.showerror(io::IO, e::InterpreterError)
     printstyled(io, " " ^ (e.location.col_num + 6), color=:light_black)
     printstyled(io, "^" ^ e.len, color=:red)
 end
+
+function Base.showerror(io::IO, e::InterpreterError, bt; backtrace = false)
+    try
+        showerror(io, e)
+    finally
+        nothing
+    end
+end
