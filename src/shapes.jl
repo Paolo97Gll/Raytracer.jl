@@ -97,9 +97,9 @@ function get_t(::Type{Sphere}, ray::Ray)
     t_1 = (-b - sqrt_Δ) / (2f0 * a)
     t_2 = (-b + sqrt_Δ) / (2f0 * a)
     # nearest point
-    if (t_1 > ray.tmin) && (t_1 < ray.tmax)
+    if ray.tmin < t_1 < ray.tmax
         return t_1
-    elseif (t_2 > ray.tmin) && (t_2 < ray.tmax)
+    elseif ray.tmin < t_2 < ray.tmax
         return t_2
     else
         return nothing
@@ -182,11 +182,11 @@ Base.@kwdef struct AABB
 end
 
 """
-    ray_intersection(ray::Ray, aabb::AABB)
+    get_t(ray::Ray, aabb::AABB)
 
 Return the parameter `t` at which [`Ray`](@ref) first hits the [`AABB`](@ref). If no hit exists, return `Inf32`.
 """
-function ray_intersection(ray::Ray, aabb::AABB)
+function get_t(ray::Ray, aabb::AABB)
     dir = ray.dir
     o = ray.origin
     overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
@@ -194,6 +194,7 @@ function ray_intersection(ray::Ray, aabb::AABB)
     t1, t2 = overlap.first, overlap.last
     ray.tmin < t1 < ray.tmax && return t1
     ray.tmin < t2 < ray.tmax && return t2
+    return Inf32
 end
 
 #######
@@ -205,8 +206,8 @@ Base.@kwdef struct Cube <: Shape
 end
 
 function get_t(::Type{Cube}, ray::Ray)
-    t = ray_intersection(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
-    ray.tmin < t < ray.tmax ? t : nothing
+    t = get_t(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
+    isfinite(t) ? t : nothing
 end
 
 function get_uv(::Type{Cube}, point::Point)
