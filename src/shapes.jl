@@ -72,7 +72,6 @@ Base.@kwdef struct Sphere <: Shape
     material::Material = Material()
 end
 
-function get_t(::Type{Sphere}, ray::Ray)
 @doc """
     Sphere(transformation::Transformation, material::Material)
 
@@ -86,15 +85,7 @@ Constructor for a [`Sphere`](@ref) instance.
 Constructor for a [`Sphere`](@ref) instance.
 """ Sphere(; ::Transformation, ::Material)
 
-"""
-    ray_intersection(ray::Ray, s::Sphere)
-
-Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Sphere`](@ref).
-
-If none exists, return `nothing`.
-"""
-function ray_intersection(ray::Ray, s::Sphere)
-    inv_ray = inv(s.transformation) * ray
+function get_t(::Type{Sphere}, ray::Ray)
     # compute intersection
     origin_vec = convert(Vec, ray.origin)
     a = norm²(ray.dir)
