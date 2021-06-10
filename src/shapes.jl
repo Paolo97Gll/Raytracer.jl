@@ -248,3 +248,67 @@ function get_normal(::Type{Cube}, point::Point, ray::Ray)
     [i == index ? s * 1f0 : 0f0 for i ∈ 1:3] |> Normal{true}
 end
 
+
+Base.@kwdef struct Cylinder <: Shape
+    transformation::Transformation = Transformation()
+    material::Material = Material()
+end
+
+function get_t(::Type{Cylinder}, ray::Ray)
+    sray = scaling(2) * ray
+    ox, oy, oz = sray.origin.v
+    dx, dy, dz = sray.dir
+
+    # check if side is hit
+    a = dx^2 + dy^2
+    b = 2 * (ox * dx + oy * dy)
+    c = ox^2 + oy^2 - 1
+    Δ = b^2 - 4f0 * a * c
+    Δ < 0 && return nothing
+    sqrt_Δ = sqrt(Δ)
+    t_1 = (-b - sqrt_Δ) / (2f0 * a)
+    t_2 = (-b + sqrt_Δ) / (2f0 * a)
+    # nearest point
+    if ray.tmin < t_1 < ray.tmax
+        t_side = t_1
+        abs(oz + t_side * dz) <= 1f0 && return t_side
+    elseif ray.tmin < t_2 < ray.tmax
+        t_side = t_2
+    else
+        t_side = Inf32
+    end
+
+
+    # check if caps are hit
+    tz1, tz2 = minmax(( 1f0 - oz) / dz, (-1f0 - oz) / dz)
+    ispos1, ispos2 = (tz1, tz2) .∈ Ref(Interval(minmax(t_1, t_2)...))
+    if ispos1
+        @assert ((ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= 1)
+        return tz1
+    elseif ispos2
+        @assert ((ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <= 1)
+        return tz2
+    else
+        return nothing
+    end
+end
+
+function get_normal(::Type{Cylinder}, point::Point, ray::Ray)
+    z = point.v[3]
+    # if it comes from the caps
+    (abs(z) ≈ 1f0) && return -sign(z) * sign(ray.dir.z) * NORMAL_Z
+
+    # if it comes from the side
+    x, y = normalize(point.v[1:2])
+    normal = Normal{true}(x, y, 0f0)
+    (normal ⋅ ray.dir < 0) ? normal : -normal
+end
+
+function get_uv(::Type{Cylinder}, point::Point)
+    z = point.v[3]
+    x, y = normalize(point.v[1:2])
+    z ≈  0.5f0 && return Vec2D(3 - x, 3 - y) * 0.25f0
+    z ≈ -0.5f0 && return Vec2D(3 - x, 1 + y) * 0.25f0
+    (clamp(z + 0.5f0, 0, 1), (atan(y, x)/2π + 1) * 0.5f0)
+end
+    
