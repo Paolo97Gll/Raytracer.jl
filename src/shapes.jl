@@ -205,7 +205,7 @@ Base.@kwdef struct Cube <: Shape
 end
 
 function get_t(::Type{Cube}, ray::Ray)
-    t = ray_intersection(ray, AABB(Point(fill(5f-1, 3)), Point(fill(-5f-1, 3))))
+    t = ray_intersection(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
     ray.tmin < t < ray.tmax ? t : nothing
 end
 
