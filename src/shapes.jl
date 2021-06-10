@@ -114,7 +114,7 @@ function get_uv(::Type{Sphere}, point::Point)
 end
 
 function get_normal(::Type{Sphere}, point::Point, ray::Ray)
-    normal = convert(Normal, point)
+    normal = convert(Normal, point) |> normalize
     (normal ⋅ ray.dir < 0) ? normal : -normal
 end
 
