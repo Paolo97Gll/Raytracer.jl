@@ -449,6 +449,14 @@ function Base.setdiff(s::Shape, ss::Shape...)
     setdiff(s, union(ss...))
 end
 
+function fuse(s1::Shape, s2::Shape)
+    FusionCSG(s1, s2)
+end
+
+function fuse(s::Shape, ss::Shape...)
+    fuse(fuse(s, ss[begin:end ÷ 2]...), fuse(ss[end ÷ 2 + 1:end]...))
+end
+    
 ###########
 # UnionCSG
 

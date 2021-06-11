@@ -106,6 +106,7 @@ export # Scene
             IntersectCSG, 
             DiffCSG,
             FusionCSG,
+        fuse,
         Rule,
             UniteRule,
             IntersectRule,
