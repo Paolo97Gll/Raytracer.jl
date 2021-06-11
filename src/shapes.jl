@@ -39,6 +39,18 @@ function ray_intersection(ray::Ray, s::S) where {S <: Shape}
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
 
+function all_ray_intersections(ray::Ray, s::S) where {S <: Shape}
+    inv_ray = inv(s.transformation) * ray
+    inv_ray = Ray(inv_ray.origin, inv_ray.dir, -Inf32, Inf32, 0)
+    ts = get_all_ts(S, inv_ray)
+    isempty(ts) && return Vector{HitRecord}()
+    hit_points = inv_ray.(ts)
+    world_points = Ref(s.transformation) .* hit_points
+    normals = Ref(s.transformation) .* get_normal.(S, hit_points, Ref(inv_ray)) 
+    surface_points = get_uv.(S, hit_points)
+    HitRecord.(world_points, normals, surface_points, ts, Ref(ray), Ref(s.material))
+end
+
 """
     quick_ray_intersection(ray, s)
 
@@ -84,6 +96,26 @@ Constructor for a [`Sphere`](@ref) instance.
 
 Constructor for a [`Sphere`](@ref) instance.
 """ Sphere(; ::Transformation, ::Material)
+
+function get_all_ts(::Type{Sphere}, ray::Ray)
+    res = Vector{Float32}()
+    sizehint!(res, 2)
+    # compute intersection
+    origin_vec = convert(Vec, ray.origin)
+    a = norm²(ray.dir)
+    b = 2f0 * origin_vec ⋅ ray.dir
+    c = norm²(origin_vec) - 1f0
+    Δ = b^2 - 4f0 * a * c
+    Δ < 0 && return res
+    sqrt_Δ = sqrt(Δ)
+    t_1 = (-b - sqrt_Δ) / (2f0 * a)
+    t_2 = (-b + sqrt_Δ) / (2f0 * a)
+
+    isfinite(t_1) && push!(res, t_1) 
+    isfinite(t_2) && push!(res, t_2)
+
+    return res
+end
 
 function get_t(::Type{Sphere}, ray::Ray)
     # compute intersection
@@ -152,6 +184,10 @@ Constructor for a [`Plane`](@ref) instance.
 Constructor for a [`Plane`](@ref) instance.
 """ Plane(; ::Transformation, ::Material)
 
+function get_all_ts(::Type{Plane}, ray::Ray)
+    abs(ray.dir.z) >= 1f-5 && ((t = -ray.origin.v[3] / ray.dir.z) |> isfinite) ? [t] : Vector{Float32}()
+end
+
 function get_t(::Type{Plane}, ray::Ray)
     abs(ray.dir.z) < 1f-5 && return nothing
     t = -ray.origin.v[3] / ray.dir.z
@@ -197,6 +233,19 @@ function get_t(ray::Ray, aabb::AABB)
     return Inf32
 end
 
+function get_all_ts(ray::Ray, aabb::AABB)
+    res = Vector{Float32}()
+    sizehint!(res, 2)
+    dir = ray.dir
+    o = ray.origin
+    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
+    isempty(overlap) && return res
+    t1, t2 = overlap.first, overlap.last
+    isfinite(t1) && push!(res, t1)
+    isfinite(t2) && push!(res, t2)
+    return res
+end
+
 #######
 # Cube
 
@@ -208,6 +257,10 @@ end
 function get_t(::Type{Cube}, ray::Ray)
     t = get_t(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
     isfinite(t) ? t : nothing
+end
+
+function get_all_ts(::Type{Cube}, ray::Ray)
+    get_all_ts(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))    
 end
 
 function get_uv(::Type{Cube}, point::Point)
@@ -284,6 +337,39 @@ function get_t(::Type{Cylinder}, ray::Ray)
     ray.tmin < tz1 < ray.tmax && (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= 1f0 && return tz1
     ray.tmin < tz2 < ray.tmax && (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <= 1f0 && return tz2
     return nothing
+end
+
+function get_all_ts(::Type{Cylinder}, ray::Ray)
+    res = Vector{Float32}()
+    sizehint!(res, 2)
+    sray = scaling(2) * ray
+    ox, oy, oz = sray.origin.v
+    dx, dy, dz = sray.dir
+
+    # check if side is hit
+    a = dx^2 + dy^2
+    b = 2 * (ox * dx + oy * dy)
+    c = ox^2 + oy^2 - 1
+    Δ = b^2 - 4f0 * a * c
+    if !(iszero(a) && iszero(b) && iszero(Δ)) && Δ >= 0
+        sqrt_Δ = sqrt(Δ)
+        t_1 = (-b - sqrt_Δ) / (2f0 * a)
+        t_2 = (-b + sqrt_Δ) / (2f0 * a)
+        # nearest point
+        @assert !isnan(t_1)
+        @assert !isnan(t_2)
+        abs(oz + t_1 * dz) <= 1f0 && push!(res, t_1)
+        abs(oz + t_2 * dz) <= 1f0 && push!(res, t_2)
+        length(res) == 2 && return res
+    end
+
+    # check if caps are hit
+    tz1, tz2 = minmax(( 1f0 - oz) / dz, (-1f0 - oz) / dz)
+    
+    (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= 1f0 && push!(res, tz1)
+    length(res) == 2 && return res
+    (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <= 1f0 && push!(res, tz2)
+    return res
 end
 
 function get_normal(::Type{Cylinder}, point::Point, ray::Ray)

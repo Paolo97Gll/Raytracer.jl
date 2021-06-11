@@ -17,6 +17,7 @@ module Raytracer
 # Imports
 
 
+using Intervals: minimum
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
@@ -99,8 +100,8 @@ export # Scene
         scaling, translation,
     Shape,
         Sphere, Plane, Cube, Cylinder,
-        get_t, get_uv, get_normal,
-        ray_intersection, quick_ray_intersection,
+        get_t, get_all_ts, get_uv, get_normal,
+        ray_intersection, all_ray_intersections, quick_ray_intersection,
     World,
         is_point_visible,
     PointLight,
