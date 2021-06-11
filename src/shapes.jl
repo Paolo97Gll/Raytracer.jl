@@ -391,3 +391,114 @@ function get_uv(::Type{Cylinder}, point::Point)
     (clamp(z + 0.5f0, 0, 1), (atan(y, x)/2π + 1) * 0.5f0)
 end
     
+#######
+# CSG
+
+@enum Rule begin
+    UniteRule
+    IntersectRule
+    DiffRule
+end
+
+struct CSG{R} <: Shape
+    rbranch::Shape
+    lbranch::Shape
+    function CSG{R}(rbranch::Shape, lbranch::Shape) where {R}
+        R::Rule
+        new{R}(rbranch, lbranch)
+    end
+end
+
+const UnionCSG     = CSG{UniteRule}
+const IntersectCSG = CSG{IntersectRule}
+const DiffCSG      = CSG{DiffRule}
+
+function ray_intersection(ray::Ray, csg::UnionCSG)
+    r_hit = ray_intersection(ray, csg.rbranch)
+    l_hit = ray_intersection(ray, csg.lbranch)
+    isnothing(r_hit) && return l_hit
+    isnothing(l_hit) && return r_hit
+    min(r_hit, l_hit)
+end
+
+function all_ray_intersections(ray::Ray, csg::UnionCSG)
+    r_hits = all_ray_intersections(ray, csg.rbranch)
+    l_hits = all_ray_intersections(ray, csg.lbranch)
+    isempty(r_hits) && return filter(hit -> ray.tmin < hit.t < ray.tmax, l_hits)
+    isempty(l_hits) && return filter(hit -> ray.tmin < hit.t < ray.tmax, r_hits)
+    r_min, r_max = extrema(r_hits)
+    l_min, l_max = extrema(l_hits)
+    r_filter = filter(hit -> !(l_min < hit < l_max) && ray.tmin < hit.t < ray.tmax, r_hits)
+    l_filter = filter(hit -> !(r_min < hit < r_max) && ray.tmin < hit.t < ray.tmax, l_hits)
+    isempty(r_filter) && return l_filter
+    isempty(l_filter) && return r_filter
+    append!(r_filter, l_filter)
+end
+
+function all_ray_intersections(ray::Ray, csg::IntersectCSG)
+    r_hits = all_ray_intersections(ray, csg.rbranch)
+    isempty(r_hits) && return Vector{HitRecord}()
+    l_hits = all_ray_intersections(ray, csg.lbranch)
+    isempty(l_hits) && return Vector{HitRecord}()
+    r_min, r_max = extrema(r_hits)
+    l_min, l_max = extrema(l_hits)
+    r_filter = filter(hit -> l_min < hit < l_max && ray.tmin < hit.t < ray.tmax, r_hits)
+    l_filter = filter(hit -> r_min < hit < r_max && ray.tmin < hit.t < ray.tmax, l_hits)
+    isempty(r_filter) && return l_filter
+    isempty(l_filter) && return r_filter
+    append!(r_filter, l_filter)
+end
+
+function ray_intersection(ray::Ray, csg::IntersectCSG)
+    hits = all_ray_intersections(ray, csg)
+    isempty(hits) && return nothing
+    minimum(hits)
+end
+
+function all_ray_intersections(ray::Ray, csg::DiffCSG)
+    r_hits = all_ray_intersections(ray, csg.rbranch)
+    isempty(r_hits) && return Vector{HitRecord}()
+    l_hits = all_ray_intersections(ray, csg.lbranch)
+    isempty(l_hits) && return r_hits
+    r_min, r_max = extrema(r_hits)
+    l_min, l_max = extrema(l_hits)
+    r_filter = filter(hit -> !(l_min < hit < l_max) && ray.tmin < hit.t < ray.tmax, r_hits)
+    l_filter = filter(hit ->   r_min < hit < r_max  && ray.tmin < hit.t < ray.tmax, l_hits)
+    isempty(r_filter) && return l_filter
+    isempty(l_filter) && return r_filter
+    append!(r_filter, l_filter)
+end
+
+function ray_intersection(ray::Ray, csg::DiffCSG)
+    hits = all_ray_intersections(ray, csg)
+    isempty(hits) && return nothing
+    minimum(hits)
+end
+
+function Base.union(s1::Shape, s2::Shape)
+    UnionCSG(s1, s2)
+end
+
+function Base.union(s::Shape, ss::Shape...)
+    union(union(s, ss[begin:end ÷ 2]...), union(ss[end ÷ 2 + 1:end]...))
+end
+
+Base.union(s::Shape) = s
+
+function Base.intersect(s1::Shape, s2::Shape)
+    IntersectCSG(s1, s2)
+end
+
+function Base.intersect(s::Shape, ss::Shape...)
+    intersect(intersect(s, ss[begin:end ÷ 2]...), intersect(ss[(end ÷ 2 + 1):end]...))
+end
+
+Base.intersect(s::Shape) = s
+
+function Base.setdiff(s1::Shape, s2::Shape)
+    DiffCSG(s1, s2)
+end
+
+function Base.setdiff(s::Shape, ss::Shape...)
+    setdiff(s, union(ss...))
+end

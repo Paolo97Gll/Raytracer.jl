@@ -109,10 +109,6 @@ function CheckeredPigment(color_on::RGB{Float32} = WHITE, color_off::RGB{Float32
     CheckeredPigment{2}(color_on, color_off)
 end
 
-function CheckeredPigment{N}(; color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK) where {N}
-    CheckeredPigment{N}(color_on, color_off)
-end
-
 """
     (cp::CheckeredPigment{N})(u::Float32, v::Float32) where {N}
 

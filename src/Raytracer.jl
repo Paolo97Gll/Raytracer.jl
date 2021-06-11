@@ -24,6 +24,7 @@ import Base:
     axes, clamp, convert, eltype, fill!, firstindex, getindex, iterate,
     lastindex, length, one, print_matrix, rand, read, readline, setindex!, show,
     size, write, zero,
+    union, intersect, setdiff,
     isless, isequal
 
 import Base.Broadcast:
@@ -100,6 +101,11 @@ export # Scene
         scaling, translation,
     Shape,
         Sphere, Plane, Cube, Cylinder,
+        CSG, UnionCSG, IntersectCSG, DiffCSG,
+        Rule,
+            UniteRule,
+            IntersectRule,
+            DiffRule,
         get_t, get_all_ts, get_uv, get_normal,
         ray_intersection, all_ray_intersections, quick_ray_intersection,
     World,
