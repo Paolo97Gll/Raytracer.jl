@@ -24,12 +24,13 @@ function show(io::IO, ::MIME"text/plain", s::T) where {T <: Shape}
     end
 end
 
-"""
+@doc """
     ray_intersection(ray, s)
 
 Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
 if none exists, return `nothing`.
-"""
+""" ray_intersection(::Ray, ::Shape)
+
 function ray_intersection(ray::Ray, s::S) where {S <: Shape}
     inv_ray = inv(s.transformation) * ray
     t = get_t(S, inv_ray)
@@ -40,6 +41,12 @@ function ray_intersection(ray::Ray, s::S) where {S <: Shape}
     surface_point = get_uv(S, hit_point)
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
+
+@doc """
+    all_ray_intersections(ray, s)
+
+Return a `Vector` of [`HitRecord`](@ref)s of all the ray intersections with the given [`Shape`](@ref) for every finite value of `t`, even outside of the ray domain.
+""" all_ray_intersections(::Ray, ::Shape)
 
 function all_ray_intersections(ray::Ray, s::S) where {S <: Shape}
     inv_ray = inv(s.transformation) * ray
@@ -53,11 +60,12 @@ function all_ray_intersections(ray::Ray, s::S) where {S <: Shape}
     HitRecord.(world_points, normals, surface_points, ts, Ref(ray), Ref(s.material))
 end
 
-"""
+@doc """
     quick_ray_intersection(ray, s)
 
 Return whether the ray intersects the given [`Shape`](@ref).
-"""
+""" quick_ray_intersection(::Ray, ::Shape)
+
 function quick_ray_intersection(ray::Ray, s::S) where {S <: Shape}
     inv_ray = inv(s.transformation) * ray
     !isnothing(get_t(S, inv_ray))
@@ -78,8 +86,6 @@ This is a unitary sphere centered in the origin. A generic sphere can be specifi
 
 - `transformation::Transformation`: the `Transformation` associated with the sphere.
 - `material::Material`: the [`Material`](@ref) of the spere.
-
-See also: [`ray_intersection(::Ray, ::Sphere)`](@ref)
 """
 Base.@kwdef struct Sphere <: Shape
     transformation::Transformation = Transformation()
@@ -164,9 +170,7 @@ A [`Shape`](@ref) representing an infinite plane.
 # Members
 
 - `transformation::Transformation`: the `Transformation` associated with the plane.
-- `material::Material`: the [`Material`](@ref) of the spere.
-
-See also: [`ray_intersection(::Ray, ::Plane)`](@ref)
+- `material::Material`: the [`Material`](@ref) of the plane.
 """
 Base.@kwdef struct Plane <: Shape
     transformation::Transformation = Transformation()
@@ -212,7 +216,7 @@ end
 """
     struct AABB
 
-A type representing an Axis-Aligned Bounding Box
+A type representing an Axis-Aligned Bounding Box.
 """
 Base.@kwdef struct AABB
     p_M::Point = Point(1f0, 1f0, 1f0)
@@ -251,10 +255,33 @@ end
 #######
 # Cube
 
+"""
+    struct Cube <: Shape
+
+A [`Shape`](@ref) representing a cube of unitary size.
+
+# Members
+
+- `transformation::Transformation`: the `Transformation` associated with the cube.
+- `material::Material`: the [`Material`](@ref) of the cube.
+"""
 Base.@kwdef struct Cube <: Shape
     transformation::Transformation = Transformation()
     material::Material = Material()
 end
+
+@doc """
+    Cube(transformation::Transformation, material::Material)
+
+Constructor for a [`Cube`](@ref) instance.
+""" Cube(::Transformation, ::Material)
+
+@doc """
+    Cube(transformation::Transformation = Transformation(),
+           material::Material = Material())
+
+Constructor for a [`Cube`](@ref) instance.
+""" Cube(; ::Transformation, ::Material)
 
 function get_t(::Type{Cube}, ray::Ray)
     t = get_t(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
@@ -307,10 +334,33 @@ end
 ###########
 # Cylinder
 
+"""
+    struct Cylinder <: Shape
+
+A [`Shape`](@ref) representing a cylinder of unitary heigth and diameter.
+
+# Members
+
+- `transformation::Transformation`: the `Transformation` associated with the cylinder.
+- `material::Material`: the [`Material`](@ref) of the cylinder.
+"""
 Base.@kwdef struct Cylinder <: Shape
     transformation::Transformation = Transformation()
     material::Material = Material()
 end
+
+@doc """
+    Cylinder(transformation::Transformation, material::Material)
+
+Constructor for a [`Cylinder`](@ref) instance.
+""" Cylinder(::Transformation, ::Material)
+
+@doc """
+    Cylinder(transformation::Transformation = Transformation(),
+           material::Material = Material())
+
+Constructor for a [`Cylinder`](@ref) instance.
+""" Cylinder(; ::Transformation, ::Material)
 
 function get_t(::Type{Cylinder}, ray::Ray)
     sray = scaling(2) * ray
@@ -396,6 +446,20 @@ end
 #######
 # CSG
 
+"""
+    Rule
+
+Enum type representing the hit point selection of a [`CSG`](@ref).
+
+# Instances
+
+- `UniteRule`: indicates that every hit point is valid
+- `IntersectRule`: indicates that only hit points located inside of other shapes are valid
+- `DiffRule`: indicates that only hit points outside of the `lbranch` and inside the `rbranch` are valid
+- `FuseRule`: indicates that every hit point outside of other shapes is valid
+
+See also: [`CSG`](@ref).
+"""
 @enum Rule begin
     UniteRule
     IntersectRule
@@ -403,23 +467,79 @@ end
     FuseRule
 end
 
+"""
+    struct CSG{R} <: Shape
+
+A [`Shape`](@ref) representing a Constructive Solid Geometry tree.
+
+The behavior of the CSG tree is determined by the [`Rule`](@ref) `R`.
+
+# Members
+
+- `rbranch::Shape`: represents the right branch of the tree
+- `lbranch::Shape`: represents the left branch of the tree
+- `transformation::Transformation`: represents the [`Transformation`](@ref) of the whole composite shape
+
+# External references
+
+- Constructive Solid Geometry: https://en.wikipedia.org/wiki/Constructive_solid_geometry
+
+"""
 struct CSG{R} <: Shape
     rbranch::Shape
     lbranch::Shape
-    function CSG{R}(rbranch::Shape, lbranch::Shape) where {R}
+    transformation::Transformation
+    """
+        CSG{R::Rule}(rbranch::Shape, lbranch::Shape)
+
+    Constrcts an instance of a CSG tree with the given [`Rule`](@ref) and branches.
+    """
+    function CSG{R}(rbranch::Shape, lbranch::Shape; transformation::Transformation = Transformation()) where {R}
         R::Rule
-        new{R}(rbranch, lbranch)
+        new{R}(rbranch, lbranch, transformation)
     end
 end
 
 function quick_ray_intersection(ray::Ray, csg::CSG)
-    ray_intersection(ray, csg) |> isnothing |> !
+    inv_ray = inv(csg.transformation) * ray
+    ray_intersection(inv_ray, csg) |> isnothing |> !
 end
 
-const UnionCSG     = CSG{UniteRule}
-const IntersectCSG = CSG{IntersectRule}
-const DiffCSG      = CSG{DiffRule}
-const FusionCSG    = CSG{FuseRule}
+"""
+    UnionCSG
+
+Alias for `CSG{UniteRule}`.
+
+See also: [`CSG`](@ref), [`Rule`](@ref).
+"""
+const UnionCSG = CSG{UniteRule}
+
+"""
+    IntersectionCSG
+
+Alias for `CSG{IntersectRule}`.
+
+See also: [`CSG`](@ref), [`Rule`](@ref).
+"""
+const IntersectionCSG = CSG{IntersectRule}
+
+"""
+    DiffCSG
+
+Alias for `CSG{DiffRule}`.
+
+See also: [`CSG`](@ref), [`Rule`](@ref).
+"""
+const DiffCSG = CSG{DiffRule}
+
+"""
+    FusionCSG
+
+Alias for `CSG{FuseeRule}`.
+
+See also: [`CSG`](@ref), [`Rule`](@ref).
+"""
+const FusionCSG = CSG{FuseRule}
 
 function Base.union(s1::Shape, s2::Shape)
     UnionCSG(s1, s2)
@@ -432,7 +552,7 @@ end
 Base.union(s::Shape) = s
 
 function Base.intersect(s1::Shape, s2::Shape)
-    IntersectCSG(s1, s2)
+    IntersectionCSG(s1, s2)
 end
 
 function Base.intersect(s::Shape, ss::Shape...)
@@ -461,30 +581,33 @@ end
 # UnionCSG
 
 function ray_intersection(ray::Ray, csg::UnionCSG)
-    r_hit = ray_intersection(ray, csg.rbranch)
-    l_hit = ray_intersection(ray, csg.lbranch)
+    inv_ray = inv(csg.transformation) * ray
+    r_hit = ray_intersection(inv_ray, csg.rbranch)
+    l_hit = ray_intersection(inv_ray, csg.lbranch)
     isnothing(r_hit) && return l_hit
     isnothing(l_hit) && return r_hit
     min(r_hit, l_hit)
 end
 
 function all_ray_intersections(ray::Ray, csg::UnionCSG)
-    append!(all_ray_intersections(ray, csg.rbranch), all_ray_intersections(ray, csg.lbranch))
+    inv_ray = inv(csg.transformation) * ray
+    append!(all_ray_intersections(inv_ray, csg.rbranch), all_ray_intersections(inv_ray, csg.lbranch))
 end
 
 ###############
-# IntersectCSG
+# IntersectionCSG
 
-function ray_intersection(ray::Ray, csg::IntersectCSG)
+function ray_intersection(ray::Ray, csg::IntersectionCSG)
     hits = filter(hit -> ray.tmin < hit.t < ray.tmax, all_ray_intersections(ray, csg))
     isempty(hits) && return nothing
     minimum(hits)
 end
 
-function all_ray_intersections(ray::Ray, csg::IntersectCSG)
-    r_hits = all_ray_intersections(ray, csg.rbranch)
+function all_ray_intersections(ray::Ray, csg::IntersectionCSG)
+    inv_ray = inv(csg.transformation) * ray
+    r_hits = all_ray_intersections(inv_ray, csg.rbranch)
     isempty(r_hits) && return Vector{HitRecord}()
-    l_hits = all_ray_intersections(ray, csg.lbranch)
+    l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(l_hits) && return Vector{HitRecord}()
     r_min, r_max = extrema(r_hits)
     l_min, l_max = extrema(l_hits)
@@ -505,9 +628,10 @@ function ray_intersection(ray::Ray, csg::DiffCSG)
 end
 
 function all_ray_intersections(ray::Ray, csg::DiffCSG)
-    r_hits = all_ray_intersections(ray, csg.rbranch)
+    inv_ray = inv(csg.transformation) * ray
+    r_hits = all_ray_intersections(inv_ray, csg.rbranch)
     isempty(r_hits) && return Vector{HitRecord}()
-    l_hits = all_ray_intersections(ray, csg.lbranch)
+    l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(l_hits) && return r_hits
     r_min, r_max = extrema(r_hits)
     l_min, l_max = extrema(l_hits)
@@ -522,16 +646,18 @@ end
 # FusionCSG
 
 function ray_intersection(ray::Ray, csg::FusionCSG)
-    r_hit = ray_intersection(ray, csg.rbranch)
-    l_hit = ray_intersection(ray, csg.lbranch)
+    inv_ray = inv(csg.transformation) * ray
+    r_hit = ray_intersection(inv_ray, csg.rbranch)
+    l_hit = ray_intersection(inv_ray, csg.lbranch)
     isnothing(r_hit) && return l_hit
     isnothing(l_hit) && return r_hit
     min(r_hit, l_hit)
 end
 
 function all_ray_intersections(ray::Ray, csg::FusionCSG)
-    r_hits = all_ray_intersections(ray, csg.rbranch)
-    l_hits = all_ray_intersections(ray, csg.lbranch)
+    inv_ray = inv(csg.transformation) * ray
+    r_hits = all_ray_intersections(inv_ray, csg.rbranch)
+    l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(r_hits) && return l_hits
     isempty(l_hits) && return r_hits 
     r_min, r_max = extrema(r_hits)

@@ -103,7 +103,7 @@ export # Scene
         Sphere, Plane, Cube, Cylinder,
         CSG, 
             UnionCSG, 
-            IntersectCSG, 
+            IntersectionCSG, 
             DiffCSG,
             FusionCSG,
         fuse,
