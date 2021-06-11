@@ -535,7 +535,7 @@ const DiffCSG = CSG{DiffRule}
 """
     FusionCSG
 
-Alias for `CSG{FuseeRule}`.
+Alias for `CSG{FuseRule}`.
 
 See also: [`CSG`](@ref), [`Rule`](@ref).
 """
