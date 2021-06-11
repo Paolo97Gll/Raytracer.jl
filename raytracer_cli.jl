@@ -48,6 +48,7 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
         @error err.text
     end
 
+    println(stderr, "\n", usage_string(settings))
     exit(err_code)
 end
 
@@ -68,6 +69,9 @@ function parse_commandline()
         "demo"
             action = :command
             help = "show a demo of Raytracer.jl"
+        "docs"
+            action = :command
+            help = "show the documentation link"
     end
 
     # tonemapping
@@ -299,6 +303,10 @@ function parse_commandline()
             default = "demo"
     end
 
+    # docs
+
+    s["docs"].description = "Show the documentation link."
+
     parse_args(s)
 end
 
@@ -323,12 +331,12 @@ end
 function demoimage(options::Dict{String, Any})
     printstyled("Raytracer.jl demo image\n\n", bold=true)
     println("Renderer: $(options["renderer"])")
-    println("Number of threads: $(Threads.nthreads())\n")
+    println("Number of threads: $(Threads.nthreads())")
 
     options["output_file"] = normpath(options["output_file"])
 
     if !options["force"] && isfile(options["output_file"])
-        print("Image ./$(options["output_file"]) existing: overwrite? [y|n] ")
+        print("\nImage ./$(options["output_file"]) existing: overwrite? [y|n] ")
         if readline() != "y"
             println("Aborting.")
             exit(1)
@@ -351,6 +359,7 @@ function demoimage(options::Dict{String, Any})
         γ = options["gamma"]
     )
 end
+
 
 function demoanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, options::Dict{String, Any})
     index, θ = elem
@@ -423,6 +432,21 @@ function demoanimation(options::Dict{String, Any})
     println(" done!")
 
     cd(curdir)
+end
+
+
+function docs(options::Dict{String, Any})
+    printstyled("Raytracer.jl documentation\n", bold=true)
+    println("\nDocumentation home")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev")
+    println("\nCLI")
+    println("Quickstart")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/cli")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev/quickstart/cli")
+    println("Full doc")
+    println("  Latest release (stable): https://paolo97gll.github.io/Raytracer.jl/stable/cli")
+    println("  Master branch (dev): https://paolo97gll.github.io/Raytracer.jl/dev/cli")
 end
 
 

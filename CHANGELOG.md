@@ -2,6 +2,8 @@
 
 ## HEAD
 
+## v0.2.0
+
 ### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
 
 - Removed type parameters from most structs. All floating points calculations are now performed on `Float32`. This provides a significant speedup. All code specifying type parameters will be broken from now on ([#23](https://github.com/Paolo97Gll/Raytracer.jl/pull/23)).
@@ -20,7 +22,7 @@
 
 - Add `PathTracer` renderer ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
 
-- Add the implementation of an OrthoNormal Basis (ONB) creation algorithm based on [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
+- Add the implementation of an ortho-normal Basis (ONB) creation algorithm based on [Duff et al. 2017](https://graphics.pixar.com/library/OrthonormalB/paper.pdf) ([#20](https://github.com/Paolo97Gll/Raytracer.jl/pull/20)).
 
 - Add a PCG-family Random Number Generator (RNG) based on [O'Neill 2014](https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf) as a `Random.AbstractRNG` ([#18](https://github.com/Paolo97Gll/Raytracer.jl/pull/18)).
 

@@ -6,6 +6,11 @@ git-tree-sha1 = "485ee0867925449198280d4af84bdb46a2a404d0"
 uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 version = "1.0.1"
 
+[[AbstractTrees]]
+git-tree-sha1 = "03e0550477d86222521d254b741d470ba17ea0b5"
+uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+version = "0.3.4"
+
 [[Adapt]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "84918055d15b3114ede17ac6a7182f68870c16f7"
@@ -147,6 +152,12 @@ git-tree-sha1 = "3ebb967819b284dc1e3c0422229b58a40a255649"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "0.26.3"
 
+[[DocumenterTools]]
+deps = ["AbstractTrees", "Base64", "DocStringExtensions", "Documenter", "FileWatching", "Gumbo", "LibGit2", "Sass"]
+git-tree-sha1 = "ce2ed9a6ecb1db632d06dd264c47c90e1e711f05"
+uuid = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
+version = "0.1.11"
+
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
@@ -194,6 +205,9 @@ repo-url = "https://github.com/Samuele-Colombo/FileIO.jl"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 version = "1.9.0"
 
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -205,6 +219,18 @@ deps = ["Colors", "LinearAlgebra", "NaNMath"]
 git-tree-sha1 = "2c1cf4df419938ece72de17f368a021ee162762e"
 uuid = "a2bd30eb-e257-5431-a919-1863eab51364"
 version = "1.1.0"
+
+[[Gumbo]]
+deps = ["AbstractTrees", "Gumbo_jll", "Libdl"]
+git-tree-sha1 = "e711d08d896018037d6ff0ad4ebe675ca67119d4"
+uuid = "708ec375-b3d6-5a57-a7ce-8257bf98657a"
+version = "0.8.0"
+
+[[Gumbo_jll]]
+deps = ["Libdl", "Pkg"]
+git-tree-sha1 = "86111f5523d7c42da0edd85ef7999c663881ac1e"
+uuid = "528830af-5a63-567c-a44a-034ed33b8444"
+version = "0.10.1+1"
 
 [[IOCapture]]
 deps = ["Logging"]
@@ -573,6 +599,14 @@ git-tree-sha1 = "37d210f612d70f3f7d57d488cb3b6eff56ad4e41"
 uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
 version = "0.4.0"
 
+[[Raytracer]]
+deps = ["ArgParse", "ColorTypes", "Colors", "Documenter", "FileIO", "ImageIO", "ImageMagick", "ImagePFM", "Images", "Intervals", "LinearAlgebra", "Netpbm", "ProgressMeter", "QuartzImageIO", "Random", "StaticArrays", "Test"]
+git-tree-sha1 = "ea4796ed9d80844fbb362b244c58d3ebc605ba7d"
+repo-rev = "master"
+repo-url = "https://github.com/Paolo97Gll/Raytracer.jl"
+uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
+version = "0.2.0"
+
 [[RecipesBase]]
 git-tree-sha1 = "b3fb709f3c97bfc6e948be68beeecb55a0b340ae"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
@@ -597,6 +631,12 @@ version = "1.0.2"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+
+[[Sass]]
+deps = ["libsass_jll"]
+git-tree-sha1 = "aa841c3738cec78b5dbccd56dda332710f35f6a5"
+uuid = "322a6be2-4ae8-5d68-aaf1-3e960788d1d9"
+version = "0.2.0"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -737,6 +777,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
 git-tree-sha1 = "94d180a6d2b5e55e447e2d27a29ed04fe79eb30c"
 uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
 version = "1.6.38+0"
+
+[[libsass_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "663428b7ebaf60c60ee147f0f9466430e9959ad6"
+uuid = "47bcb7c8-5119-555a-9eeb-0afcc36cd728"
+version = "3.5.5+0"
 
 [[nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]

@@ -12,6 +12,8 @@ Abstract type for functors that map [`Ray`](@ref) to `RGB{Float32}`.
 
 Each subtype of this type must be a callable like `(r::Renderer)(ray::Ray)` and must return a `RGB{Float32}`.
 Each subtype of this type sould have a member of type [`World`](@ref) to check for intersections of the given [`Ray`](@ref).
+
+See also: [`OnOffRenderer`](@ref), [`FlatRenderer`](@ref), [`PathTracer`](@ref), [`PointLightRenderer`](@ref)
 """
 abstract type Renderer end
 
@@ -22,7 +24,7 @@ abstract type Renderer end
 """
     struct OnOffRenderer <: Renderer
 
-A basic bichrome renderer that checks whether a [`Ray`](@ref) has collided or not.
+A basic bichrome [`Renderer`](@ref) that checks whether a [`Ray`](@ref) has collided or not.
 
 This renderer returns its field `off_color` when the given `Ray` is `nothing`, else it returns its field `on_color`.
 
@@ -71,7 +73,7 @@ end
 """
     struct FlatRenderer <: Renderer
 
-A basic renderer that returns the color of the [`Shape`](@ref) first hit by a given [`Ray`](@ref).
+A basic [`Renderer`](@ref) that returns the color of the [`Shape`](@ref) first hit by a given [`Ray`](@ref).
 
 This renderer returns the color stored in the `material` field of the [`Shape`](@ref) first hit by the given [`Ray`](@ref) at the hit point.
 To this renderer there is no difference between radiated light and reflected color. There are no shades, diffusions or reflections.
@@ -119,7 +121,7 @@ end
 """
     struct PathTracer <: Renderer
 
-A path-tracing algorithm that considers the optical path of a [`Ray`](@ref) from the observer to a light source.
+A path-tracing [`Renderer`](@ref) that considers the optical path of a [`Ray`](@ref) from the observer to a light source.
 
 # Members
 
@@ -220,7 +222,7 @@ end
 """
     struct PointLightRenderer <: Renderer
 
-This renderer is similar to what POV-Ray provides by default.
+Point-light tracing [`Renderer`](@ref). This renderer is similar to what POV-Ray provides by default.
 
 # Members
 

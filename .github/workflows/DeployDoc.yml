@@ -16,6 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.6'
+
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@latest
 
