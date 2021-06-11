@@ -409,6 +409,10 @@ struct CSG{R} <: Shape
     end
 end
 
+function quick_ray_intersection(ray::Ray, csg::CSG)
+    ray_intersection(ray, csg) |> isnothing |> !
+end
+
 const UnionCSG     = CSG{UniteRule}
 const IntersectCSG = CSG{IntersectRule}
 const DiffCSG      = CSG{DiffRule}
