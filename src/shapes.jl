@@ -400,6 +400,7 @@ end
     UniteRule
     IntersectRule
     DiffRule
+    FuseRule
 end
 
 struct CSG{R} <: Shape
@@ -418,6 +419,7 @@ end
 const UnionCSG     = CSG{UniteRule}
 const IntersectCSG = CSG{IntersectRule}
 const DiffCSG      = CSG{DiffRule}
+const FusionCSG    = CSG{FuseRule}
 
 function Base.union(s1::Shape, s2::Shape)
     UnionCSG(s1, s2)
@@ -459,17 +461,7 @@ function ray_intersection(ray::Ray, csg::UnionCSG)
 end
 
 function all_ray_intersections(ray::Ray, csg::UnionCSG)
-    r_hits = all_ray_intersections(ray, csg.rbranch)
-    l_hits = all_ray_intersections(ray, csg.lbranch)
-    isempty(r_hits) && return l_hits
-    isempty(l_hits) && return r_hits 
-    r_min, r_max = extrema(r_hits)
-    l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> !(l_min < hit < l_max), r_hits)
-    l_filter = filter(hit -> !(r_min < hit < r_max), l_hits)
-    isempty(r_filter) && return l_filter
-    isempty(l_filter) && return r_filter
-    append!(r_filter, l_filter)
+    append!(all_ray_intersections(ray, csg.rbranch), all_ray_intersections(ray, csg.lbranch))
 end
 
 ###############
@@ -513,6 +505,31 @@ function all_ray_intersections(ray::Ray, csg::DiffCSG)
     l_min, l_max = extrema(l_hits)
     r_filter = filter(hit -> !(l_min < hit < l_max), r_hits)
     l_filter = filter(hit ->   r_min < hit < r_max , l_hits)
+    isempty(r_filter) && return l_filter
+    isempty(l_filter) && return r_filter
+    append!(r_filter, l_filter)
+end
+
+###########
+# FusionCSG
+
+function ray_intersection(ray::Ray, csg::FusionCSG)
+    r_hit = ray_intersection(ray, csg.rbranch)
+    l_hit = ray_intersection(ray, csg.lbranch)
+    isnothing(r_hit) && return l_hit
+    isnothing(l_hit) && return r_hit
+    min(r_hit, l_hit)
+end
+
+function all_ray_intersections(ray::Ray, csg::FusionCSG)
+    r_hits = all_ray_intersections(ray, csg.rbranch)
+    l_hits = all_ray_intersections(ray, csg.lbranch)
+    isempty(r_hits) && return l_hits
+    isempty(l_hits) && return r_hits 
+    r_min, r_max = extrema(r_hits)
+    l_min, l_max = extrema(l_hits)
+    r_filter = filter(hit -> !(l_min < hit < l_max), r_hits)
+    l_filter = filter(hit -> !(r_min < hit < r_max), l_hits)
     isempty(r_filter) && return l_filter
     isempty(l_filter) && return r_filter
     append!(r_filter, l_filter)
