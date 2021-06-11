@@ -70,6 +70,7 @@ export # Rendering
         fire_all_rays!,
     Ray,
     HitRecord,
+        HitOrMiss,
     Pigment,
         UniformPigment,
         CheckeredPigment,

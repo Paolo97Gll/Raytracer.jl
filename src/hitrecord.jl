@@ -28,6 +28,13 @@ struct HitRecord
     material::Material
 end
 
+"""
+    HitOrMiss
+
+Alias for `Union{HitRecord, Nothing}`.
+"""
+const HitOrMiss = Union{HitRecord, Nothing}
+
 function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
     print(io, T)
     fns = fieldnames(T)
