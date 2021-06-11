@@ -5,17 +5,15 @@
 # Generate documentation
 
 using Pkg
-Pkg.activate(normpath((@__DIR__) * "/.."))
+Pkg.activate(normpath(joinpath(@__DIR__, "..")))
 
-using Raytracer
-
-using Documenter
-
-
-################
-# Generate docs
+using Documenter, Raytracer
 
 
 makedocs(
-    sitename="Raytracer.jl"
+    sitename = "Raytracer.jl"
+)
+
+deploydocs(
+    repo = "github.com/Paolo97Gll/Raytracer.jl.git",
 )
