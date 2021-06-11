@@ -249,6 +249,8 @@ function get_normal(::Type{Cube}, point::Point, ray::Ray)
     [i == index ? s * 1f0 : 0f0 for i ∈ 1:3] |> Normal{true}
 end
 
+###########
+# Cylinder
 
 Base.@kwdef struct Cylinder <: Shape
     transformation::Transformation = Transformation()
