@@ -17,7 +17,7 @@ module Raytracer
 # Imports
 
 
-using Intervals: minimum
+using Intervals: minimum, isfinite
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
