@@ -44,7 +44,7 @@ The behavior of the CSG tree is determined by the [`Rule`](@ref) `R`.
 - Constructive Solid Geometry: https://en.wikipedia.org/wiki/Constructive_solid_geometry
 
 """
-struct CSG{R} <: Shape
+struct CSG{R} <: CompositeShape
     rbranch::Shape
     lbranch::Shape
     transformation::Transformation
