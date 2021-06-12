@@ -62,7 +62,7 @@ function get_t(::Type{Sphere}, ray::Ray)
     b = 2f0 * origin_vec ⋅ ray.dir
     c = norm²(origin_vec) - 1f0
     Δ = b^2 - 4f0 * a * c
-    Δ < 0 && return nothing
+    Δ < 0 && return Inf32
     sqrt_Δ = sqrt(Δ)
     t_1 = (-b - sqrt_Δ) / (2f0 * a)
     t_2 = (-b + sqrt_Δ) / (2f0 * a)
@@ -72,7 +72,7 @@ function get_t(::Type{Sphere}, ray::Ray)
     elseif ray.tmin < t_2 < ray.tmax
         return t_2
     else
-        return nothing
+        return Inf32
     end
 end
 
