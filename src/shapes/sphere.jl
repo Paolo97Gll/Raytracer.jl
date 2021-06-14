@@ -36,23 +36,21 @@ Constructor for a [`Sphere`](@ref) instance.
 """ Sphere(; ::Transformation, ::Material)
 
 function get_all_ts(::Type{Sphere}, ray::Ray)
-    res = Vector{Float32}()
-    sizehint!(res, 2)
     # compute intersection
     origin_vec = convert(Vec, ray.origin)
     a = norm²(ray.dir)
     b = 2f0 * origin_vec ⋅ ray.dir
     c = norm²(origin_vec) - 1f0
     Δ = b^2 - 4f0 * a * c
-    Δ < 0 && return res
+    Δ < 0 && return Vector{Float32}()
     sqrt_Δ = sqrt(Δ)
     t_1 = (-b - sqrt_Δ) / (2f0 * a)
     t_2 = (-b + sqrt_Δ) / (2f0 * a)
 
-    isfinite(t_1) && push!(res, t_1) 
-    isfinite(t_2) && push!(res, t_2)
+    # @assert isfinite(t_1)
+    # @assert isfinite(t_2)
 
-    return res
+    return [t_1, t_2]
 end
 
 function get_t(::Type{Sphere}, ray::Ray)

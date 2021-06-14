@@ -48,8 +48,8 @@ function get_t(::Type{Cylinder}, ray::Ray)
         t_1 = (-b - sqrt_Δ) / (2f0 * a)
         t_2 = (-b + sqrt_Δ) / (2f0 * a)
         # nearest point
-        @assert !isnan(t_1) "$a, $b, $c"
-        @assert !isnan(t_2) repr(ray)
+        # @assert !isnan(t_1)
+        # @assert !isnan(t_2)
         ray.tmin < t_1 < ray.tmax && abs(oz + t_1 * dz) <= 1f0 && return t_1
         ray.tmin < t_2 < ray.tmax && abs(oz + t_2 * dz) <= 1f0 && abs(oz) <= 1f0 && return t_2
     end
@@ -79,8 +79,8 @@ function get_all_ts(::Type{Cylinder}, ray::Ray)
         t_1 = (-b - sqrt_Δ) / (2f0 * a)
         t_2 = (-b + sqrt_Δ) / (2f0 * a)
         # nearest point
-        @assert !isnan(t_1)
-        @assert !isnan(t_2)
+        # @assert !isnan(t_1)
+        # @assert !isnan(t_2)
         abs(oz + t_1 * dz) <= 1f0 && push!(res, t_1)
         abs(oz + t_2 * dz) <= 1f0 && push!(res, t_2)
         length(res) == 2 && return res
@@ -89,9 +89,23 @@ function get_all_ts(::Type{Cylinder}, ray::Ray)
     # check if caps are hit
     tz1, tz2 = minmax(( 1f0 - oz) / dz, (-1f0 - oz) / dz)
     
-    (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= 1f0 && push!(res, tz1)
-    length(res) == 2 && return res
-    (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <= 1f0 && push!(res, tz2)
+    # ⪅(x::Number, y::Number) = x < y || x ≈ y
+    # (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 ⪅ 1f0 && push!(res, tz1)
+    # length(res) == 2 && return res
+    # (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 ⪅ 1f0 && push!(res, tz2)
+    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2" 
+    proj_height1, proj_height2 = (ox .+ (tz1, tz2) .* dx) .^ 2 .+ (oy .+ (tz1, tz2) .* dy) .^ 2 .|> x -> (x < 1f0 || x ≈ 1f0)
+    if length(res) == 1
+        if proj_height1
+            push!(res, tz1)
+        else
+            @assert proj_height2
+            push!(res, tz2)
+        end
+    elseif proj_height1 && proj_height2
+        res = [tz1, tz2]
+    end
+    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2" 
     return res
 end
 
