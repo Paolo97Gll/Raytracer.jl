@@ -299,9 +299,9 @@ end
 
 function get_all_ts(csg::DiffCSG, ray::Ray)
     inv_ray = inv(csg.transformation) * ray
-    r_ts = get_all_ts(inv_ray, csg.rbranch)
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
     isempty(r_ts) && return Vector{Float32}()
-    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return r_ts
     r_min, r_max = extrema(r_ts)
     l_min, l_max = extrema(l_ts)
@@ -336,8 +336,8 @@ end
 
 function quick_ray_intersection(ray::Ray, csg::FusionCSG)
     inv_ray = inv(csg.transformation) * ray
-    r_ts = get_all_ts(inv_ray, csg.rbranch)
-    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return !isempty(l_ts)
     isempty(l_ts) && return true 
     r_min, r_max = extrema(r_ts)
@@ -348,8 +348,8 @@ end
 
 function get_all_ts(csg::FusionCSG, ray::Ray)
     inv_ray = inv(csg.transformation) * ray
-    r_ts = get_all_ts(inv_ray, csg.rbranch)
-    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return l_ts
     isempty(l_ts) && return r_ts 
     r_min, r_max = extrema(r_ts)
