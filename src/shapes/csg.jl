@@ -201,6 +201,16 @@ function all_ray_intersections(ray::Ray, csg::UnionCSG)
     append!(all_ray_intersections(inv_ray, csg.rbranch), all_ray_intersections(inv_ray, csg.lbranch))
 end
 
+function quick_ray_intersection(ray::Ray, csg::UnionCSG)
+    inv_ray = inv(csg.transformation) * ray
+    quick_ray_intersection(inv_ray, csg.rbranch) || quick_ray_intersection(inv_ray, csg.rbranch)
+end
+
+function get_all_ts(csg::UnionCSG, ray::Ray)
+    inv_ray = inv(csg.transformation) * ray
+    append!(get_all_ts(csg.rbranch, inv_ray), get_all_ts(csg.lbranch, inv_ray))
+end
+
 ##################
 # IntersectionCSG
 
@@ -218,10 +228,34 @@ function all_ray_intersections(ray::Ray, csg::IntersectionCSG)
     isempty(l_hits) && return Vector{HitRecord}()
     r_min, r_max = extrema(r_hits)
     l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> l_min < hit < l_max, r_hits)
-    l_filter = filter(hit -> r_min < hit < r_max, l_hits)
-    isempty(r_filter) && return l_filter
-    isempty(l_filter) && return r_filter
+    r_filter = filter(hit -> l_min <= hit <= l_max, r_hits)
+    l_filter = filter(hit -> r_min <= hit <= r_max, l_hits)
+    append!(r_filter, l_filter)
+end
+
+function quick_ray_intersection(ray::Ray, csg::IntersectionCSG)
+    inv_ray = inv(csg.transformation) * ray
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
+    isempty(r_ts) && return false
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
+    isempty(l_ts) && return false
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    any(t -> l_min <= t <= l_max && ray.tmin < t < ray.tmax, r_ts) ||
+    any(t -> r_min <= t <= r_max && ray.tmin < t < ray.tmax, l_ts)
+end
+
+function get_all_ts(csg::IntersectionCSG, ray::Ray)
+    inv_ray = inv(csg.transformation) * ray
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
+    isempty(r_ts) && return Vector{Float32}() 
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
+    isempty(l_ts) && return Vector{Float32}() 
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    r_filter = filter(t -> l_min <= t <= l_max, r_ts)
+    l_filter = filter(t -> r_min <= t <= r_max, l_ts)
+    # @assert (length(r_filter) + length(l_filter) != 1) "Only one intersection for $(typeof(csg.rbranch)): $r_ts + $l_ts between $l_min and $l_max"
     append!(r_filter, l_filter)
 end
 
@@ -242,10 +276,37 @@ function all_ray_intersections(ray::Ray, csg::DiffCSG)
     isempty(l_hits) && return r_hits
     r_min, r_max = extrema(r_hits)
     l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> !(l_min < hit < l_max), r_hits)
-    l_filter = filter(hit ->   r_min < hit < r_max , l_hits)
-    isempty(r_filter) && return l_filter
-    isempty(l_filter) && return r_filter
+    r_filter = filter(hit -> !(l_min <= hit <= l_max), r_hits)
+    l_filter = filter(hit ->   r_min <= hit <= r_max , l_hits)
+    append!(r_filter, l_filter)
+end
+
+function quick_ray_intersection(ray::Ray, csg::DiffCSG)
+    inv_ray = inv(csg.transformation) * ray
+    # !isnothing(ray_intersection(inv_ray, csg))
+    r_ts = get_all_ts(csg.rbranch, inv_ray)
+    isempty(r_ts) && return false
+    l_ts = get_all_ts(csg.lbranch, inv_ray)
+    isempty(l_ts) && return any(t -> ray.tmin < t < ray.tmax, r_ts)
+
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    # @assert r_min != r_max "Only one intersection on $(typeof(csg.rbranch))"
+    # @assert l_min != l_max "Only one intersection on $(typeof(csg.lbranch))"
+    any(t -> !(l_min <= t <= l_max) && ray.tmin < t < ray.tmax, r_ts) || 
+    any(t ->   r_min <= t <= r_max  && ray.tmin < t < ray.tmax, l_ts) 
+end
+
+function get_all_ts(csg::DiffCSG, ray::Ray)
+    inv_ray = inv(csg.transformation) * ray
+    r_ts = get_all_ts(inv_ray, csg.rbranch)
+    isempty(r_ts) && return Vector{Float32}()
+    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    isempty(l_ts) && return r_ts
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    r_filter = filter(t -> !(l_min <= t <= l_max), r_ts)
+    l_filter = filter(t ->   r_min <= t <= r_max , l_ts)
     append!(r_filter, l_filter)
 end
 
@@ -253,12 +314,9 @@ end
 # FusionCSG
 
 function ray_intersection(ray::Ray, csg::FusionCSG)
-    inv_ray = inv(csg.transformation) * ray
-    r_hit = ray_intersection(inv_ray, csg.rbranch)
-    l_hit = ray_intersection(inv_ray, csg.lbranch)
-    isnothing(r_hit) && return l_hit
-    isnothing(l_hit) && return r_hit
-    min(r_hit, l_hit)
+    hits = filter(hit -> ray.tmin < hit.t < ray.tmax, all_ray_intersections(ray, csg))
+    isempty(hits) && return nothing
+    minimum(hits)
 end
 
 function all_ray_intersections(ray::Ray, csg::FusionCSG)
@@ -269,9 +327,34 @@ function all_ray_intersections(ray::Ray, csg::FusionCSG)
     isempty(l_hits) && return r_hits 
     r_min, r_max = extrema(r_hits)
     l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> !(l_min < hit < l_max), r_hits)
-    l_filter = filter(hit -> !(r_min < hit < r_max), l_hits)
+    r_filter = filter(hit -> !(l_min <= hit <= l_max), r_hits)
+    l_filter = filter(hit -> !(r_min <= hit <= r_max), l_hits)
     isempty(r_filter) && return l_filter
     isempty(l_filter) && return r_filter
+    append!(r_filter, l_filter)
+end
+
+function quick_ray_intersection(ray::Ray, csg::FusionCSG)
+    inv_ray = inv(csg.transformation) * ray
+    r_ts = get_all_ts(inv_ray, csg.rbranch)
+    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    isempty(r_ts) && return !isempty(l_ts)
+    isempty(l_ts) && return true 
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    any(t -> !(l_min <= t <= l_max) && ray.tmin < t < ray.tmax, r_ts) ||
+    any(t -> !(r_min <= t <= r_max) && ray.tmin < t < ray.tmax, l_ts) 
+end
+
+function get_all_ts(csg::FusionCSG, ray::Ray)
+    inv_ray = inv(csg.transformation) * ray
+    r_ts = get_all_ts(inv_ray, csg.rbranch)
+    l_ts = get_all_ts(inv_ray, csg.lbranch)
+    isempty(r_ts) && return l_ts
+    isempty(l_ts) && return r_ts 
+    r_min, r_max = extrema(r_ts)
+    l_min, l_max = extrema(l_ts)
+    r_filter = filter(t -> !(l_min <= t <= l_max), r_ts)
+    l_filter = filter(t -> !(r_min <= t <= r_max), l_ts)
     append!(r_filter, l_filter)
 end
