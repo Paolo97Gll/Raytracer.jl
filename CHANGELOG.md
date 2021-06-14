@@ -2,6 +2,8 @@
 
 ## HEAD
 
+- Improve documentation.
+
 ## v0.2.0
 
 ### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
