@@ -73,9 +73,7 @@ function get_normal(::Type{Cube}, point::Point, ray::Ray)
 
     @assert 1 <= index <= 3
 
-    s = -sign(point[index] * ray.dir[index])
+    normal = [i == index ? 1f0 : 0f0 for i ∈ 1:3] |> Normal{true}
 
-    @assert s != 0
-
-    [i == index ? s * 1f0 : 0f0 for i ∈ 1:3] |> Normal{true}
+    normal ⋅ ray.dir < 0 ? normal : -normal
 end
