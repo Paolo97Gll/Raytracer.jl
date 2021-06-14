@@ -159,6 +159,7 @@ let shapesdir = "shapes"
     include(joinpath(shapesdir, "aabb.jl"))
 
     # Simple shapes
+    include(joinpath(shapesdir, "cone.jl"))
     include(joinpath(shapesdir, "cube.jl"))
     include(joinpath(shapesdir, "cylinder.jl"))
     include(joinpath(shapesdir, "plane.jl"))

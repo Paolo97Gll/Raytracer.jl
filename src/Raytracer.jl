@@ -100,7 +100,7 @@ export # Scene
         rotationX, rotationY, rotationZ,
         scaling, translation,
     Shape,
-        Sphere, Plane, Cube, Cylinder,
+        Sphere, Plane, Cube, Cylinder, Cone,
         CSG, 
             UnionCSG, 
             IntersectionCSG, 
