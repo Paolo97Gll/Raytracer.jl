@@ -63,7 +63,7 @@ OnOffRenderer(world::World; on_color::RGB{Float32} = WHITE, off_color::RGB{Float
 Render a [`Ray`](@ref) and return a `RBG{Float32}`.
 """
 function (oor::OnOffRenderer)(ray::Ray)
-    isnothing(ray_intersection(ray, oor.world)) ? oor.off_color : oor.on_color
+    !any(quick_ray_intersection.(Ref(ray), oor.world)) ? oor.off_color : oor.on_color
 end
 
 
