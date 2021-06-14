@@ -33,14 +33,13 @@ function get_t(ray::Ray, aabb::AABB)
 end
 
 function get_all_ts(ray::Ray, aabb::AABB)
-    res = Vector{Float32}()
     sizehint!(res, 2)
     dir = ray.dir
     o = ray.origin
     overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
-    isempty(overlap) && return res
+    isempty(overlap) && return Vector{Float32}()
     t1, t2 = overlap.first, overlap.last
-    isfinite(t1) && push!(res, t1)
-    isfinite(t2) && push!(res, t2)
-    return res
+    isfinite(t1) && (@assert isfinite(t2); return [t1, t2])
+    @assert !isfinite(t2)
+    return Vector{Float32}()
 end
