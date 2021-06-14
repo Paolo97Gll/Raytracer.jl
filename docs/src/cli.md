@@ -310,8 +310,8 @@ julia raytracer_cli.jl demo animation
 ```
 
 ```@raw html
-<video width="540" height="540" controls>
-  <source src="[](https://i.imgur.com/2yEoRbA.mp4)" type="video/mp4">
+<video autoplay="" controls="" loop="" width="540" height="540">
+  <source src="https://i.imgur.com/2yEoRbA.mp4">
 </video>
 ```
 
