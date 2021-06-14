@@ -8,7 +8,7 @@
 """
     struct Cylinder <: SimpleShape
 
-A [`SimpleShape`](@ref) representing a cylinder of unitary heigth and diameter.
+A [`SimpleShape`](@ref) representing a cylinder of unitary height and diameter.
 
 # Members
 
@@ -121,8 +121,7 @@ function get_normal(::Type{Cylinder}, point::Point, ray::Ray)
 end
 
 function get_uv(::Type{Cylinder}, point::Point)
-    z = point.v[3]
-    x, y = point.v[1:2]
+    x, y, z = point.v
     z ≈  0.5f0 && return Vec2D(3 - 2x, 3 - 2y) * 0.25f0
     z ≈ -0.5f0 && return Vec2D(3 - 2x, 1 + 2y) * 0.25f0
     (clamp(z + 0.5f0, 0, 1), (atan(y, x)/2π + 1) * 0.5f0)
