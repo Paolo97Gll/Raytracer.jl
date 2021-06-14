@@ -33,7 +33,6 @@ function get_t(ray::Ray, aabb::AABB)
 end
 
 function get_all_ts(ray::Ray, aabb::AABB)
-    sizehint!(res, 2)
     dir = ray.dir
     o = ray.origin
     overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
