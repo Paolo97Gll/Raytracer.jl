@@ -309,9 +309,11 @@ To create a demo animation, use the command [`demo animation`](@ref raytracer_cl
 julia raytracer_cli.jl demo animation
 ```
 
+```@raw html
 <video width="540" height="540" controls>
   <source src="[](https://i.imgur.com/2yEoRbA.mp4)" type="video/mp4">
 </video>
+```
 
 It creates a new folder `demo_animation` with the video `demo.mp4` and all the frames in jpeg format.
 
