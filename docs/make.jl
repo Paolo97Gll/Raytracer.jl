@@ -37,5 +37,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/Paolo97Gll/Raytracer.jl.git"
+    repo = "github.com/Paolo97Gll/Raytracer.jl.git",
+    push_preview = true
 )
