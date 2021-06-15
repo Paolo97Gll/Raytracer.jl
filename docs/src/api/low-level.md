@@ -55,7 +55,7 @@ Pages   = ["materials.jl"]
 ```@autodocs
 Modules = [Raytracer]
 Private = false
-Pages   = ["hitrecord.jl", "shapes.jl", "world.jl"]
+Pages   = ["hitrecord.jl", "shapes.jl", "world.jl", "shapes/aabb.jl", "shapes/cone.jl", "shapes/csg.jl", "shapes/cube.jl", "shapes/cylinder.jl", "shapes/plane.jl", "shapes/sphere.jl"]
 ```
 
 ## Lights
