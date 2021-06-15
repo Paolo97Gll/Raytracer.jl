@@ -6,7 +6,7 @@
 
 
 """
-    struct ImageTracer
+    ImageTracer
 
 Trace an image by shooting light rays through each of its pixels.
 

@@ -20,7 +20,7 @@ abstract type Camera end
 
 
 """
-    struct OrthogonalCamera <: Camera
+    OrthogonalCamera <: Camera
 
 A [`Camera`](@ref) implementing an orthogonal 3D → 2D projection.
 
@@ -53,7 +53,7 @@ If no parameter is specified, it return a camera with square aspect ratio and an
 
 
 """
-    struct PerspectiveCamera <: Camera
+    PerspectiveCamera <: Camera
 
 A [`Camera`](@ref) implementing a perspective 3D → 2D projection.
 

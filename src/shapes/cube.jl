@@ -38,7 +38,7 @@ function get_t(::Type{Cube}, ray::Ray)
 end
 
 function get_all_ts(::Type{Cube}, ray::Ray)
-    get_all_ts(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))    
+    get_all_ts(scaling(2f0) * ray, AABB(Point(fill(1f0, 3)), Point(fill(-1f0, 3))))
 end
 
 function get_uv(::Type{Cube}, point::Point)
@@ -50,15 +50,15 @@ function get_uv(::Type{Cube}, point::Point)
 
     ispos = point[index] > 0
 
-    if index == 1 
+    if index == 1
         uc = ispos ? z : -z
         vc = y
-        offset = (ispos ? 2 : 0, 1)  
+        offset = (ispos ? 2 : 0, 1)
     elseif index == 2
         uc = x;
         vc = ispos ? z : -z
         offset = (1, ispos ? 2 : 0)
-    else 
+    else
         uc = ispos ? -x : x
         vc = y
         offset = (ispos ? 3 : 1, 1)

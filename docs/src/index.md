@@ -10,7 +10,7 @@ The input scene is composed by a list of shapes (spheres, planes, ...) of variou
 
 There are two main steps in the image generation. We offer high-level API and a CLI tool for these steps (see below).
 
-- The _generation of an HDR (high dynamic range) image_ in the [PFM format](http://www.pauldebevec.com/Research/HDR/PFM/). In this step, the scene is loaded along with the informations about the observer (position, orientation, type of the camera, ...) and the choosen renderer. Then the image is rendered using the choosen algorithm.
+- The _generation of an HDR (high dynamic range) image_ in the [PFM format](http://www.pauldebevec.com/Research/HDR/PFM/). In this step, the scene is loaded along with the informations about the observer (position, orientation, type of the camera, ...) and the chosen renderer. Then the image is rendered using the chosen algorithm.
 
 - The _conversion of this image to an LDR (low dynamic range) image_, such as jpg or png, using a [tone mapping](https://en.wikipedia.org/wiki/Tone_mapping) process.
 
@@ -66,7 +66,7 @@ Applying tone mapping...  done!
 Saving final image to 'demo.jpg'... done!
 ```
 
-The CLI tool has more advanced features, like the generation of animations. But using the package from the REPL give more flexibility.
+The CLI tool has more advanced features, like the generation of animations. But using the package from the REPL gives more flexibility.
 
 ## Installation
 

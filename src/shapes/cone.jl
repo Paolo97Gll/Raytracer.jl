@@ -80,7 +80,7 @@ function get_all_ts(::Type{Cone{RR}}, ray::Ray) where {RR}
 	if B₂ ≈ 0f0 && !(B₁ ≈ 0f0)
 		t = B₀/2B₁
 		0 <= Z₁ * t + Z₀ <= 1 && push!(res, t)
-	elseif (Δ = B₁^2 - B₀ * B₂) >= 0f0 
+	elseif (Δ = B₁^2 - B₀ * B₂) >= 0f0
 		t1 = (B₁ + sqrt(Δ))/B₂
 		t2 = (B₁ - sqrt(Δ))/B₂
 		0 <= Z₁ * t1 + Z₀ <= 1 && push!(res, t1)
@@ -89,7 +89,7 @@ function get_all_ts(::Type{Cone{RR}}, ray::Ray) where {RR}
 
     # check if caps are hit
     tz1, tz2 = (( 1f0 - oz) / dz, - oz / dz)
-    
+
 	if !iseven(length(res))
 		(ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= RR^2 ? push!(res, tz1) : push!(res, tz2)
 		# @assert (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <=  1f0
@@ -104,13 +104,13 @@ end
 
 function get_normal(::Type{Cone{RR}}, point::Point, ray::Ray) where {RR}
     # z = point.v[3]
-    # # if it comes from the upper cap 
+    # # if it comes from the upper cap
     # (abs(z) ≈ 1f0) && return -sign(ray.dir.z) * NORMAL_Z
 	# # if it comes from the base
 	# (abs(z) ≈ 0f0) && return  sign(ray.dir.z) * NORMAL_Z
     z = ray.origin[3]
 	abs_z = abs(z)
-    # if it comes from the upper cap 
+    # if it comes from the upper cap
 	# or if it comes from the base
     (abs_z ≈ 1f0 || abs_z ≈ 0f0) && return -sign(z) * sign(ray.dir.z) * NORMAL_Z
 

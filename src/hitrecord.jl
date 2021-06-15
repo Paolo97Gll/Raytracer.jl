@@ -6,7 +6,7 @@
 
 
 """
-    struct HitRecord
+    HitRecord
 
 A struct representing the result of an intersection between a [`Ray`](@ref) and a [`Shape`](@ref).
 
