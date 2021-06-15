@@ -40,7 +40,7 @@ See also: [`CSG`](@ref).
 end
 
 """
-    CSG{R} <: Shape
+    CSG{R} <: CompositeShape
 
 A [`Shape`](@ref) representing a Constructive Solid Geometry tree.
 
