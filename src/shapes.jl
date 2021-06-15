@@ -148,7 +148,7 @@ end
 
 Abstract type representing shapes composed of other shapes.
 
-These shapes cannot be easily described as transformed versions of a unitary shape, and so they differ from [`SimpleShapes`](@ref) under many aspects.
+These shapes cannot be easily described as transformed versions of a unitary shape, and so they differ from [`SimpleShape`](@ref) under many aspects.
 
 See also: [`Shape`](@ref), [`Transformation`](@ref)
 """
