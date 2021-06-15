@@ -1,4 +1,4 @@
-name: Deploy documentation
+name: Doc Deploy
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
   pull_request:
 
 jobs:
-  documentation:
-    name: Documentation
+  doc-deploy:
+    name: Doc Deploy
     runs-on: ubuntu-latest
 
     steps:
