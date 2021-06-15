@@ -106,9 +106,9 @@ function show(io::IO, ::MIME"text/plain", n::Normal{V}) where {V}
 end
 
 """
-    normalize(n::Normal{V}) where {V}
+    normalize(n::Normal)
 
-Normalize `n` and return a [`Normal{true}`](@ref). If `V` is `true`, no normalization is computed and `n` is returned.
+Normalize `n` and return a [`Normal{true}`](@ref). If `n` is already a `Normal{true}` instance, no normalization is computed and `n` is returned.
 
 # Examples
 
@@ -133,9 +133,9 @@ Compute the squared norm of a [`Normal{true}`](@ref). Since `n` is already norma
 norm(::Normal{true}) = 1f0
 
 """
-    norm²(n::Normal{V}) where {V}
+    norm²(n::Normal)
 
-Compute the squared norm of a [`Normal`](@ref). If `V` is `true`, `1f0` is returned.
+Compute the squared norm of a [`Normal`](@ref). If `n` is a `Normal{true}` instance then `1f0` is returned.
 
 # Examples
 

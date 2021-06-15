@@ -43,7 +43,7 @@ R: -3.0, G: -3.0, B: -3.0
     *(scalar::Number, c::RGB)
     *(c::RGB, scalar::Number)
 
-Return a `RGB{T}` color with each component multiplied by `scalar`.
+Return a `RGB` color with each component multiplied by `scalar`.
 
 # Examples
 
@@ -220,7 +220,7 @@ luminosity(c::RGB) = (max(c...) + min(c...)) / 2
 @doc raw"""
     clamp(c::RGB)
 
-Return a clamped `RGB{T}` color, with each component `x` obtained with the formula:
+Return a clamped `RGB` color, with each component `x` obtained with the formula:
 
 ```math
 \frac{x}{1 + x}
@@ -239,7 +239,7 @@ clamp(c::RGB{T}) where {T} = RGB{T}(map(x -> x / (1f0 + x), c)...)
 @doc raw"""
     γ_correction(c::RGB, γ::Float32)
 
-Return a `RGB{T}` color, with each component `x` corrected with the formula:
+Return a `RGB` color, with each component `x` corrected with the formula:
 
 ```math
 x^{1 / \gamma}

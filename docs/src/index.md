@@ -66,7 +66,7 @@ Applying tone mapping...  done!
 Saving final image to 'demo.jpg'... done!
 ```
 
-The CLI tool has more advanced features, like the generation of animations. But using the package from the REPL give more flexibility.
+The CLI tool has more advanced features, like the generation of animations. But using the package from the REPL gives more flexibility.
 
 ## Installation
 

@@ -91,7 +91,7 @@ Constructor for a [`CheckeredPigment`](@ref) instance.
 """ CheckeredPigment{N}(::RGB{Float32}, ::RGB{Float32}) where {N}
 
 """
-CheckeredPigment{N}(; color_on::RGB{Float32} = WHITE,
+    CheckeredPigment{N}(; color_on::RGB{Float32} = WHITE,
                       color_off::RGB{Float32} = BLACK) where {N}
 
 Constructor for a [`CheckeredPigment`](@ref) instance.
