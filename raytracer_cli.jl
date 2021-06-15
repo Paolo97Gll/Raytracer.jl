@@ -13,7 +13,8 @@ Pkg.activate(normpath(@__DIR__))
 
 using Raytracer
 
-using ArgParse, ImageIO, ImageMagick, ImagePFM, ProgressMeter
+using ArgParse, ProgressMeter
+# using ImageIO, ImageMagick, ImagePFM
 using FileIO:
     File, @format_str, query
 
