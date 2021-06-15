@@ -36,7 +36,7 @@ end
 
 
 """
-    struct UniformPigment <: Pigment
+    UniformPigment <: Pigment
 
 A uniform [`Pigment`](@ref) over the whole surface.
 """
@@ -69,7 +69,7 @@ Return the color of the surface in the given point ``(u,v)``.
 
 
 """
-    struct CheckeredPigment{N} <: Pigment
+    CheckeredPigment{N} <: Pigment
 
 A checkered [`Pigment`](@ref). The number of rows/columns in the checkered pattern is tunable with `N`,
 but you cannot have a different number of repetitions along the u/v directions.
@@ -124,7 +124,7 @@ end
 
 
 """
-    struct ImagePigment <: Pigment
+    ImagePigment <: Pigment
 
 A textured [`Pigment`](@ref). The texture is given through a PFM image.
 """
@@ -170,7 +170,7 @@ abstract type BRDF end
 
 
 """
-    struct DiffuseBRDF <: BRDF
+    DiffuseBRDF <: BRDF
 
 A class representing an ideal diffuse [`BRDF`](@ref) (also called "Lambertian").
 """
@@ -229,7 +229,7 @@ end
 
 
 """
-    struct SpecularBRDF <: BRDF
+    SpecularBRDF <: BRDF
 
 A class representing an ideal mirror [`BRDF`](@ref).
 """
@@ -285,7 +285,7 @@ end
 
 
 """
-    struct Material
+    Material
 
 A material with a `brdf::BRDF` ([`BRDF`](@ref)) and and `emitted_radiance::Pigment` ([`Pigment`](@ref)).
 """

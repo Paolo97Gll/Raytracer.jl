@@ -6,7 +6,7 @@
 
 
 """
-    struct Ray
+    Ray
 
 A ray of light propagating in space.
 

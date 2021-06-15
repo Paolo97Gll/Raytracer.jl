@@ -6,7 +6,7 @@
 
 
 """
-    struct Transformation
+    Transformation
 
 A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
 

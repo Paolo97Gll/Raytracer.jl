@@ -22,7 +22,7 @@ abstract type Renderer end
 # OnOffRenderer
 
 """
-    struct OnOffRenderer <: Renderer
+    OnOffRenderer <: Renderer
 
 A basic bichrome [`Renderer`](@ref) that checks whether a [`Ray`](@ref) has collided or not.
 
@@ -71,7 +71,7 @@ end
 # FlatRenderer
 
 """
-    struct FlatRenderer <: Renderer
+    FlatRenderer <: Renderer
 
 A basic [`Renderer`](@ref) that returns the color of the [`Shape`](@ref) first hit by a given [`Ray`](@ref).
 
@@ -119,7 +119,7 @@ end
 # PathTracer
 
 """
-    struct PathTracer <: Renderer
+    PathTracer <: Renderer
 
 A path-tracing [`Renderer`](@ref) that considers the optical path of a [`Ray`](@ref) from the observer to a light source.
 
@@ -220,7 +220,7 @@ end
 
 
 """
-    struct PointLightRenderer <: Renderer
+    PointLightRenderer <: Renderer
 
 Point-light tracing [`Renderer`](@ref). This renderer is similar to what POV-Ray provides by default.
 

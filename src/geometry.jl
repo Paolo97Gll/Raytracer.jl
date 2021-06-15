@@ -9,7 +9,7 @@
 
 
 """
-    struct Vec <: StaticArrays.FieldVector{3, Float32}
+    Vec <: StaticArrays.FieldVector{3, Float32}
 
 A vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
 
@@ -57,7 +57,7 @@ norm²(v::Vec) = sum(el -> el^2, v)
 #####################################################################
 
 """
-    struct Normal{V} <: StaticArrays.FieldVector{3, Float32}
+    Normal{V} <: StaticArrays.FieldVector{3, Float32}
 
 A pseudo-vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
 The parameter `V` tells if the normal is normalized or not.
@@ -157,7 +157,7 @@ norm²(::Normal{true}) = 1f0
 
 
 """
-    struct Point
+    Point
 
 A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, Float32}`.
 """
