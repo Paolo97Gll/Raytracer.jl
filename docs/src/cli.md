@@ -86,6 +86,9 @@ optional arguments:
 
 ### [`raytracer_cli.jl demo image`](@id raytracer_cli_demo_image)
 
+!!! note
+    The options `camera_position` and `camera_orientation` represent the camera transformations. The application order is: first the rotation, then the translation.
+
 ```text
 usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
                         [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
@@ -158,6 +161,9 @@ This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to 
 
 !!! note
     For now, the generation of animations is available only with the CLI tool.
+
+!!! note
+    The parameter `camera_orientation` is not present since the animation is done by rotating the camera and therefore there isn't a fixed camera orientation.
 
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
