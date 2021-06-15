@@ -1,11 +1,10 @@
 name = "Raytracer"
 uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
 authors = ["Samuele Colombo <79973069+Samuele-Colombo@users.noreply.github.com>", "Paolo Galli <49845775+Paolo97Gll@users.noreply.github.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
@@ -25,14 +24,13 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 ArgParse = "^1.1"
-BenchmarkTools = "0.7"
 ColorTypes = "0.10"
 Colors = "0.12"
 Documenter = "0.26"
 FileIO = "^1.6"
 ImageIO = "0.5"
 ImageMagick = "^1.2"
-ImagePFM = "^1.0"
+ImagePFM = "^2.0"
 Images = "0.23"
 Intervals = "^1.5"
 Netpbm = "^1.0"

@@ -9,7 +9,7 @@
 
 
 """
-    struct Vec <: StaticArrays.FieldVector{3, Float32}
+    Vec <: StaticArrays.FieldVector{3, Float32}
 
 A vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
 
@@ -57,7 +57,7 @@ norm²(v::Vec) = sum(el -> el^2, v)
 #####################################################################
 
 """
-    struct Normal{V} <: StaticArrays.FieldVector{3, Float32}
+    Normal{V} <: StaticArrays.FieldVector{3, Float32}
 
 A pseudo-vector in 3D space with 3 fields `x`, `y`, and `z` of type `Float32`.
 The parameter `V` tells if the normal is normalized or not.
@@ -106,9 +106,9 @@ function show(io::IO, ::MIME"text/plain", n::Normal{V}) where {V}
 end
 
 """
-    normalize(n::Normal{V}) where {V}
+    normalize(n::Normal)
 
-Normalize `n` and return a [`Normal{true}`](@ref). If `V` is `true`, no normalization is computed and `n` is returned.
+Normalize `n` and return a [`Normal{true}`](@ref). If `n` is already a `Normal{true}` instance, no normalization is computed and `n` is returned.
 
 # Examples
 
@@ -133,9 +133,9 @@ Compute the squared norm of a [`Normal{true}`](@ref). Since `n` is already norma
 norm(::Normal{true}) = 1f0
 
 """
-    norm²(n::Normal{V}) where {V}
+    norm²(n::Normal)
 
-Compute the squared norm of a [`Normal`](@ref). If `V` is `true`, `1f0` is returned.
+Compute the squared norm of a [`Normal`](@ref). If `n` is a `Normal{true}` instance then `1f0` is returned.
 
 # Examples
 
@@ -157,7 +157,7 @@ norm²(::Normal{true}) = 1f0
 
 
 """
-    struct Point
+    Point
 
 A point in a 3D space. Implemented as a wrapper struct around a `SVector{3, Float32}`.
 """

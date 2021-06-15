@@ -9,7 +9,7 @@
     mutable struct PCG <: AbstractRNG
 
 Random number generator that implement the Permuted Congruential Generator, a simple fast space-efficient
-statistically good algorithms for random number generation. See [O’Neill (2014)](https://www.pcg-random.org/paper.html).
+statistically good algorithms for random number generation. See [O'Neill (2014)](https://www.pcg-random.org/paper.html).
 
 # Members
 

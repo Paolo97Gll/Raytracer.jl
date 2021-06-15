@@ -6,7 +6,7 @@
 
 
 """
-    struct Ray
+    Ray
 
 A ray of light propagating in space.
 
@@ -42,12 +42,12 @@ Constructor for a [`Ray`](@ref) instance.
 """
     Ray(origin::Point, dir::Vec
         ; tmin::Float32 = 1f-5,
-          tmax::Float32 = typemax(Float32),
+          tmax::Float32 = Inf32,
           depth::Int = 0)
 
 Constructor for a [`Ray`](@ref) instance.
 """
-Ray(origin::Point, dir::Vec; tmin::Float32 = 1f-5, tmax::Float32 = typemax(Float32), depth::Int = 0) = Ray(origin, dir, tmin, tmax, depth)
+Ray(origin::Point, dir::Vec; tmin::Float32 = 1f-5, tmax::Float32 = Inf32, depth::Int = 0) = Ray(origin, dir, tmin, tmax, depth)
 
 @doc raw"""
     (r::Ray)(t::Float32)

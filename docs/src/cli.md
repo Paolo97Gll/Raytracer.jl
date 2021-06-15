@@ -1,57 +1,51 @@
-# Command line interface (CLI) tool
+# [CLI tool](@id cli_tool)
 
-A command line tool `raytracer_cli.jl` is available to manage through this package the generation and rendering of photorealistic images.
+The CLI tool is named `raytracer_cli.jl` and is placed in the root of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang.
 
-This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run these commands also from the REPL.
+This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run almost all these commands also from the REPL, by calling the same functions called by the tool.
+
+!!! note
+    For now, the command [`demo animation`](@ref raytracer_cli_demo_animation) is available only with the CLI tool.
 
 ## Installation
 
-To use it, clone this repository:
-
-```shell
-git clone https://github.com/Paolo97Gll/Raytracer.jl.git
-cd Raytracer.jl
-```
-
-Then, open julia REPL and type the following commands to update your environment:
-
-```@repl
-import Pkg
-Pkg.activate(".")
-Pkg.instantiate()
-```
+See [CLI tool installation](@ref cli_tool_installation).
 
 ## Usage
 
-The menu tree is:
+!!! note
+    You _must_ call this tool from the repo main folder! It will not work if called by another folder.
+
+The CLI tool is based on a series of commands, in a similar way to the `git` and `docker` CLI tools. The menu tree is:
+
+- [`raytracer_cli.jl`](@ref raytracer_cli)
+  - [`tonemapping`](@ref raytracer_cli_tonemapping)
+  - [`demo`](@ref raytracer_cli_demo)
+    - [`image`](@ref raytracer_cli_demo_image)
+    - [`animation`](@ref raytracer_cli_demo_animation)
+  - [`docs`](@ref raytracer_cli_docs)
+
+### [`raytracer_cli.jl`](@id raytracer_cli)
 
 ```text
-raytracer_cli.jl
-├── tonemapping
-└── demo
-    ├── image
-    └── animation
-```
-
-### `raytracer_cli.jl`
-
-```text
-usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo}
+usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo|docs}
 
 Raytracing for the generation of photorealistic images in Julia.
 
 commands:
   tonemapping  apply tone mapping to a pfm image and save it to file
   demo         show a demo of Raytracer.jl
+  docs         show the documentation link
 
 optional arguments:
   --version    show version information and exit
   -h, --help   show this help message and exit
 ```
 
-### `raytracer_cli.jl tonemapping`
+### [`raytracer_cli.jl tonemapping`](@id raytracer_cli_tonemapping)
 
-We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
+!!! note
+    We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
 
 ```text
 usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [--version]
@@ -74,7 +68,7 @@ files:
   output_file        output file name
 ```
 
-### `raytracer_cli.jl demo`
+### [`raytracer_cli.jl demo`](@id raytracer_cli_demo)
 
 ```text
 usage: raytracer_cli.jl demo [--version] [-h] {image|animation}
@@ -90,7 +84,10 @@ optional arguments:
   -h, --help  show this help message and exit
 ```
 
-### `raytracer_cli.jl demo image`
+### [`raytracer_cli.jl demo image`](@id raytracer_cli_demo_image)
+
+!!! note
+    The options `camera_position` and `camera_orientation` represent the camera transformations. The application order is: first the translation, then the rotation.
 
 ```text
 usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
@@ -158,7 +155,15 @@ files:
                         (default: "demo.jpg")
 ```
 
-### `raytracer_cli.jl demo animation`
+### [`raytracer_cli.jl demo animation`](@id raytracer_cli_demo_animation)
+
+This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to be installed on the local machine and to be in the PATH. It generates an H.264 mp4 video containing the animation.
+
+!!! note
+    For now, the generation of animations is available only with the CLI tool.
+
+!!! note
+    The parameter `camera_orientation` is not present since the animation is done by rotating the camera around the Z axis and therefore there isn't a fixed camera orientation.
 
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
@@ -236,40 +241,86 @@ files:
                         extension (default: "demo")
 ```
 
+### [`raytracer_cli.jl docs`](@id raytracer_cli_docs)
+
+```text
+usage: raytracer_cli.jl docs [--version] [-h]
+
+Show the documentation link.
+
+optional arguments:
+  --version   show version information and exit
+  -h, --help  show this help message and exit
+```
+
+## Multithreading
+
+To enable multithreading, e.g. use 8 threads, add `-t num_threads` after the `julia` command:
+
+```shell
+julia -t 8 raytracer_cli.jl demo image
+```
+
+Here all examples use only one thread, but you can specify the number of threads you prefer.
+
 ## Examples
 
 ### Tone mapping
 
-You can use the `tonemapping` command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
+You can use the [`tonemapping`](@ref raytracer_cli_tonemapping) ray command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
 
 ```shell
 julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
 ```
 
+![](https://i.imgur.com/YX9eSkk.jpg)
+
+You can also convert to a png image:
+
+```shell
+julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.png
+```
+
+or any other format supported (see [here](@ref raytracer_cli_tonemapping)).
+
 You can also change the default values of `alpha` and/or `gamma` to obtain a better tone mapping, according to your source image:
 
 ```shell
-julia raytracer_cli.jl tonemapping --alpha 0.35 --gamma 1.3 test/memorial.pfm memorial.jpg
+julia raytracer_cli.jl tonemapping --alpha 0.2 --gamma 1.8 test/memorial.pfm memorial.jpg
 ```
 
-### Demo
+![](https://i.imgur.com/c6tKSRG.jpg)
 
-You can use the `demo image` command to render a demo image:
+### Generate a demo image
+
+You can use the [`demo image`](@ref raytracer_cli_demo_image) command to render a demo image:
 
 ```shell
 julia raytracer_cli.jl demo image
 ```
 
-It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image). You can change the output file name, the LDR extension and other rendering parameters using the command options.
+![](https://i.imgur.com/DiYwNyG.jpg)
 
-To create a demo animation, use the command `demo animation`:
+It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image).
+
+You can change the output file name, the LDR extension and other rendering parameters using the command options. For example, you can enable antialiasing and see the difference it can make. Here an example with 36 rays/pixel:
+
+![](https://i.imgur.com/8JCWIJ2.jpg)
+
+### Generate a demo animation
+
+To create a demo animation, use the command [`demo animation`](@ref raytracer_cli_demo_animation):
 
 ```shell
 julia raytracer_cli.jl demo animation
 ```
 
-To enable multithreading, e.g. use 8 threads, use:
-
-```shell
-julia --threads 8 raytracer_cli.jl demo animation
+```@raw html
+<video autoplay="" controls="" loop="" width="540" height="540">
+  <source src="https://i.imgur.com/2yEoRbA.mp4">
+</video>
 ```
+
+It creates a new folder `demo_animation` with the video `demo.mp4` and all the frames in jpeg format.
+
+You can change the output folder and file name and other rendering and animation parameters using the command options.

@@ -6,7 +6,7 @@
 
 
 @doc raw"""
-    struct PointLight
+    PointLight
 
 A point light (used by [`PointLightRenderer`](@ref)).
 
