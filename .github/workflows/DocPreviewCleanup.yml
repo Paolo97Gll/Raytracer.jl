@@ -2,7 +2,8 @@ name: Doc Preview Cleanup
 
 on:
   pull_request:
-    types: [closed]
+    types:
+      - closed
 
 jobs:
   doc-preview-cleanup:
