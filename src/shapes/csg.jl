@@ -2,6 +2,19 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+"""
+    valid_intervals(ts::Vector)
+
+Return a `Vector` of `Interval`s describing what ranges of the `t` parameter are internal to the shape, given its `ts` hit parameters.
+
+For the function to work correctly `ts` must be of even length.
+"""
+function valid_intervals(ts::Vector)
+    iseven(length(ts)) || throw(ArgumentError("given vector must have even length: got $ts"))
+    sorted_ts = sort(ts)
+    [Interval(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
+end
+
 #######
 # CSG
 
@@ -226,10 +239,10 @@ function all_ray_intersections(ray::Ray, csg::IntersectionCSG)
     isempty(r_hits) && return Vector{HitRecord}()
     l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(l_hits) && return Vector{HitRecord}()
-    r_min, r_max = extrema(r_hits)
-    l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> l_min <= hit <= l_max, r_hits)
-    l_filter = filter(hit -> r_min <= hit <= r_max, l_hits)
+    r_intervals = valid_intervals(r_hits)
+    l_intervals = valid_intervals(l_hits)
+    r_filter = filter(hit -> any(Ref(hit) .∈ l_intervals), r_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -239,10 +252,10 @@ function quick_ray_intersection(ray::Ray, csg::IntersectionCSG)
     isempty(r_ts) && return false
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return false
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    any(t -> l_min <= t <= l_max && ray.tmin < t < ray.tmax, r_ts) ||
-    any(t -> r_min <= t <= r_max && ray.tmin < t < ray.tmax, l_ts)
+    r_intervals = valid_intervals(r_hits)
+    l_intervals = valid_intervals(l_hits)
+    any(t -> any(t .∈ l_intervals) && ray.tmin < t < ray.tmax, r_ts) ||
+    any(t -> any(t .∈ r_intervals) && ray.tmin < t < ray.tmax, l_ts)
 end
 
 function get_all_ts(csg::IntersectionCSG, ray::Ray)
@@ -251,10 +264,10 @@ function get_all_ts(csg::IntersectionCSG, ray::Ray)
     isempty(r_ts) && return Vector{Float32}() 
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return Vector{Float32}() 
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    r_filter = filter(t -> l_min <= t <= l_max, r_ts)
-    l_filter = filter(t -> r_min <= t <= r_max, l_ts)
+    r_intervals = valid_intervals(r_ts)
+    l_intervals = valid_intervals(l_ts)
+    r_filter = filter(t -> any(t .∈ l_intervals), r_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
     # @assert (length(r_filter) + length(l_filter) != 1) "Only one intersection for $(typeof(csg.rbranch)): $r_ts + $l_ts between $l_min and $l_max"
     append!(r_filter, l_filter)
 end
@@ -274,10 +287,10 @@ function all_ray_intersections(ray::Ray, csg::DiffCSG)
     isempty(r_hits) && return Vector{HitRecord}()
     l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(l_hits) && return r_hits
-    r_min, r_max = extrema(r_hits)
-    l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> !(l_min <= hit <= l_max), r_hits)
-    l_filter = filter(hit ->   r_min <= hit <= r_max , l_hits)
+    r_intervals = valid_intervals(r_hits)
+    l_intervals = valid_intervals(l_hits)
+    r_filter = filter(hit -> any(Ref(hit) .∉ l_intervals), r_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -289,12 +302,12 @@ function quick_ray_intersection(ray::Ray, csg::DiffCSG)
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return any(t -> ray.tmin < t < ray.tmax, r_ts)
 
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    # @assert r_min != r_max "Only one intersection on $(typeof(csg.rbranch))"
-    # @assert l_min != l_max "Only one intersection on $(typeof(csg.lbranch))"
-    any(t -> !(l_min <= t <= l_max) && ray.tmin < t < ray.tmax, r_ts) || 
-    any(t ->   r_min <= t <= r_max  && ray.tmin < t < ray.tmax, l_ts) 
+    # r_min, r_max = extrema(r_hits)
+    # l_min, l_max = extrema(l_hits)
+    r_intervals = valid_intervals(r_ts)
+    l_intervals = valid_intervals(l_ts)
+    any(t -> any(t .∉ l_intervals), r_ts) ||
+    any(t -> any(t .∈ r_intervals), l_ts)
 end
 
 function get_all_ts(csg::DiffCSG, ray::Ray)
@@ -303,10 +316,12 @@ function get_all_ts(csg::DiffCSG, ray::Ray)
     isempty(r_ts) && return Vector{Float32}()
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return r_ts
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    r_filter = filter(t -> !(l_min <= t <= l_max), r_ts)
-    l_filter = filter(t ->   r_min <= t <= r_max , l_ts)
+    # r_min, r_max = extrema(r_hits)
+    # l_min, l_max = extrema(l_hits)
+    r_intervals = valid_intervals(r_ts)
+    l_intervals = valid_intervals(l_ts)
+    r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
     append!(r_filter, l_filter)
 end
 
@@ -325,10 +340,10 @@ function all_ray_intersections(ray::Ray, csg::FusionCSG)
     l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(r_hits) && return l_hits
     isempty(l_hits) && return r_hits 
-    r_min, r_max = extrema(r_hits)
-    l_min, l_max = extrema(l_hits)
-    r_filter = filter(hit -> !(l_min <= hit <= l_max), r_hits)
-    l_filter = filter(hit -> !(r_min <= hit <= r_max), l_hits)
+    r_intervals = valid_intervals(r_hits)
+    l_intervals = valid_intervals(l_hits)
+    r_filter = filter(hit -> any(Ref(hit) .∉ l_intervals), r_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∉ r_intervals), l_hits)
     isempty(r_filter) && return l_filter
     isempty(l_filter) && return r_filter
     append!(r_filter, l_filter)
@@ -340,10 +355,10 @@ function quick_ray_intersection(ray::Ray, csg::FusionCSG)
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return !isempty(l_ts)
     isempty(l_ts) && return true 
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    any(t -> !(l_min <= t <= l_max) && ray.tmin < t < ray.tmax, r_ts) ||
-    any(t -> !(r_min <= t <= r_max) && ray.tmin < t < ray.tmax, l_ts) 
+    r_intervals = valid_intervals(r_ts)
+    l_intervals = valid_intervals(l_ts)
+    any(t -> any(t .∉ l_intervals), r_ts) ||
+    any(t -> any(t .∉ r_intervals), l_ts)
 end
 
 function get_all_ts(csg::FusionCSG, ray::Ray)
@@ -352,9 +367,9 @@ function get_all_ts(csg::FusionCSG, ray::Ray)
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return l_ts
     isempty(l_ts) && return r_ts 
-    r_min, r_max = extrema(r_ts)
-    l_min, l_max = extrema(l_ts)
-    r_filter = filter(t -> !(l_min <= t <= l_max), r_ts)
-    l_filter = filter(t -> !(r_min <= t <= r_max), l_ts)
+    r_intervals = valid_intervals(r_ts)
+    l_intervals = valid_intervals(l_ts)
+    r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
+    l_filter = filter(t -> any(t .∉ r_intervals), l_ts)
     append!(r_filter, l_filter)
 end
