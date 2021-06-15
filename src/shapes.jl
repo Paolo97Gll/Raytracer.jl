@@ -30,7 +30,7 @@ end
 
 
 """
-    struct Sphere <: Shape
+    Sphere <: Shape
 
 A [`Shape`](@ref) representing a sphere.
 
@@ -123,7 +123,7 @@ end
 
 
 """
-    struct Plane <: Shape
+    Plane <: Shape
 
 A [`Shape`](@ref) representing an infinite plane.
 
@@ -188,7 +188,7 @@ end
 
 
 """
-    struct AABB
+    AABB
 
 A type representing an Axis-Aligned Bounding Box
 """

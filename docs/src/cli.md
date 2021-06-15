@@ -16,7 +16,7 @@ See [CLI tool installation](@ref cli_tool_installation).
 !!! note
     You _must_ call this tool from the repo main folder! It will not work if called by another folder.
 
-The CLI tool is based on a list of commands, like the `git` or `docker` commands. The menu tree is:
+The CLI tool is based on a series of commands, in a similar way to the `git` and `docker` CLI tools. The menu tree is:
 
 - [`raytracer_cli.jl`](@ref raytracer_cli)
   - [`tonemapping`](@ref raytracer_cli_tonemapping)
@@ -87,7 +87,7 @@ optional arguments:
 ### [`raytracer_cli.jl demo image`](@id raytracer_cli_demo_image)
 
 !!! note
-    The options `camera_position` and `camera_orientation` represent the camera transformations. The application order is: first the rotation, then the translation.
+    The options `camera_position` and `camera_orientation` represent the camera transformations. The application order is: first the translation, then the rotation.
 
 ```text
 usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
@@ -163,7 +163,7 @@ This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to 
     For now, the generation of animations is available only with the CLI tool.
 
 !!! note
-    The parameter `camera_orientation` is not present since the animation is done by rotating the camera and therefore there isn't a fixed camera orientation.
+    The parameter `camera_orientation` is not present since the animation is done by rotating the camera around the Z axis and therefore there isn't a fixed camera orientation.
 
 ```text
 usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]

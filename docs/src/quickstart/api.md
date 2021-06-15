@@ -41,7 +41,7 @@ Now we can choose the renderer. For this example, we use a [`FlatRenderer`](@ref
 renderer = FlatRenderer(world)
 ```
 
-Now we need to create a [`Camera`](@ref), representing an obesrver. For this example, we use a [`PerspectiveCamera`](@ref) positioned at the point ``(-10,0,0)`` and looking the origin.
+Now we need to create a [`Camera`](@ref), representing an observer. For this example, we use a [`PerspectiveCamera`](@ref) positioned at the point ``(-10,0,0)`` and looking the origin.
 
 ```@repl 1
 camera = PerspectiveCamera(
@@ -51,7 +51,7 @@ camera = PerspectiveCamera(
 )
 ```
 
-Now we can create the [`ImageTracer`](@ref), with the observer informations, an empty FHD [`HdrImage`](@ref) and no antialiasing:
+Now we can create the [`ImageTracer`](@ref), with the observer informations, an empty FHD (i.e. with resolution of 1920x1080) [`HdrImage`](@ref) and no antialiasing:
 
 ```@repl 1
 image = HdrImage(1920, 1080)
@@ -65,7 +65,7 @@ julia> fire_all_rays!(image_tracer, renderer)
 Progress: 100%|███████████████████████████████████████| Time: 0:00:03
 ```
 
-Finally, we can save the generated HDR image. Remmember to use `permutedims` when saving the image, otherwise you will have a wrong image!
+Finally, we can save the generated HDR image. Remember to use `permutedims` when saving the image, otherwise you will have an output image reflected along the diagonal!
 
 ```julia-repl
 julia> save("myimage.pfm", permutedims(image_tracer.image.pixel_matrix))
@@ -74,7 +74,7 @@ julia> save("myimage.pfm", permutedims(image_tracer.image.pixel_matrix))
 
 ## Tone mapping
 
-We can apply tone mapping to an HDR image to get a LDR image, like a jpeg or png file.
+We can apply tone mapping to an HDR image to get a LDR image, for example a jpeg or png file.
 
 ```julia-repl
 julia> tonemapping("myimage.pfm", "myimage.jpg", 0.5f0, 1f0)

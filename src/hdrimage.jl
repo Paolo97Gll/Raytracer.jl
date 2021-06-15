@@ -6,7 +6,7 @@
 
 
 """
-    struct HdrImage
+    HdrImage
 
 Wrapper of a `Matrix` of elements of type `RGB{Float32}`, used to represent an image in hdr format.
 """

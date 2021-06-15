@@ -76,6 +76,7 @@ export # Rendering
         ImagePigment,
     BRDF,
         DiffuseBRDF, SpecularBRDF,
+        at,
     Material,
     Renderer,
         OnOffRenderer, FlatRenderer, PathTracer, PointLightRenderer
@@ -86,7 +87,9 @@ export # Scene
         norm,
         norm²,
         create_onb_from_z,
-        NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, VEC_X, VEC_Y, VEC_Z,
+        NORMAL_X, NORMAL_Y, NORMAL_Z,
+        VEC_X, VEC_Y, VEC_Z,
+        NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, 
     Point,
         convert,
         ORIGIN,
