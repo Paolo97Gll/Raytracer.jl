@@ -7,7 +7,7 @@
 # Cone
 
 """
-    struct Cone{radius_ratio} <: SimpleShape
+    Cone{radius_ratio} <: SimpleShape
 
 A [`SimpleShape`](@ref) representing a truncated cone of unitary height, unitary base radius, and `radius_ratio` upper circle diameter.
 

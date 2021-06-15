@@ -7,7 +7,7 @@
 
 
 """
-    struct AABB
+    AABB
 
 A type representing an Axis-Aligned Bounding Box.
 """

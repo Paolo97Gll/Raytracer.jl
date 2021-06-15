@@ -6,7 +6,7 @@
 # Cube
 
 """
-    struct Cube <: SimpleShape
+    Cube <: SimpleShape
 
 A [`SimpleShape`](@ref) representing a cube of unitary size.
 

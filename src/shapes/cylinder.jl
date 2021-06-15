@@ -6,7 +6,7 @@
 # Cylinder
 
 """
-    struct Cylinder <: SimpleShape
+    Cylinder <: SimpleShape
 
 A [`SimpleShape`](@ref) representing a cylinder of unitary height and diameter.
 
