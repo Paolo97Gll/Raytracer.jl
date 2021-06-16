@@ -9,6 +9,9 @@ module Interpreter
 using Base:
     SizeUnknown
 
+using Raytracer:
+    ImageTracer, Renderer
+
 import Base:
     show, showerror, print, eof, copy, IteratorSize
 
@@ -35,6 +38,7 @@ include(joinpath(interpreter_dir, "exceptions.jl"))
 include(joinpath(interpreter_dir, "utilities.jl"))
 include(joinpath(interpreter_dir, "inputstream.jl"))
 include(joinpath(interpreter_dir, "lexer.jl"))
+include(joinpath(interpreter_dir, "parser.jl"))
 
 
 end # module
