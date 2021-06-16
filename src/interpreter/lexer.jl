@@ -6,7 +6,7 @@
 
 
 """
-    _update_pos!(stream, ch)
+    _update_pos!(stream::InputStream, ch::Union{Char, Nothing})
 
 Update `stream.location` after having read `ch` from the stream.
 """
@@ -45,7 +45,7 @@ function read_char!(stream::InputStream)
 end
 
 """
-    unread_char!(stream, ch)
+    unread_char!(stream::InputStream, ch::Union{Char, Nothing})
 
 Push a character back to the stream.
 """
@@ -74,7 +74,7 @@ function skip_whitespaces_and_comments(stream::InputStream)
 end
 
 """
-    _parse_string_token(stream, token_location)
+    _parse_string_token(stream::InputStream, token_location::SourceLocation)
 
 Parse the stream into a [`Token`](@ref) with [`LiteralString`](@ref) value.
 """
@@ -85,20 +85,20 @@ function _parse_string_token(stream::InputStream, token_location::SourceLocation
 
         ch == '"' && break
 
-        (isnothing(ch) || isnewline(ch)) && throw(GrammarError(token_location, "Unterminated string", length(str) + 1))
+        (isnothing(ch) || isnewline(ch)) && throw(GrammarException(token_location, "Unterminated string", length(str) + 1))
 
         str *= ch
     end
 
-    return Token(token_location, LiteralString(str))
+    return Token(token_location, LiteralString(str), length(str))
 end
 
 """
-    _parse_float_token(stream, first_char, token_location)
+    _parse_number_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
 
 Parse the stream into a [`Token`](@ref) with [`LiteralNumber`](@ref) value.
 """
-function _parse_float_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+function _parse_number_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
     str = first_char |> string
     while true
         ch = read_char!(stream)
@@ -114,15 +114,15 @@ function _parse_float_token(stream::InputStream, first_char::Char, token_locatio
     value = try
         parse(Float32, str)
     catch e
-        isa(e, ArgumentError) && rethrow(GrammarError(token_location, "'$str' is an invalid floating-point number", length(str)))
+        isa(e, ArgumentError) && rethrow(GrammarException(token_location, "'$str' is an invalid floating-point number", length(str)))
         rethrow(e)
     end
 
-    return Token(token_location, LiteralNumber(value))
+    return Token(token_location, LiteralNumber(value), length(str))
 end
 
 """
-    _parse_keyword_or_identifier_token(stream, first_char, token_location)
+    _parse_keyword_or_identifier_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
 
 Parse the stream into a [`Token`](@ref) with [`Keyword`](@ref) or [`Identifier`](@ref) value.
 """
@@ -139,8 +139,8 @@ function _parse_keyword_or_identifier_token(stream::InputStream, first_char::Cha
     sym = Symbol(str)
     keywords = instances(Keyword) .|> Symbol
     (index = findfirst(s -> s == sym, keywords)) |> isnothing ?
-        Token(token_location, Identifier(sym)) :
-        Token(token_location, Keyword(index))
+        Token(token_location, Identifier(sym), length(str)) :
+        Token(token_location, Keyword(index), length(str))
 end
 
 """
@@ -148,14 +148,14 @@ end
 
 Read the next token in the stream.
 """
-function read_token(stream)
+function read_token(stream::InputStream)
     skip_whitespaces_and_comments(stream)
 
     # At this point we're sure that ch does *not* contain a whitespace character
     ch = read_char!(stream)
     if isnothing(ch)
         # No more characters in the file, so return a StopToken
-        return Token(stream.location, StopToken())
+        return Token(stream.location, StopToken(), 1)
     end
 
     # At this point we must check what kind of token begins with the "ch" character
@@ -165,19 +165,19 @@ function read_token(stream)
 
     if issymbol(ch)
         # One-character symbol, like '(' or ','
-        return Token(token_location, Symbol(ch))
+        return Token(token_location, Symbol(ch), 1)
     elseif ch == '"'
         # A literal string (used for file names)
         return _parse_string_token(stream, token_location)
     elseif isdigit(ch) || ch ∈ ('+', '-', '.')
         # A floating-point number
-        return _parse_float_token(stream, ch, token_location)
+        return _parse_number_token(stream, ch, token_location)
     elseif isletter(ch) || ch == '_'
         # Since it begins with an alphabetic character, it must either be a keyword
         # or a identifier
         return _parse_keyword_or_identifier_token(stream, ch, token_location)
     else
         # We got some weird character, like '@` or `&`
-        throw(GrammarError(stream.location, "Invalid character $ch"))
+        throw(GrammarException(stream.location, "Invalid character $ch"))
     end
 end
