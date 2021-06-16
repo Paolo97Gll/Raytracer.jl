@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-##########
-# Utility
+# Interpreter utility functions
+
 
 """
     read_at_line(io, line_num)

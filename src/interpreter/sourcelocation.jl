@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-#################
-# SourceLocation
+# SourceLocation struct for file position
+
 
 """
     SourceLocation
@@ -27,4 +27,3 @@ end
 function Base.copy(loc::SourceLocation)
     SourceLocation(loc.file_name, loc.line_num, loc.col_num)
 end
-

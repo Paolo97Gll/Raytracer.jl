@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-########
-# Token
+# Token implementation
+
 
 @enum Keyword begin
     SPAWN = 1
@@ -82,7 +82,7 @@ Type representing a language token of a SceneLang script.
 - `value::TokenValue`: representing the value of the token (see [`TokenValue`](@ref))
 
 """
-struct Token 
+struct Token
     loc::SourceLocation
     value::TokenValue
 end

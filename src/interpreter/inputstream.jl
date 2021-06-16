@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-##############
-# InputStream
+# InputStream struct for reading SceneLang scripts
+
 
 """
     InputStream
@@ -37,6 +37,22 @@ mutable struct InputStream
     end
 end
 
+
+#################
+# File iteration
+
+
+function Base.iterate(stream::InputStream, state::Int = 1)
+    isa((token = read_token(stream)).value, StopToken) ? nothing : (token, state + 1)
+end
+
+Base.IteratorSize(::Type{InputStream}) = Base.SizeUnknown()
+
+
+####################
+# Utility functions
+
+
 """
     open_stream(f, file_name; tabulations = 8)
 
@@ -48,19 +64,13 @@ function open_stream(f::Function, file_name::String; tabulations::Int = 8)
     end
 end
 
-function Base.iterate(stream::InputStream, state::Int = 1)
-    isa((token = read_token(stream)).value, StopToken) ? nothing : (token, state + 1)
-end
-
-Base.IteratorSize(::Type{InputStream}) = Base.SizeUnknown()
-
-
 """
     eof(stream::InputStream)
 
 Check if the stream has reached the end-of-file.
 """
 Base.eof(stream::InputStream) = eof(stream.stream)
+
 
 """
     _update_pos!(stream, ch)
@@ -112,6 +122,7 @@ function unread_char!(stream::InputStream, ch::Union{Char, Nothing})
     stream.location = stream.saved_location
 end
 
+
 """
     skip_whitespaces_and_comments(stream::InputStream)
 
@@ -130,13 +141,14 @@ function skip_whitespaces_and_comments(stream::InputStream)
     unread_char!(stream, ch)
 end
 
+
 """
     _parse_string_token(stream, token_location)
 
 Parse the stream into a [`Token`](@ref) with [`LiteralString`](@ref) value.
 """
 function _parse_string_token(stream::InputStream, token_location::SourceLocation)
-    str = "" 
+    str = ""
     while true
         ch = read_char!(stream)
 
@@ -178,7 +190,6 @@ function _parse_float_token(stream::InputStream, first_char::Char, token_locatio
     return Token(token_location, LiteralNumber(value))
 end
 
-
 """
     _parse_keyword_or_identifier_token(stream, first_char, token_location)
 
@@ -196,10 +207,11 @@ function _parse_keyword_or_identifier_token(stream::InputStream, first_char::Cha
 
     sym = Symbol(str)
     keywords = instances(Keyword) .|> Symbol
-    (index = findfirst(s -> s == sym, keywords)) |> isnothing ? 
+    (index = findfirst(s -> s == sym, keywords)) |> isnothing ?
         Token(token_location, Identifier(sym)) :
         Token(token_location, Keyword(index))
 end
+
 
 """
     read_token(stream::InputStream)
@@ -216,12 +228,12 @@ function read_token(stream)
         return Token(stream.location, StopToken())
     end
 
-    # At this point we must check what kind of token begins with the "ch" character 
+    # At this point we must check what kind of token begins with the "ch" character
     # (which has been put back in the stream with stream.unread_char). First,
     # we save the position in the stream
     token_location = copy(stream.location)
 
-    if issymbol(ch) 
+    if issymbol(ch)
         # One-character symbol, like '(' or ','
         return Token(token_location, Symbol(ch))
     elseif ch == '"'
