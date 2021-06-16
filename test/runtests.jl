@@ -57,9 +57,10 @@ end
     include("test_imagetracer.jl")
 end
 
-@testset "Interpreter" begin
-    include("test_interpreter.jl")
-end
+
+# @testset "Interpreter" begin
+#     include("test_interpreter.jl")
+# end
 
 
 ################
