@@ -6,26 +6,13 @@ using Base: String, Float32
 # Parser of SceneLang
 
 """
-    ValueAndLoc{V}
-
-Alias to `NamedTuple{(:value, :location), Tuple{V, SourceLocation}}`
-
-Stores a value of a variable and its position.
-"""
-const ValueAndLoc{V} = NamedTuple{(:value, :location), Tuple{V, SourceLocation}}
-
-function ValueAndLoc(val::V, loc::SourceLocation) where {V}
-    ValueAndLoc{V}((val, loc))
-end
-
-"""
     IdTable
 
-Alias to `Dict{DataType, Dict{Symbol, ValueAndLoc{V} where {V}}}`.
+Alias to `Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}`.
 
 Dictionary with all the variables read from a SceneLang script.
 """
-const IdTable = Dict{DataType, Dict{Symbol, ValueAndLoc{V} where {V}}}
+const IdTable = Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}
 
 const TableOrNot = Union{IdTable, Nothing}
 const TracerOrNot = Union{ImageTracer, Nothing}
@@ -41,7 +28,7 @@ function Scene(; variables::TableOrNot = nothing, image_tracer::TracerOrNot = no
 	Scene(variables, image_tracer, renderer)
 end
 
-function Scene(variables::Vector{Pair{DataType, Vector{Pair{Symbol, ValueAndLoc}}}} ; image_tracer::TracerOrNot = nothing, renderer::RendererOrNot = nothing)
+function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, Token}}}} ; image_tracer::TracerOrNot = nothing, renderer::RendererOrNot = nothing)
 	variables =  Dict(zip(first.(variables), (Dict(last(pair)) for pair ∈ variables)))
 	Scene(variables, image_tracer, renderer)
 end
@@ -87,10 +74,11 @@ function expect_string(stream::InputStream, vars::IdTable)
                                                            "Got '$(typeof(token.value.value))' instead of 'String'",
                                                            token.length))
     var_name = token.value.value
-    haskey(vars[String], var_name) || throw(GrammarException(stream.location,
-                                                             "Unknown variable '$var_name'",
-                                                             token.length))
-    vars[String][var_name].value
+    if !haskey(vars[LiteralString], var_name) 
+        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || throw(GrammarException(stream.location, "Variable '$var_name' is a '$type': expected 'LiteralString'"))
+        throw(GrammarException(stream.location, "Undefined variable '$var_name'", token.length))
+    end
+    vars[LiteralString][var_name].value
 end
 
 """
@@ -105,8 +93,9 @@ function expect_number(stream::InputStream, vars::IdTable)
                                                            "Got '$(typeof(token.value.value))' instead of 'Float32'",
                                                            token.length))
     var_name = token.value.value
-    haskey(vars[Float32], var_name) || throw(GrammarException(stream.location,
-                                                              "Unknown variable '$var_name'",
-                                                              token.length))
-    vars[Float32][var_name].value
+    if !haskey(vars[LiteralNumber], var_name) 
+        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || throw(GrammarException(stream.location, "Variable '$var_name' is a '$type': expected 'LiteralNumber'"))
+        throw(GrammarException(stream.location, "Undefined variable '$var_name'", token.length))
+    end
+    vars[LiteralNumber][var_name].value
 end
