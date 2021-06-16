@@ -14,7 +14,7 @@ To fill an image store it into `ImageTracer` along with the desired camera and a
 to it. Alternatively apply iteratively [`fire_ray(::ImageTracer, ::Int, ::Int; ::Float32, ::Float32)`](@ref)
 on the desired ranges.
 
-# Members
+# Fields
 
 - `image::HdrImage`: a [`HdrImage`](@ref) in which save the rendered image.
 - `camera::Camera`: a [`Camera`](@ref) holding the observer informations.

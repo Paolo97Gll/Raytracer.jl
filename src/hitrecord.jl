@@ -10,7 +10,7 @@
 
 A struct representing the result of an intersection between a [`Ray`](@ref) and a [`Shape`](@ref).
 
-# Members
+# Fields
 
 - `world_point::Point`: a [`Point`](@ref) representing the world coordinates of the hit point.
 - `normal::Normal`: a [`Normal`](@ref) representing the orientation of the normal to the surface where the hit happened.

@@ -28,7 +28,7 @@ A basic bichrome [`Renderer`](@ref) that checks whether a [`Ray`](@ref) has coll
 
 This renderer returns its field `off_color` when the given `Ray` is `nothing`, else it returns its field `on_color`.
 
-# Members
+# Fields
 
 - `world::World`: the [`World`](@ref) to render.
 - `on_color::RGB{Float32}`: color if the ray collide.
@@ -79,7 +79,7 @@ This renderer returns the color stored in the `material` field of the [`Shape`](
 To this renderer there is no difference between radiated light and reflected color. There are no shades, diffusions or reflections.
 If there are no hits this renderer returns the value of its field `background_color`.
 
-# Members
+# Fields
 
 - `world::World`: the [`World`](@ref) to render.
 - `background_color::RGB{Float32}`: color if the ray do not collide.
@@ -123,7 +123,7 @@ end
 
 A path-tracing [`Renderer`](@ref) that considers the optical path of a [`Ray`](@ref) from the observer to a light source.
 
-# Members
+# Fields
 
 - `world::World`: the [`World`](@ref) to render.
 - `background_color::RGB{Float32}`: color if the ray do not collide.
@@ -224,7 +224,7 @@ end
 
 Point-light tracing [`Renderer`](@ref). This renderer is similar to what POV-Ray provides by default.
 
-# Members
+# Fields
 
 - `world::World`: the [`World`](@ref) to render.
 - `lights::Lights`: a [`Lights`](@ref) instance that contain a list of lights.

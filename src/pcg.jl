@@ -11,7 +11,7 @@
 Random number generator that implement the Permuted Congruential Generator, a simple fast space-efficient
 statistically good algorithms for random number generation. See [O'Neill (2014)](https://www.pcg-random.org/paper.html).
 
-# Members
+# Fields
 
 - `state::UInt64`: the state of the generator.
 - `inc::UInt64`: sequence identifier.

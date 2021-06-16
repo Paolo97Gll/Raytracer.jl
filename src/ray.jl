@@ -10,7 +10,7 @@
 
 A ray of light propagating in space.
 
-# Members
+# Fields
 
 - `origin::Point`: the ([`Point`](@ref)) where the ray originated.
 - `dir::Vec`: a ([`Vec`](@ref)) representing the direction along which this ray propagates.

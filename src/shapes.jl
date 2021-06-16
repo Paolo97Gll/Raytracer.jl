@@ -36,7 +36,7 @@ A [`Shape`](@ref) representing a sphere.
 
 This is a unitary sphere centered in the origin. A generic sphere can be specified by applying a [`Transformation`](@ref).
 
-# Members
+# Fields
 
 - `transformation::Transformation`: the `Transformation` associated with the sphere.
 - `material::Material`: the [`Material`](@ref) of the spere.
@@ -127,7 +127,7 @@ end
 
 A [`Shape`](@ref) representing an infinite plane.
 
-# Members
+# Fields
 
 - `transformation::Transformation`: the `Transformation` associated with the plane.
 - `material::Material`: the [`Material`](@ref) of the spere.

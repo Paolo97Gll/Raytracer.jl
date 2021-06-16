@@ -12,7 +12,7 @@ A point light (used by [`PointLightRenderer`](@ref)).
 
 This type holds information about a point light.
 
-# Members
+# Fields
 
 - `position::Point`: a [`Point`](@ref) object holding the position of the point light in 3D space.
 - `color::RGB{Float32}`: the color of the point light.

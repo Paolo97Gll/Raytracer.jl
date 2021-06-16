@@ -13,7 +13,7 @@ A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref
 A 4x4 matrix is needed to use the properties of homogeneous coordinates in 3D space. Storing the inverse of the transformation
 significantly increases performance at the cost of memory space.
 
-# Members
+# Fields
 
 - `m::SMatrix{4, 4, Float32}`: the homogeneous matrix representation of the transformation.
 - `invm::SMatrix{4, 4, Float32}`: the homogeneous matrix representation of the inverse transformation.
