@@ -44,3 +44,20 @@ Check if `c` is in a partucular set of characters used in a SceneLang script.
 issymbol(c::Char) = c ∈ "()<>[],*"
 
 const valid_operations = (:+, :-, :*, :/, :%, :div, :^)
+
+"""
+    isvalid(expr::Expr, str_len::Int)
+
+Return `true` if the given expression is valid in a SceneLang script, else throw an appropriate exception.
+"""
+function isvalid(expr::Expr, str_len::Int)
+    expr.head == :call || 
+        throw(GrammarException(token_location, "Invalid mathematical expression: expression head is not a call", str_len + 1))
+    expr.args[begin] ∈ valid_operations || 
+        throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), str_len + 1))
+    (invalid = findfirst(arg -> !isa(arg, Union{Integer, AbstractFloat, Expr, Symbol}), expr.args[begin + 1:end])) |> isnothing || 
+        throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", str_len + 1))
+    
+    return all(arg -> (isa(arg, Expr) ? isvalid(arg, str_len) : true), expr.args[begin + 1:end])
+end
+

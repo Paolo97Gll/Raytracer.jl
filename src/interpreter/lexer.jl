@@ -171,19 +171,8 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
         str *= ch
     end
 
-    function isvalid(expr::Expr)
-        expr.head == :call || 
-            throw(GrammarException(token_location, "Invalid mathematical expression: expression head is not a call", length(str) + 1))
-        expr.args[begin] ∈ valid_operations || 
-            throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), length(str) + 1))
-        (invalid = findfirst(arg -> !isa(arg, Union{Integer, AbstractFloat, Expr, Symbol}), expr.args[begin + 1:end])) |> isnothing || 
-            throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", length(str) + 1))
-      
-        return all(arg -> (isa(arg, Expr) ? isvalid(arg) : true), expr.args[begin + 1:end])
-    end
-
     expr = Meta.parse(str)
-    isvalid(expr)
+    isvalid(expr, length(str))
     return Token(token_location, MathExpression(expr), length(str))
 end
 
