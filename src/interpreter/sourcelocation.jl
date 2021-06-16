@@ -9,12 +9,30 @@
     SourceLocation
 
 Represents a position in a file at a certain line and column.
+
+# Fields
+
+- `file_name::String`: the input file name
+- `line_num::Int`: line position
+- `col_num::Int`: column position
 """
 Base.@kwdef mutable struct SourceLocation
     file_name::String = ""
     line_num::Int = 1
     col_num::Int = 0
 end
+
+@doc """
+    SourceLocation(file_name::String, line_num::Int, col_num::Int)
+
+Constructor for a [`SourceLocation`](@ref) instance.
+""" SourceLocation(::String, ::Int, ::Int)
+
+@doc """
+    SourceLocation(; file_name::String = "", line_num::Int = 1, col_num::Int = 0)
+
+Constructor for a [`SourceLocation`](@ref) instance.
+""" SourceLocation(; ::String, ::Int, ::Int)
 
 function Base.show(io::IO, ::MIME"text/plain", loc::SourceLocation)
     print(io, abspath(loc.file_name), ":", loc.line_num, ":", loc.col_num)

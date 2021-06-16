@@ -13,27 +13,29 @@ Type wrapping the `IOStream` from the source code of a SceneLang script.
 # Fields
 
 - `stream::IOStream`: IO stream from the source code
-- `location::SourceLocation`: keeps track of the reading position in the source file
+- `location::SourceLocation`: a [`SourceLocation`](@ref) that keeps track of the reading position in the source file
 - `saved_char::Union{Char, Nothing}`: stores a character from [`unread_char!`](@ref) or nothing
-- `saved_location::SourceLocation`: the previous reading position
+- `saved_location::SourceLocation`: a [`SourceLocation`](@ref) storing the previous reading position
+- `saved_token::Union{Token, Nothing}`: stores an unreaded [`Token`](@ref)
 - `tabulations::Int`: how many columns a `<tab>` charachter is worth
-
 """
 mutable struct InputStream
     stream::IOStream
     location::SourceLocation
     saved_char::Union{Char, Nothing}
     saved_location::SourceLocation
+    saved_token::Union{Token, Nothing}
     tabulations::Int
 
     """
-        InputStream(stream, file_name; tabulations = 8)
+        InputStream(stream::IOStream, file_name::String; tabulations::Int = 8)
 
-    Construct an instance of [`InputStream`](@ref).
+    Construct an instance of [`InputStream`](@ref) with location at the beginning of the file and initialize
+    `saved_char` and `saved_token` to `nothing`.
     """
     function InputStream(stream::IOStream, file_name::String; tabulations::Int = 8)
         loc = SourceLocation(file_name=file_name)
-        new(stream, loc, nothing, loc, tabulations)
+        new(stream, loc, nothing, loc, nothing, tabulations)
     end
 end
 
@@ -44,7 +46,7 @@ end
 Base.IteratorSize(::Type{InputStream}) = Base.SizeUnknown()
 
 """
-    open_stream(f, file_name; tabulations = 8)
+    open_stream(f::Function, file_name::String; tabulations::Int = 8)
 
 Open read-only a file named `file_name` as an [`InputStream`](@ref) and apply `f` to it.
 """
