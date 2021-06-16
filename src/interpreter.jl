@@ -15,7 +15,7 @@ import Base:
 export # Interpreter
     SourceLocation,
     TokenValue,
-        Keyword, Identifier, LiteralString, LiteralNumber, StopToken,
+        Keyword, Identifier, LiteralString, LiteralNumber, LiteralSymbol, MathExpression, StopToken,
     Token,
     InputStream,
         open_stream,
@@ -36,10 +36,5 @@ include(joinpath(interpreter_dir, "utilities.jl"))
 include(joinpath(interpreter_dir, "inputstream.jl"))
 include(joinpath(interpreter_dir, "lexer.jl"))
 
-for instance ∈ Symbol.(instances(Keyword))
-    quote
-        export $instance
-    end |> eval
-end
 
 end # module

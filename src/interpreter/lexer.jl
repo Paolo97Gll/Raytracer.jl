@@ -122,11 +122,11 @@ function _parse_number_token(stream::InputStream, first_char::Char, token_locati
 end
 
 """
-    _parse_keyword_or_identifier_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+    _parse_keyword_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
 
-Parse the stream into a [`Token`](@ref) with [`Keyword`](@ref) or [`Identifier`](@ref) value.
+Parse the stream into a [`Token`](@ref) with [`Keyword`](@ref) value.
 """
-function _parse_keyword_or_identifier_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+function _parse_keyword_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
     str = first_char |> string
     while true
         ch = read_char!(stream)
@@ -137,10 +137,54 @@ function _parse_keyword_or_identifier_token(stream::InputStream, first_char::Cha
     end
 
     sym = Symbol(str)
-    keywords = instances(Keyword) .|> Symbol
-    (index = findfirst(s -> s == sym, keywords)) |> isnothing ?
-        Token(token_location, Identifier(sym), length(str)) :
-        Token(token_location, Keyword(index), length(str))
+    Token(token_location, Keyword(sym), length(str))
+end
+
+"""
+    _parse_identifier_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+
+Parse the stream into a [`Token`](@ref) with [`Identifier`](@ref) value.
+"""
+function _parse_identifier_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+    str = first_char |> string
+    while true
+        ch = read_char!(stream)
+        # Note that here we do not call "isalpha" but "isalnum": digits are ok after the first character
+        !isnothing(ch) && (isdigit(ch) || isletter(ch) || ch == '_') || (unread_char!(stream, ch); break)
+
+        str *= ch
+    end
+
+    sym = Symbol(str)
+    Token(token_location, Identifier(sym), length(str))
+end
+
+function _parse_math_expression_token(stream::InputStream, token_location::SourceLocation)
+    str = ""
+    while true
+        ch = read_char!(stream)
+
+        ch == '$' && break
+
+        (isnothing(ch) || isnewline(ch)) && throw(GrammarException(token_location, "Unterminated mathematical expression", length(str) + 1))
+
+        str *= ch
+    end
+
+    function isvalid(expr::Expr)
+        expr.head == :call || 
+            throw(GrammarException(token_location, "Invalid mathematical expression: expression head is not a call", length(str) + 1))
+        expr.args[begin] ∈ valid_operations || 
+            throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), length(str) + 1))
+        (invalid = findfirst(arg -> !isa(arg, Union{Integer, AbstractFloat, Expr, Symbol}), expr.args[begin + 1:end])) |> isnothing || 
+            throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", length(str) + 1))
+      
+        return all(arg -> (isa(arg, Expr) ? isvalid(arg) : true), expr.args[begin + 1:end])
+    end
+
+    expr = Meta.parse(str)
+    isvalid(expr)
+    return Token(token_location, MathExpression(expr), length(str))
 end
 
 """
@@ -163,21 +207,29 @@ function read_token(stream::InputStream)
     # we save the position in the stream
     token_location = copy(stream.location)
 
+    # Check if we got some non ASCII character
+    isascii(ch) || throw(GrammarException(stream.location, "Invalid character $ch: only ASCII charachters are supported"))
+
     if issymbol(ch)
         # One-character symbol, like '(' or ','
-        return Token(token_location, Symbol(ch), 1)
+        return Token(token_location, LiteralSymbol(Symbol(ch)), 1)
     elseif ch == '"'
         # A literal string (used for file names)
         return _parse_string_token(stream, token_location)
+    elseif ch == '$'
+        # A math expression
+        return _parse_math_expression_token(stream, token_location)
     elseif isdigit(ch) || ch ∈ ('+', '-', '.')
         # A floating-point number
         return _parse_number_token(stream, ch, token_location)
-    elseif isletter(ch) || ch == '_'
-        # Since it begins with an alphabetic character, it must either be a keyword
-        # or a identifier
-        return _parse_keyword_or_identifier_token(stream, ch, token_location)
+    elseif isuppercase(ch)
+        # Since it begins with an uppercase letter, it must keyword
+        return _parse_keyword_token(stream, ch, token_location)
+    elseif islowercase(ch) || ch == '_'
+        # Since it begins with a lowercase letter, it must be an identifier
+        return _parse_identifier_token(stream, ch, token_location)
     else
-        # We got some weird character, like '@` or `&`
+        # We got some weird ASCII character, like '@` or `&`
         throw(GrammarException(stream.location, "Invalid character $ch"))
     end
 end

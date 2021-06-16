@@ -6,20 +6,18 @@ using Base: Symbol
 # Token implementation
 
 
-@enum Keyword begin
-    SPAWN = 1
-    DESPAWN
-end
-
-@doc """
+"""
     Keyword
 
-Enum type listing all keywords of SceneLang.
+Type wrapping a `Symbol` representing a command or type in a SceneLangscript.
 
-# Instances
+# Fields
 
-$(join( "- `" .* repr.(instances(Keyword)) .* "`", "\n"))
-""" Keyword
+- `value::Symbol`: the value of the token
+""" 
+struct Keyword
+    value::Symbol
+end
 
 """
     Identifier
@@ -74,6 +72,19 @@ struct LiteralSymbol
 end
 
 """
+    MathExpression
+
+Type wrapping a `Expr` representing a mathematical expression in a SceneLang script.
+
+# Fields
+
+- `value::Expr`: the value of the token
+"""
+struct MathExpression
+    value::Expr
+end
+
+"""
     StopToken
 
 Convenience empty type to help identify the end of a SceneLang script.
@@ -105,7 +116,7 @@ Union of all types that can be used as token values while interpreting a SceneLa
 - [`StopToken`](@ref)
 
 """
-const TokenValue = Union{Keyword, Identifier, LiteralString, LiteralNumber, LiteralSymbol, StopToken}
+const TokenValue = Union{Keyword, Identifier, MathExpression, LiteralString, LiteralNumber, LiteralSymbol, StopToken}
 
 """
     Token
