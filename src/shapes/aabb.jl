@@ -7,7 +7,7 @@
 
 
 """
-    struct AABB
+    AABB
 
 A type representing an Axis-Aligned Bounding Box.
 """
@@ -25,7 +25,7 @@ function get_t(ray::Ray, aabb::AABB)
     dir = ray.dir
     o = ray.origin
     overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
-    isempty(overlap) && return Inf32 
+    isempty(overlap) && return Inf32
     t1, t2 = overlap.first, overlap.last
     ray.tmin < t1 < ray.tmax && return t1
     ray.tmin < t2 < ray.tmax && return t2

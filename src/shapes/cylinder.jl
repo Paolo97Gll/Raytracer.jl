@@ -6,7 +6,7 @@
 # Cylinder
 
 """
-    struct Cylinder <: SimpleShape
+    Cylinder <: SimpleShape
 
 A [`SimpleShape`](@ref) representing a cylinder of unitary height and diameter.
 
@@ -56,7 +56,7 @@ function get_t(::Type{Cylinder}, ray::Ray)
 
     # check if caps are hit
     tz1, tz2 = minmax(( 1f0 - oz) / dz, (-1f0 - oz) / dz)
-    
+
     ray.tmin < tz1 < ray.tmax && (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= 1f0 && return tz1
     ray.tmin < tz2 < ray.tmax && (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <= 1f0 && return tz2
     return Inf32
@@ -88,12 +88,12 @@ function get_all_ts(::Type{Cylinder}, ray::Ray)
 
     # check if caps are hit
     tz1, tz2 = minmax(( 1f0 - oz) / dz, (-1f0 - oz) / dz)
-    
+
     # ⪅(x::Number, y::Number) = x < y || x ≈ y
     # (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 ⪅ 1f0 && push!(res, tz1)
     # length(res) == 2 && return res
     # (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 ⪅ 1f0 && push!(res, tz2)
-    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2" 
+    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2"
     proj_height1, proj_height2 = (ox .+ (tz1, tz2) .* dx) .^ 2 .+ (oy .+ (tz1, tz2) .* dy) .^ 2 .|> x -> (x < 1f0 || x ≈ 1f0)
     if length(res) == 1
         if proj_height1
@@ -105,7 +105,7 @@ function get_all_ts(::Type{Cylinder}, ray::Ray)
     elseif proj_height1 && proj_height2
         res = [tz1, tz2]
     end
-    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2" 
+    # @assert (length(res) == 2 || length(res) == 0) "This cylinder does not have an entrance and an exit!\n\tres: $res\n\ttz1: $tz1\ttz2: $tz2"
     return res
 end
 

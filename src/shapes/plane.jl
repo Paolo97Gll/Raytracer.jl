@@ -7,7 +7,7 @@
 
 
 """
-    struct Plane <: SimpleShape
+    Plane <: SimpleShape
 
 A [`SimpleShape`](@ref) representing an infinite plane.
 

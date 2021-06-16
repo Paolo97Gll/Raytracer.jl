@@ -1,3 +1,3 @@
-# ScieneLang
+# SceneLang
 
 Coming soon!

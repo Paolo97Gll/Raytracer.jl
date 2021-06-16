@@ -6,7 +6,7 @@
 
 
 """
-    struct Transformation
+    Transformation
 
 A wrapper around two 4x4 matrices representing a transformation for [`Vec`](@ref), [`Normal`](@ref), and [`Point`](@ref) instances.
 
@@ -224,7 +224,7 @@ let rotation_matrices = Dict(
     let docmsg = (ax, mat) -> """
             rotation$ax(θ::Real)
 
-        Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle around the $ax-axis.
+        Return a [`Transformation`](@ref) that rotates a 3D vector field of the given angle in radians around the $ax-axis.
 
         If an `AbstractVector` is provided as argument it must have a `size = (3,)`.
 

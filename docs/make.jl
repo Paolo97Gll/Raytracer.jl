@@ -10,6 +10,7 @@ push!(LOAD_PATH, "../src/")
 
 using Pkg
 Pkg.activate(normpath(@__DIR__))
+# Pkg.activate(normpath(joinpath(@__DIR__, "..")))
 
 using Documenter, Raytracer
 
@@ -19,11 +20,11 @@ makedocs(
     pages = [
         "Introduction" => "index.md",
         "Quickstart" => [
-            "Basic ScieneLang usage" => "quickstart/scienelang.md",
+            "Basic SceneLang usage" => "quickstart/scenelang.md",
             "Basic CLI usage" => "quickstart/cli.md",
             "Basic API usage" => "quickstart/api.md"
         ],
-        "ScieneLang" => "scienelang.md",
+        "SceneLang" => "scenelang.md",
         "CLI tool" => "cli.md",
         "API" => [
             "High-level API" => "api/high-level.md",
@@ -37,5 +38,6 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/Paolo97Gll/Raytracer.jl.git"
+    repo = "github.com/Paolo97Gll/Raytracer.jl.git",
+    push_preview = true
 )

@@ -40,7 +40,7 @@ See also: [`CSG`](@ref).
 end
 
 """
-    struct CSG{R} <: Shape
+    CSG{R} <: CompositeShape
 
 A [`Shape`](@ref) representing a Constructive Solid Geometry tree.
 
@@ -192,7 +192,7 @@ Construct a [`FusionCSG`](@ref) binary tree, by recursively calling [`intersect`
 function fuse(s::Shape, ss::Shape...)
     fuse(fuse(s, ss[begin:end ÷ 2]...), fuse(ss[end ÷ 2 + 1:end]...))
 end
-    
+
 function fuse(s1::Shape, s2::Shape, s3::Shape)
     fuse(fuse(s1, s2), s3)
 end
@@ -261,9 +261,9 @@ end
 function get_all_ts(csg::IntersectionCSG, ray::Ray)
     inv_ray = inv(csg.transformation) * ray
     r_ts = get_all_ts(csg.rbranch, inv_ray)
-    isempty(r_ts) && return Vector{Float32}() 
+    isempty(r_ts) && return Vector{Float32}()
     l_ts = get_all_ts(csg.lbranch, inv_ray)
-    isempty(l_ts) && return Vector{Float32}() 
+    isempty(l_ts) && return Vector{Float32}()
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∈ l_intervals), r_ts)
@@ -339,7 +339,7 @@ function all_ray_intersections(ray::Ray, csg::FusionCSG)
     r_hits = all_ray_intersections(inv_ray, csg.rbranch)
     l_hits = all_ray_intersections(inv_ray, csg.lbranch)
     isempty(r_hits) && return l_hits
-    isempty(l_hits) && return r_hits 
+    isempty(l_hits) && return r_hits
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
     r_filter = filter(hit -> any(Ref(hit) .∉ l_intervals), r_hits)
@@ -354,7 +354,7 @@ function quick_ray_intersection(ray::Ray, csg::FusionCSG)
     r_ts = get_all_ts(csg.rbranch, inv_ray)
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return !isempty(l_ts)
-    isempty(l_ts) && return true 
+    isempty(l_ts) && return true
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     any(t -> any(t .∉ l_intervals), r_ts) ||
@@ -366,7 +366,7 @@ function get_all_ts(csg::FusionCSG, ray::Ray)
     r_ts = get_all_ts(csg.rbranch, inv_ray)
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(r_ts) && return l_ts
-    isempty(l_ts) && return r_ts 
+    isempty(l_ts) && return r_ts
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∉ l_intervals), r_ts)

@@ -4,6 +4,7 @@
 
 # Implementation of the abstract type Shape and the derivative concrete types
 
+
 ########
 # Shape
 #
@@ -19,12 +20,13 @@
 # For more informations on these functions consult the documentation.
 #
 
+
 """
     Shape
 
 An abstract type representing a shape.
 
-See also: [`Sphere`](@ref), [`Plane`](@ref)
+See also: [`SimpleShape`](@ref), [`CompositeShape`](@ref),
 """
 abstract type Shape end
 
@@ -63,11 +65,12 @@ Return whether the ray intersects the given [`Shape`](@ref).
 Return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), even outside of the ray domain.
 """ get_all_ts(::Shape, ::Ray)
 
+
 ##############
 # SimpleShape
 #
 # All functions in this section that are documented using the `@doc` macro must be have methods
-# for any new subtype of `SimpleShape` to work in the current code setup, on top of the functions 
+# for any new subtype of `SimpleShape` to work in the current code setup, on top of the functions
 # required to be a subtype of `Shape`.
 # A list of the necessary methods for a `NewShape` to qualify as a `SimpleShape` includes:
 #
@@ -79,15 +82,16 @@ Return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), ev
 # For more informations on these functions consult the documentation.
 #
 
+
 """
     SimpleShape <: Shape
 
-Abstract type representing shapes that can be represented as transformed unitary shapes.
+Abstract type representing a [`Shape`](@ref) that can be represented as transformed unitary shapes.
 
-An example of simple shape is the parallelepiped: every instance of this shape can be transformed back into a cube of unitary size. 
+An example of simple shape is the parallelepiped: every instance of this shape can be transformed back into a cube of unitary size.
 Therefore, these shapes are univocally determined by their type (e.g. a cuboid) and the transformation that morphs the unitary shape in the desired shape.
 
-See also: [`Shape`](@ref), [`Transformation`](@ref)
+See also: [`Cone`](@ref), [`Cube`](@ref), [`Cylinder`](@ref), [`Plane`](@ref), [`Sphere`](@ref)
 """
 abstract type SimpleShape <: Shape end
 
@@ -108,22 +112,34 @@ end
 Return a `Vector` of the hit parameter `t` against the unitary shape of the given [`SimpleShape`](@ref) type, even outside of the ray domain.
 """ get_all_ts(::Type{<:SimpleShape}, ::Ray)
 
-function get_all_ts(s::S, ray::Ray) where {S <: SimpleShape} 
+function get_all_ts(s::S, ray::Ray) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
     get_all_ts(S, inv_ray)
 end
 
+"""
+    ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
+
+Return an [`HitRecord`](@ref) of the nearest [`Ray`](@ref) intersection with the given [`SimpleShape`](@ref).
+If none exists, return `nothing`.
+"""
 function ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
     t = get_t(S, inv_ray)
     isfinite(t) || return nothing
     hit_point = inv_ray(t)
     world_point = s.transformation * hit_point
-    normal = s.transformation * get_normal(S, hit_point, inv_ray) 
+    normal = s.transformation * get_normal(S, hit_point, inv_ray)
     surface_point = get_uv(S, hit_point)
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
 
+"""
+    all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
+
+Return a vector of [`HitRecord`](@ref) with all the [`Ray`](@ref) intersections with the given [`SimpleShape`](@ref).
+If none exists, return an empty vector.
+"""
 function all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
     inv_ray = Ray(inv_ray.origin, inv_ray.dir, -Inf32, Inf32, 0)
@@ -131,28 +147,40 @@ function all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
     isempty(ts) && return Vector{HitRecord}()
     hit_points = inv_ray.(ts)
     world_points = Ref(s.transformation) .* hit_points
-    normals = Ref(s.transformation) .* get_normal.(S, hit_points, Ref(inv_ray)) 
+    normals = Ref(s.transformation) .* get_normal.(S, hit_points, Ref(inv_ray))
     surface_points = get_uv.(S, hit_points)
     HitRecord.(world_points, normals, surface_points, ts, Ref(ray), Ref(s.material))
 end
 
+"""
+    quick_ray_intersection(ray::Ray, s::SimpleShape)
+
+Tells if a [`Ray`](@ref) intersect a [`SimpleShape`](@ref) or not.
+"""
 function quick_ray_intersection(ray::Ray, s::SimpleShape)
     isfinite(get_t(s, ray))
 end
 
+
 #################
 # CompositeShape
+
 
 """
     CompositeShape <: Shape
 
-Abstract type representing shapes composed of other shapes.
+Abstract type representing a [`Shape`](@ref) composed of other shapes.
 
-These shapes cannot be easily described as transformed versions of a unitary shape, and so they differ from [`SimpleShapes`](@ref) under many aspects.
+These shapes cannot be easily described as transformed versions of a unitary shape, and so they differ from [`SimpleShape`](@ref) under many aspects.
 
-See also: [`Shape`](@ref), [`Transformation`](@ref)
+See also: [`CSG`](@ref)
 """
 abstract type CompositeShape <: Shape end
+
+
+###########
+# Includes
+
 
 let shapesdir = "shapes"
     # Bounding boxes

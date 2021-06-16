@@ -1,6 +1,8 @@
 # Changelog Raytracer.jl
 
-## HEAD
+## v0.2.1
+
+- Improve documentation.
 
 ## v0.2.0
 

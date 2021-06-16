@@ -6,7 +6,7 @@
 # Sphere
 
 """
-    struct Sphere <: SimpleShape
+    Sphere <: SimpleShape
 
 A [`SimpleShape`](@ref) representing a sphere.
 
