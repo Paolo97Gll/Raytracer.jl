@@ -80,7 +80,7 @@ Pages   = ["hitrecord.jl", "shapes.jl", "world.jl"]
 ```@autodocs
 Modules = [Raytracer]
 Private = false
-Pages   = ["shapes/cone.jl", "shapes/cube.jl", "shapes/cylinder.jl", "shapes/plane.jl", "shapes/sphere.jl"]
+Pages   = ["shapes/cube.jl", "shapes/cylinder.jl", "shapes/plane.jl", "shapes/sphere.jl"]
 ```
 
 ### Composite shapes
