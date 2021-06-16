@@ -17,12 +17,15 @@ module Raytracer
 # Imports
 
 
+using Intervals: minimum, isfinite
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
     axes, clamp, convert, eltype, fill!, firstindex, getindex, iterate,
     lastindex, length, one, print_matrix, rand, read, readline, setindex!, show,
-    size, write, zero
+    size, write, zero,
+    union, intersect, setdiff,
+    isless, isequal
 
 import Base.Broadcast:
     BroadcastStyle, Broadcasted, Style,
@@ -70,6 +73,7 @@ export # Rendering
         fire_all_rays!,
     Ray,
     HitRecord,
+        HitOrMiss,
     Pigment,
         UniformPigment,
         CheckeredPigment,
@@ -99,9 +103,20 @@ export # Scene
         rotationX, rotationY, rotationZ,
         scaling, translation,
     Shape,
-        Sphere, Plane,
-        ray_intersection,
-        quick_ray_intersection,
+        Sphere, Plane, Cube, Cylinder, Cone,
+        CSG, 
+            UnionCSG, 
+            IntersectionCSG, 
+            DiffCSG,
+            FusionCSG,
+        fuse,
+        Rule,
+            UniteRule,
+            IntersectRule,
+            DiffRule,
+            FuseRule,
+        get_t, get_all_ts, get_uv, get_normal,
+        ray_intersection, all_ray_intersections, quick_ray_intersection,
     World,
         is_point_visible,
     PointLight,

@@ -28,6 +28,13 @@ struct HitRecord
     material::Material
 end
 
+"""
+    HitOrMiss
+
+Alias for `Union{HitRecord, Nothing}`.
+"""
+const HitOrMiss = Union{HitRecord, Nothing}
+
 function show(io::IO, ::MIME"text/plain", hr::T) where {T <: HitRecord}
     print(io, T)
     fns = fieldnames(T)
@@ -51,4 +58,12 @@ function (≈)(hr1::HitRecord, hr2::HitRecord)
     filter(!isnan, sp1) ≈  filter(!isnan, sp2) &&
     hr1.t               ≈  hr2.t               &&
     hr1.ray             ≈  hr2.ray
+end
+
+function Base.isless(hr1::HitRecord, hr2::HitRecord)
+    hr1.t/norm(hr1.ray.dir) < hr2.t/norm(hr2.ray.dir)
+end
+
+function Base.isequal(hr1::HitRecord, hr2::HitRecord)
+    hr1.t/norm(hr1.ray.dir) == hr2.t/norm(hr2.ray.dir)
 end

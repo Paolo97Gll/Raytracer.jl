@@ -10,6 +10,7 @@ push!(LOAD_PATH, "../src/")
 
 using Pkg
 Pkg.activate(normpath(@__DIR__))
+# Pkg.activate(normpath(joinpath(@__DIR__, "..")))
 
 using Documenter, Raytracer
 

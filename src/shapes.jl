@@ -5,12 +5,28 @@
 # Implementation of the abstract type Shape and the derivative concrete types
 
 
+########
+# Shape
+#
+# All functions in this section that are documented using the `@doc` macro must be have methods
+# for any new subtype of `Shape` to work in the current code setup.
+# A list of the necessary methods for a `NewShape` to qualify as a `Shape` includes:
+#
+# - ray_intersection(::Ray, ::NewShape)
+# - all_ray_intersections(::Ray, ::NewShape)
+# - quick_ray_intersection(::Ray, ::NewShape)
+# - get_all_ts(::NewShape, ::Ray)
+#
+# For more informations on these functions consult the documentation.
+#
+
+
 """
     Shape
 
 An abstract type representing a shape.
 
-See also: [`Sphere`](@ref), [`Plane`](@ref)
+See also: [`SimpleShape`](@ref), [`CompositeShape`](@ref),
 """
 abstract type Shape end
 
@@ -24,187 +40,159 @@ function show(io::IO, ::MIME"text/plain", s::T) where {T <: Shape}
     end
 end
 
+@doc """
+    ray_intersection(ray, s)
 
-#########
-# Sphere
+Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
+if none exists, return `nothing`.
+""" ray_intersection(::Ray, ::Shape)
+
+@doc """
+    all_ray_intersections(ray, s)
+
+Return a `Vector` of [`HitRecord`](@ref)s of all the ray intersections with the given [`Shape`](@ref) for every finite value of `t`, even outside of the ray domain.
+""" all_ray_intersections(::Ray, ::Shape)
+
+@doc """
+    quick_ray_intersection(ray, s)
+
+Return whether the ray intersects the given [`Shape`](@ref).
+""" quick_ray_intersection(::Ray, ::Shape)
+
+@doc """
+    get_all_ts(s::Shape, ray::Ray)
+
+Return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), even outside of the ray domain.
+""" get_all_ts(::Shape, ::Ray)
+
+
+##############
+# SimpleShape
+#
+# All functions in this section that are documented using the `@doc` macro must be have methods
+# for any new subtype of `SimpleShape` to work in the current code setup, on top of the functions
+# required to be a subtype of `Shape`.
+# A list of the necessary methods for a `NewShape` to qualify as a `SimpleShape` includes:
+#
+# - get_t(::Type{NewShape}, ::Ray)
+# - get_all_ts(::Type{NewShape}, ::Ray)
+# - get_normal(::Type{NewShape}, ::Point, ::Ray)
+# - get_uv(::Type{NewShape}, ::Point)
+#
+# For more informations on these functions consult the documentation.
+#
 
 
 """
-    Sphere <: Shape
+    SimpleShape <: Shape
 
-A [`Shape`](@ref) representing a sphere.
+Abstract type representing a [`Shape`](@ref) that can be represented as transformed unitary shapes.
 
-This is a unitary sphere centered in the origin. A generic sphere can be specified by applying a [`Transformation`](@ref).
+An example of simple shape is the parallelepiped: every instance of this shape can be transformed back into a cube of unitary size.
+Therefore, these shapes are univocally determined by their type (e.g. a cuboid) and the transformation that morphs the unitary shape in the desired shape.
 
-# Members
-
-- `transformation::Transformation`: the `Transformation` associated with the sphere.
-- `material::Material`: the [`Material`](@ref) of the spere.
-
-See also: [`ray_intersection(::Ray, ::Sphere)`](@ref)
+See also: [`Cone`](@ref), [`Cube`](@ref), [`Cylinder`](@ref), [`Plane`](@ref), [`Sphere`](@ref)
 """
-Base.@kwdef struct Sphere <: Shape
-    transformation::Transformation = Transformation()
-    material::Material = Material()
+abstract type SimpleShape <: Shape end
+
+@doc """
+    get_t(::Type{<:SimpleShape}, ray::Ray)
+
+Return the parameter `t` at which [`Ray`](@ref) first hits the unitary [`SimpleShape`](@ref). If no hit exists, return `Inf32`.
+""" get_t(::Type{<:SimpleShape}, ::Ray)
+
+function get_t(s::S, ray::Ray) where {S <: SimpleShape}
+    inv_ray = inv(s.transformation) * ray
+    get_t(S, inv_ray)
 end
 
 @doc """
-    Sphere(transformation::Transformation, material::Material)
+    get_all_ts(::Type{<:SimpleShape}, ray::Ray)
 
-Constructor for a [`Sphere`](@ref) instance.
-""" Sphere(::Transformation, ::Material)
+Return a `Vector` of the hit parameter `t` against the unitary shape of the given [`SimpleShape`](@ref) type, even outside of the ray domain.
+""" get_all_ts(::Type{<:SimpleShape}, ::Ray)
 
-@doc """
-    Sphere(transformation::Transformation = Transformation(),
-           material::Material = Material())
-
-Constructor for a [`Sphere`](@ref) instance.
-""" Sphere(; ::Transformation, ::Material)
+function get_all_ts(s::S, ray::Ray) where {S <: SimpleShape}
+    inv_ray = inv(s.transformation) * ray
+    get_all_ts(S, inv_ray)
+end
 
 """
-    ray_intersection(ray::Ray, s::Sphere)
+    ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
 
-Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Sphere`](@ref).
-
+Return an [`HitRecord`](@ref) of the nearest [`Ray`](@ref) intersection with the given [`SimpleShape`](@ref).
 If none exists, return `nothing`.
 """
-function ray_intersection(ray::Ray, s::Sphere)
+function ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
-    # compute intersection
-    origin_vec = convert(Vec, inv_ray.origin)
-    a = norm²(inv_ray.dir)
-    b = 2f0 * origin_vec ⋅ inv_ray.dir
-    c = norm²(origin_vec) - 1f0
-    Δ = b^2 - 4f0 * a * c
-    Δ < 0f0 && return nothing
-    sqrt_Δ = sqrt(Δ)
-    t_1 = (-b - sqrt_Δ) / (2f0 * a)
-    t_2 = (-b + sqrt_Δ) / (2f0 * a)
-    # nearest point
-    if (t_1 > inv_ray.tmin) && (t_1 < inv_ray.tmax)
-        hit_t = t_1
-    elseif (t_2 > inv_ray.tmin) && (t_2 < inv_ray.tmax)
-        hit_t = t_2
-    else
-        return nothing
-    end
-    hit_point = inv_ray(hit_t)
-    # generate HitRecord
-    world_point = s.transformation * hit_point
-    normal = convert(Normal, hit_point)
-    normal = s.transformation * ((normal ⋅ ray.dir < 0f0) ? normal : -normal)
-    u = atan(hit_point[2], hit_point[1]) / (2f0 * π)
-    u = u >= 0f0 ? u : u+1f0
-    v = acos(clamp(hit_point[3], -1f0, 1f0)) / π
-    surface_point = Vec2D(u, v)
-    HitRecord(world_point, normal, surface_point, hit_t, ray, s.material)
-end
-
-"""
-    quick_ray_intersection(ray::Ray, s::Sphere)
-
-Tells if a [`Ray`](@ref) intersect a [`Sphere`](@ref) or not.
-"""
-function quick_ray_intersection(ray::Ray, s::Sphere)
-    inv_ray = inv(s.transformation) * ray
-    origin_vec = convert(Vec, inv_ray.origin)
-    a = norm²(inv_ray.dir)
-    b = 2f0 * origin_vec ⋅ inv_ray.dir
-    c = norm²(origin_vec) - 1f0
-    Δ = b^2 - 4f0 * a * c
-    Δ < 0f0 && return false
-    sqrt_Δ = sqrt(Δ)
-    (inv_ray.tmin < (-b-sqrt_Δ)/(2f0*a) < inv_ray.tmax) || (inv_ray.tmin < (-b+sqrt_Δ)/(2f0*a) < inv_ray.tmax)
-end
-
-
-########
-# Plane
-
-
-"""
-    Plane <: Shape
-
-A [`Shape`](@ref) representing an infinite plane.
-
-# Members
-
-- `transformation::Transformation`: the `Transformation` associated with the plane.
-- `material::Material`: the [`Material`](@ref) of the spere.
-
-See also: [`ray_intersection(::Ray, ::Plane)`](@ref)
-"""
-Base.@kwdef struct Plane <: Shape
-    transformation::Transformation = Transformation()
-    material::Material = Material()
-end
-
-@doc """
-    Plane(transformation::Transformation, material::Material)
-
-Constructor for a [`Plane`](@ref) instance.
-""" Plane(::Transformation, ::Material)
-
-@doc """
-    Plane(transformation::Transformation = Transformation(),
-           material::Material = Material())
-
-Constructor for a [`Plane`](@ref) instance.
-""" Plane(; ::Transformation, ::Material)
-
-"""
-    ray_intersection(ray::Ray, s::Plane)
-
-Return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Plane`](@ref).
-
-If none exists, return `nothing`.
-"""
-function ray_intersection(ray::Ray, s::Plane)
-    inv_ray = inv(s.transformation) * ray
-    abs(inv_ray.dir.z) < 1f-5 && return nothing
-    t = -inv_ray.origin.v[3] / inv_ray.dir.z
-    inv_ray.tmin < t < inv_ray.tmax || return nothing
+    t = get_t(S, inv_ray)
+    isfinite(t) || return nothing
     hit_point = inv_ray(t)
     world_point = s.transformation * hit_point
-    normal = -sign(inv_ray.dir.z) * NORMAL_Z
-    surface_point = hit_point.v[1:2] - floor.(hit_point.v[1:2]) |> Vec2D
+    normal = s.transformation * get_normal(S, hit_point, inv_ray)
+    surface_point = get_uv(S, hit_point)
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
 
 """
-    quick_ray_intersection(ray::Ray, s::Plane)
+    all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
 
-Tells if a [`Ray`](@ref) intersect a [`Plane`](@ref) or not.
+Return a vector of [`HitRecord`](@ref) with all the [`Ray`](@ref) intersections with the given [`SimpleShape`](@ref).
+If none exists, return an empty vector.
 """
-function quick_ray_intersection(ray::Ray, s::Plane)
+function all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
-    inv_ray.dir.z < 1f-5 && return false
-    inv_ray.tmin < (-inv_ray.origin.v[3] / inv_ray.dir.z) < inv_ray.tmax
-end
-
-
-#######
-# AABB
-
-
-"""
-    AABB
-
-A type representing an Axis-Aligned Bounding Box
-"""
-Base.@kwdef struct AABB
-    p_M::Point = Point(1f0, 1f0, 1f0)
-    p_m::Point = Point(0f0, 0f0, 0f0)
+    inv_ray = Ray(inv_ray.origin, inv_ray.dir, -Inf32, Inf32, 0)
+    ts = get_all_ts(S, inv_ray)
+    isempty(ts) && return Vector{HitRecord}()
+    hit_points = inv_ray.(ts)
+    world_points = Ref(s.transformation) .* hit_points
+    normals = Ref(s.transformation) .* get_normal.(S, hit_points, Ref(inv_ray))
+    surface_points = get_uv.(S, hit_points)
+    HitRecord.(world_points, normals, surface_points, ts, Ref(ray), Ref(s.material))
 end
 
 """
-    ray_intersection(ray::Ray, aabb::AABB)
+    quick_ray_intersection(ray::Ray, s::SimpleShape)
 
-Return the parameter `t` at which [`Ray`](@ref) first hits the [`AABB`](@ref). If no hit exists, return `Inf32`.
+Tells if a [`Ray`](@ref) intersect a [`SimpleShape`](@ref) or not.
 """
-function ray_intersection(ray::Ray, aabb::AABB)
-    dir = ray.dir
-    overlap = reduce(intersect, map(t -> Interval(t...), zip(-aabb.p_m.v ./ dir, -aabb.p_M.v ./ dir)))
-    isempty(overlap) && return Inf32
-    t = overlap.first
+function quick_ray_intersection(ray::Ray, s::SimpleShape)
+    isfinite(get_t(s, ray))
+end
+
+
+#################
+# CompositeShape
+
+
+"""
+    CompositeShape <: Shape
+
+Abstract type representing a [`Shape`](@ref) composed of other shapes.
+
+These shapes cannot be easily described as transformed versions of a unitary shape, and so they differ from [`SimpleShape`](@ref) under many aspects.
+
+See also: [`CSG`](@ref)
+"""
+abstract type CompositeShape <: Shape end
+
+
+###########
+# Includes
+
+
+let shapesdir = "shapes"
+    # Bounding boxes
+    include(joinpath(shapesdir, "aabb.jl"))
+
+    # Simple shapes
+    # include(joinpath(shapesdir, "cone.jl"))
+    include(joinpath(shapesdir, "cube.jl"))
+    include(joinpath(shapesdir, "cylinder.jl"))
+    include(joinpath(shapesdir, "plane.jl"))
+    include(joinpath(shapesdir, "sphere.jl"))
+
+    # Composite shapes
+    include(joinpath(shapesdir, "csg.jl"))
 end
