@@ -10,7 +10,7 @@ using Base:
     SizeUnknown
 
 using Raytracer:
-    ImageTracer, Renderer
+    ImageTracer, Renderer, Camera, HdrImage
 
 import Base:
     show, showerror, print, eof, copy, IteratorSize

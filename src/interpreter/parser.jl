@@ -12,26 +12,42 @@ Alias to `Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}`.
 
 Dictionary with all the variables read from a SceneLang script.
 """
-const IdTable = Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}
+const IdTable = Dict{Type{<:TokenValue}, Dict{Symbol, Token{TokenValue}}}
 
 const TableOrNot = Union{IdTable, Nothing}
-const TracerOrNot = Union{ImageTracer, Nothing}
+const CameraOrNot = Union{Camera, Nothing}
 const RendererOrNot = Union{Renderer, Nothing}
+const ImageOrNot = Union{HdrImage, Nothing}
 
 mutable struct Scene
     variables::TableOrNot
-	image_tracer::TracerOrNot
+    world::World
+    lights::Lights
+    image::ImageOrNot
+	camera::CameraOrNot
 	renderer::RendererOrNot
 end
 
-function Scene(; variables::TableOrNot = nothing, image_tracer::TracerOrNot = nothing, renderer::RendererOrNot = nothing)
-	Scene(variables, image_tracer, renderer)
+function Scene(; variables::TableOrNot = nothing, 
+                 world::World = World(), 
+                 lights::Lights = Lights(), 
+                 image::ImageOrNot = nothing, 
+                 camera::CameraOrNot = nothing, 
+                 renderer::RendererOrNot = nothing)
+	Scene(variables, world, lights, image, camera, renderer)
 end
 
-function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, Token}}}} ; image_tracer::TracerOrNot = nothing, renderer::RendererOrNot = nothing)
+function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, Token}}}}; 
+               world::World = World(), lights::Lights = Lights(), 
+               image::ImageOrNot = nothing, 
+               camera::CameraOrNot = nothing, 
+               renderer::RendererOrNot = nothing)
 	variables =  Dict(zip(first.(variables), (Dict(last(pair)) for pair ∈ variables)))
-	Scene(variables, image_tracer, renderer)
+	Scene(variables, world, lights, image, camera, renderer)
 end
+
+##############
+# EXPECTATION
 
 """
     expect_keyword(stream::InputStream, keywords_list::Vector{Keyword})
@@ -43,9 +59,9 @@ function expect_keyword(stream::InputStream, keywords_list::Vector{Keyword})
     isa(token.value, Keyword) || throw(GrammarException(stream.location,
                                                         "Expected a keyword instead of '$(typeof(token.value.value))'\nValid keywords: $(join(keywords_list, ", "))",
                                                         token.length))
-    token.value.value ∈ keywords_list || throw(GrammarException(stream.location,
-                                                                "Invalid '$(token.value.value)' keyword, expecting: $(join(keywords_list, ", "))",
-                                                                token.length))
+    token.value ∈ keywords_list || throw(GrammarException(stream.location,
+                                                          "Invalid '$(token.value.value)' keyword\nValid keywords: $(join(keywords_list, ", "))",
+                                                          token.length))
     token.value.value
 end
 
@@ -57,7 +73,7 @@ Read a token from an [`InputStream`](@ref) and check that it is an [`Identifier`
 function expect_identifier(stream::InputStream)
     token = read_token(stream)
     isa(token.value, Identifier) || throw(GrammarException(stream.location,
-                                                           "Got '$(typeof(token.value.value))' instead of an identifier",
+                                                           "Got token '$(typeof(token.value))' instead of 'Identifier'",
                                                            token.length))
     token.value.value
 end
@@ -71,7 +87,7 @@ function expect_string(stream::InputStream, vars::IdTable)
     token = read_token(stream)
     isa(token.value, LiteralString) && return token.value.value
     isa(token.value, Identifier) || throw(GrammarException(stream.location,
-                                                           "Got '$(typeof(token.value.value))' instead of 'String'",
+                                                           "Got token '$(typeof(token.value))' instead of 'LiteralString'",
                                                            token.length))
     var_name = token.value.value
     if !haskey(vars[LiteralString], var_name) 
@@ -89,13 +105,36 @@ Read a token from an [`InputStream`](@ref) and check that it is either a [`Liter
 function expect_number(stream::InputStream, vars::IdTable)
     token = read_token(stream)
     isa(token.value, LiteralNumber) && return token.value.value
+    isa(token.value, MathExpression) && return evaluate_math_expression(token, vars)
     isa(token.value, Identifier) || throw(GrammarException(stream.location,
-                                                           "Got '$(typeof(token.value.value))' instead of 'Float32'",
+                                                           "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
                                                            token.length))
     var_name = token.value.value
     if !haskey(vars[LiteralNumber], var_name) 
-        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || throw(GrammarException(stream.location, "Variable '$var_name' is a '$type': expected 'LiteralNumber'"))
+        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || 
+            throw(GrammarException(stream.location, "Variable '$var_name' is a '$type': expected 'LiteralNumber'"))
         throw(GrammarException(stream.location, "Undefined variable '$var_name'", token.length))
     end
     vars[LiteralNumber][var_name].value
 end
+
+"""
+    expect_symbol(stream::InputStream, symbol::LiteralSymbol)
+
+Read a token from an [`InputStream`](@ref) and check that it is the requested a [`LiteralSymbol`](@ref).
+"""
+function expect_symbol(stream::InputStream, symbol::LiteralSymbol)
+    token = read_token(stream)
+    isa(token.value, LiteralSymbol) || throw(GrammarException(stream.location,
+                                                           "Expected a symbol instead of '$(typeof(token.value.value))'\nValid symbol: $symbol",
+                                                           token.length))
+
+    token.value == symbol || throw(GrammarException(stream.location,
+                                                    "Invalid '$(token.value.value)' symbol\nValid symbol: $symbol",
+                                                    token.length))
+    token.value.value
+end
+
+##########
+# PARSING
+
