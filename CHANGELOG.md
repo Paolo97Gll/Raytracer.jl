@@ -3,6 +3,7 @@
 ## v0.2.1
 
 - Improve documentation.
+- Add cubes, cylinders, and CSG ([#25](https://github.com/Paolo97Gll/Raytracer.jl/pull/25))
 
 ## v0.2.0
 
