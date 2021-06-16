@@ -10,23 +10,23 @@ using Base:
     SizeUnknown
 
 import Base:
-    show, print, eof, copy, IteratorSize
+    show, showerror, print, eof, copy, IteratorSize
 
 export # Interpreter
-    SourceLocation, 
+    SourceLocation,
     TokenValue,
-        Keyword, Identifier, LiteralString, LiteralNumber, StopToken, 
-    Token, 
+        Keyword, Identifier, LiteralString, LiteralNumber, StopToken,
+    Token,
     InputStream,
         open_stream,
         read_char!, unread_char!,
         skip_whitespaces_and_comments,
     #    _update_pos!, _parse_float_token, _parse_keyword_or_identifier_token, _parse_string_token,
         read_token,
-    read_at_line, 
-    isnewline, issymbol, 
-    InterpreterError, 
-        GrammarError
+    read_at_line,
+    isnewline, issymbol,
+    InterpreterError,
+        GrammarException
 
 const interpreter_dir = "interpreter"
 include(joinpath(interpreter_dir, "sourcelocation.jl"))
