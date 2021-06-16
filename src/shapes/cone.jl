@@ -31,16 +31,6 @@ function Cone(; transformation::Transformation = Transformation(), material::Mat
 	Cone(transformation, material, radius_ratio)
 end
 
-# get_ratio(::Cone{RR}) where {RR} = RR
-
-# function Base.getproperty(cone::Cone, sym::Symbol)
-# 	if sym === :radius_ratio
-# 		return get_ratio(cone)
-# 	else # fallback to getfield
-# 		return getfield(obj, sym)
-# 	end
-# end
-
 @doc """
     Cone(transformation::Transformation, material::Material)
 
@@ -96,18 +86,10 @@ function get_all_ts(::Type{Cone{RR}}, ray::Ray) where {RR}
 	elseif (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <=  1f0
 		append!(res, [tz1, tz2])
 	end
-	# (ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= RR^2 && push!(res, tz1)
-	# (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <=  1f0 && push!(res, tz2)
-	@assert iseven(length(res)) "$res\n$ray"
 	return res
 end
 
 function get_normal(::Type{Cone{RR}}, point::Point, ray::Ray) where {RR}
-    # z = point.v[3]
-    # # if it comes from the upper cap 
-    # (abs(z) ≈ 1f0) && return -sign(ray.dir.z) * NORMAL_Z
-	# # if it comes from the base
-	# (abs(z) ≈ 0f0) && return  sign(ray.dir.z) * NORMAL_Z
     z = ray.origin[3]
 	abs_z = abs(z)
     # if it comes from the upper cap 
