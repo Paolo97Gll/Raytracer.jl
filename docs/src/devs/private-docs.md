@@ -6,3 +6,10 @@ Documentation of all the code not explicitly exported.
 Modules = [Raytracer]
 Public = false
 ```
+
+## Index
+
+```@index
+Modules = [Raytracer]
+Pages   = ["private-docs.md"]
+```
