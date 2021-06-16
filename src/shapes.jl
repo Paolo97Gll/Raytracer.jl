@@ -4,6 +4,7 @@
 
 # Implementation of the abstract type Shape and the derivative concrete types
 
+
 ########
 # Shape
 #
@@ -18,6 +19,7 @@
 #
 # For more informations on these functions consult the documentation.
 #
+
 
 """
     Shape
@@ -63,6 +65,7 @@ Return whether the ray intersects the given [`Shape`](@ref).
 Return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), even outside of the ray domain.
 """ get_all_ts(::Shape, ::Ray)
 
+
 ##############
 # SimpleShape
 #
@@ -78,6 +81,7 @@ Return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), ev
 #
 # For more informations on these functions consult the documentation.
 #
+
 
 """
     SimpleShape <: Shape
@@ -113,6 +117,12 @@ function get_all_ts(s::S, ray::Ray) where {S <: SimpleShape}
     get_all_ts(S, inv_ray)
 end
 
+"""
+    ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
+
+Return an [`HitRecord`](@ref) of the nearest [`Ray`](@ref) intersection with the given [`SimpleShape`](@ref).
+If none exists, return `nothing`.
+"""
 function ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
     t = get_t(S, inv_ray)
@@ -124,6 +134,12 @@ function ray_intersection(ray::Ray, s::S) where {S <: SimpleShape}
     HitRecord(world_point, normal, surface_point, t, ray, s.material)
 end
 
+"""
+    all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
+
+Return a vector of [`HitRecord`](@ref) with all the [`Ray`](@ref) intersections with the given [`SimpleShape`](@ref).
+If none exists, return an empty vector.
+"""
 function all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
     inv_ray = inv(s.transformation) * ray
     inv_ray = Ray(inv_ray.origin, inv_ray.dir, -Inf32, Inf32, 0)
@@ -136,12 +152,19 @@ function all_ray_intersections(ray::Ray, s::S) where {S <: SimpleShape}
     HitRecord.(world_points, normals, surface_points, ts, Ref(ray), Ref(s.material))
 end
 
+"""
+    quick_ray_intersection(ray::Ray, s::SimpleShape)
+
+Tells if a [`Ray`](@ref) intersect a [`SimpleShape`](@ref) or not.
+"""
 function quick_ray_intersection(ray::Ray, s::SimpleShape)
     isfinite(get_t(s, ray))
 end
 
+
 #################
 # CompositeShape
+
 
 """
     CompositeShape <: Shape
@@ -153,6 +176,11 @@ These shapes cannot be easily described as transformed versions of a unitary sha
 See also: [`CSG`](@ref)
 """
 abstract type CompositeShape <: Shape end
+
+
+###########
+# Includes
+
 
 let shapesdir = "shapes"
     # Bounding boxes
