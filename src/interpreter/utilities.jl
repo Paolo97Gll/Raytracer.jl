@@ -61,3 +61,26 @@ function isvalid(expr::Expr, str_len::Int)
     return all(arg -> (isa(arg, Expr) ? isvalid(arg, str_len) : true), expr.args[begin + 1:end])
 end
 
+"""
+    evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
+
+Replace all identifiers in the mathematical expression stored in the [`MathExpression`](@ref) token and then evaluate it.
+"""
+function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
+    expr = token.value.value
+    args = map(expr.args[begin + 1: end]) do arg
+        if isa(arg, Symbol)
+            if !haskey(vars[LiteralNumber], arg) 
+                (type = findfirst(type -> haskey(vars[type], arg), keys(vars))) |> isnothing || 
+                    throw(GrammarException(stream.location, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'"))
+                throw(GrammarException(stream.location, "Undefined variable '$arg' in 'MathExpression'", token.length))
+            end
+            return vars[arg]
+        elseif isa(arg, Expr)
+            return evaluate_math_expression(arg, vars)
+        else
+            return arg
+        end
+    end
+    Expr(expr.head, expr.args[begin], args...) |> eval
+end
