@@ -6,41 +6,42 @@
 
 
 """
-    InterpreterError <: Exception
+    InterpreterException <: Exception
 
 Abstract type for all SceneLang interpreter errors.
+
+See also: [`GrammarException`](@ref)
 """
-abstract type InterpreterError <: Exception end
+abstract type InterpreterException <: Exception end
 
 
 """
-    GrammarError <: InterpreterError
+    GrammarException <: InterpreterException
 
-Type representing an error in the SceneLang lexer.
+An [`InterpreterException`](@ref) representing an error in the SceneLang lexer.
 
 # Fields
 
 - `location::SourceLocation`: location of the error
 - `msg::AbstractString`: descriptive error message
 - `len::Int`: how many characters are involved in the error
-
 """
-struct GrammarError <: InterpreterError
+struct GrammarException <: InterpreterException
     location::SourceLocation
     msg::AbstractString
     len::Int
 end
 
 """
-    GrammarError(location, msg, len = 1)
+    GrammarException(location::SourceLocation, msg::AbstractString)
 
-Construct an instance of [`GrammarError`](@ref).
+Construct an instance of [`GrammarException`](@ref) with `len = 1`.
 """
-function GrammarError(location::SourceLocation, msg::AbstractString)
-    GrammarError(location, msg, 1)
+function GrammarException(location::SourceLocation, msg::AbstractString)
+    GrammarException(location, msg, 1)
 end
 
-function Base.showerror(io::IO, e::InterpreterError)
+function Base.showerror(io::IO, e::InterpreterException)
     print(io, typeof(e))
     printstyled(io, " @ ", e.location, color=:light_black)
     println(io)
@@ -53,7 +54,7 @@ function Base.showerror(io::IO, e::InterpreterError)
     println(io)
 end
 
-function Base.showerror(io::IO, e::InterpreterError, bt; backtrace = false)
+function Base.showerror(io::IO, e::InterpreterException, bt; backtrace = false)
     try
         showerror(io, e)
     finally
