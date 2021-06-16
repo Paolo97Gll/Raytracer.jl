@@ -6,6 +6,14 @@
 
 ## v0.2.0
 
+- Add cubes, cylinders, and CSG ([#25](https://github.com/Paolo97Gll/Raytracer.jl/pull/25))
+
+## v0.2.1
+
+- Improve documentation.
+
+## v0.2.0
+
 ### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
 
 - Removed type parameters from most structs. All floating points calculations are now performed on `Float32`. This provides a significant speedup. All code specifying type parameters will be broken from now on ([#23](https://github.com/Paolo97Gll/Raytracer.jl/pull/23)).

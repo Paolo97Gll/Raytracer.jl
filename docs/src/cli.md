@@ -1,5 +1,14 @@
 # [CLI tool](@id cli_tool)
 
+## Contents
+
+```@contents
+Pages = ["cli.md"]
+Depth = 3
+```
+
+## Description
+
 The CLI tool is named `raytracer_cli.jl` and is placed in the root of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang.
 
 This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run almost all these commands also from the REPL, by calling the same functions called by the tool.

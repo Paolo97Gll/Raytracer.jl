@@ -2,6 +2,13 @@
 
 Raytracing package for the generation of photorealistic images in Julia.
 
+## Contents
+
+```@contents
+Pages = ["index.md"]
+Depth = 3
+```
+
 ## Brief description
 
 The main purpose of this package is to generate photorealistic images given an input scene.
