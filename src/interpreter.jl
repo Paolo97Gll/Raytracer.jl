@@ -25,15 +25,16 @@ export # Interpreter
         read_token,
     read_at_line,
     isnewline, issymbol,
-    InterpreterError,
+    InterpreterException,
         GrammarException
 
 const interpreter_dir = "interpreter"
 include(joinpath(interpreter_dir, "sourcelocation.jl"))
 include(joinpath(interpreter_dir, "token.jl"))
-include(joinpath(interpreter_dir, "utilities.jl"))
 include(joinpath(interpreter_dir, "exceptions.jl"))
+include(joinpath(interpreter_dir, "utilities.jl"))
 include(joinpath(interpreter_dir, "inputstream.jl"))
+include(joinpath(interpreter_dir, "lexer.jl"))
 
 for instance ∈ Symbol.(instances(Keyword))
     quote
