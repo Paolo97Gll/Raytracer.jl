@@ -82,7 +82,7 @@ function get_all_ts(::Type{Cone{RR}}, ray::Ray) where {RR}
     
 	if !iseven(length(res))
 		(ox + tz1 * dx)^2 + (oy + tz1 * dy)^2 <= RR^2 ? push!(res, tz1) : push!(res, tz2)
-		# @assert (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <=  1f0
+		@assert (check = (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2) <=  1f0 "it was actually $check !<= 1f0"
 	elseif (ox + tz2 * dx)^2 + (oy + tz2 * dy)^2 <=  1f0
 		append!(res, [tz1, tz2])
 	end
