@@ -119,18 +119,18 @@ Union of all types that can be used as token values while interpreting a SceneLa
 const TokenValue = Union{Keyword, Identifier, MathExpression, LiteralString, LiteralNumber, LiteralSymbol, StopToken}
 
 """
-    Token
+    Token{T <: TokenValue}
 
 Type representing a language token of a SceneLang script.
 
 # Fields
 
 - `loc::SourceLocation`: a [`SourceLocation`](@ref) representing the position in the script at which the token starts,
-- `value::TokenValue`: a [`TokenValue`](@ref) representing the value of the token (see [`TokenValue`](@ref))
+- `value::T`: a [`TokenValue`](@ref) representing the value of the token (see [`TokenValue`](@ref))
 - `length::Int`: length of the input token.
 """
-struct Token
+struct Token{T <: TokenValue}
     loc::SourceLocation
-    value::TokenValue
+    value::T
     length::Int
 end
