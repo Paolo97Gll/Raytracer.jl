@@ -45,11 +45,11 @@ function read_char!(stream::InputStream)
 end
 
 """
-    unread_char!(stream::InputStream, ch::Union{Char, Nothing})
+    unread_char!(stream::InputStream, ch::Char)
 
 Push a character back to the stream.
 """
-function unread_char!(stream::InputStream, ch::Union{Char, Nothing})
+function unread_char!(stream::InputStream, ch::Char)
     @assert isnothing(stream.saved_char)
     stream.saved_char = ch
     stream.location = stream.saved_location
@@ -85,7 +85,7 @@ function _parse_string_token(stream::InputStream, token_location::SourceLocation
 
         ch == '"' && break
 
-        (isnothing(ch) || isnewline(ch)) && throw(GrammarException(token_location, "Unterminated string", length(str) + 1))
+        (isnothing(ch) || isnewline(ch)) && throw(UnfinishedExpression(token_location, "Unterminated string", length(str) + 1))
 
         str *= ch
     end
@@ -114,7 +114,8 @@ function _parse_number_token(stream::InputStream, first_char::Char, token_locati
     value = try
         parse(Float32, str)
     catch e
-        isa(e, ArgumentError) && rethrow(GrammarException(token_location, "'$str' is an invalid floating-point number", length(str)))
+        isa(e, ArgumentError) && 
+            rethrow(InvalidNumber(token_location, "'$str' is an invalid number format", length(str)))
         rethrow(e)
     end
 
@@ -126,8 +127,8 @@ end
 
 Parse the stream into a [`Token`](@ref) with [`Keyword`](@ref) value.
 """
-function _parse_keyword_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
-    str = first_char |> string
+function _parse_keyword_token(stream::InputStream, token_location::SourceLocation)
+    str = ""
     while true
         ch = read_char!(stream)
         # Note that here we do not call "isalpha" but "isalnum": digits are ok after the first character
@@ -138,6 +139,44 @@ function _parse_keyword_token(stream::InputStream, first_char::Char, token_locat
 
     sym = Symbol(str)
     Token(token_location, Keyword(sym), length(str))
+end
+
+"""
+    _parse_command_or_type_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+
+Parse the stream into a [`Token`](@ref) with [`Command`](@ref) or [`Type`](@ref) value.
+"""
+function _parse_command_or_type_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
+    start_loc = copy(stream.location)
+    str = first_char |> string
+    while true
+        ch = read_char!(stream)
+        # Note that here digits are ok after the first character
+        !isnothing(ch) && (isdigit(ch) || isletter(ch) || ch == '_') || (unread_char!(stream, ch); break)
+
+        str *= ch
+    end
+
+    class, sym = all(isuppercase, str) ? 
+        (Command,     Symbol(str)) : 
+        (LiteralType, Symbol(str * "Type"))
+
+    keywords = instances(class) .|> Symbol
+    if (index = findfirst(s -> s == sym, keywords)) |> isnothing 
+        valid_instances = replace.(
+            last.(
+                split.(
+                    repr.(
+                        instances(class)
+                    ), 
+                ".")
+            ),
+            Ref(r"Type$" => "")
+        )
+        throw((class <: Command ? InvalidCommand : InvalidType)(start_loc, 
+            "'$str' is not a valid '$class'.\nValid $(class)s are:\n\t" * join(valid_instances, "\n\t"), length(str))) 
+    end
+    Token(token_location, class(index - 1), length(str))
 end
 
 """
@@ -166,14 +205,14 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
 
         ch == '$' && break
 
-        (isnothing(ch) || isnewline(ch)) && throw(GrammarException(token_location, "Unterminated mathematical expression", length(str) + 1))
+        (isnothing(ch) || isnewline(ch)) && throw(UnfinishedExpression(token_location, "Unterminated mathematical expression", length(str) + 1))
 
         str *= ch
     end
 
     expr = Meta.parse(str)
     isvalid(expr, length(str))
-    return Token(token_location, MathExpression(expr), length(str))
+    return Token(token_location, MathExpression(expr), length(str) + 2)
 end
 
 """
@@ -182,6 +221,12 @@ end
 Read the next token in the stream.
 """
 function read_token(stream::InputStream)
+    if !isnothing(stream.saved_token)
+        result = stream.saved_token
+        stream.saved_token = nothing
+        return result
+    end
+
     skip_whitespaces_and_comments(stream)
 
     # At this point we're sure that ch does *not* contain a whitespace character
@@ -191,13 +236,13 @@ function read_token(stream::InputStream)
         return Token(stream.location, StopToken(), 1)
     end
 
+    # Check if we got some non ASCII character
+    isascii(ch) || throw(BadCharacter(stream.location, "Invalid character $ch: only ASCII charachters are supported"))
+    
     # At this point we must check what kind of token begins with the "ch" character
     # (which has been put back in the stream with stream.unread_char). First,
     # we save the position in the stream
     token_location = copy(stream.location)
-
-    # Check if we got some non ASCII character
-    isascii(ch) || throw(GrammarException(stream.location, "Invalid character $ch: only ASCII charachters are supported"))
 
     if issymbol(ch)
         # One-character symbol, like '(' or ','
@@ -208,17 +253,29 @@ function read_token(stream::InputStream)
     elseif ch == '$'
         # A math expression
         return _parse_math_expression_token(stream, token_location)
-    elseif isdigit(ch) || ch ∈ ('+', '-', '.')
+    elseif ch == '.'
+        return _parse_keyword_token(stream, token_location)
+    elseif isdigit(ch) || ch ∈ ('+', '-')
         # A floating-point number
         return _parse_number_token(stream, ch, token_location)
     elseif isuppercase(ch)
-        # Since it begins with an uppercase letter, it must keyword
-        return _parse_keyword_token(stream, ch, token_location)
+        # Since it begins with an uppercase letter, it must be either a command or a type
+        return _parse_command_or_type_token(stream, ch, token_location)
     elseif islowercase(ch) || ch == '_'
         # Since it begins with a lowercase letter, it must be an identifier
         return _parse_identifier_token(stream, ch, token_location)
     else
         # We got some weird ASCII character, like '@` or `&`
-        throw(GrammarException(stream.location, "Invalid character $ch"))
+        throw(BadCharacter(stream.location, "Invalid character $ch"))
     end
+end
+
+"""
+    unread_token(stream::InputStream, ch::Token)
+
+Push a token back to the stream.
+"""
+function unread_token(stream::InputStream, token::Token)
+    @assert isnothing(stream.saved_token)
+    stream.saved_token = token
 end

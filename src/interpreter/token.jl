@@ -1,4 +1,4 @@
-using Base: Symbol
+using Base: Symbol, Number
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
@@ -18,6 +18,50 @@ Type wrapping a `Symbol` representing a command or type in a SceneLangscript.
 struct Keyword
     value::Symbol
 end
+
+@enum Command begin
+    USING
+    SET
+    UNSET
+    SPAWN
+    LOAD
+    ROTATE
+    TRANSLATE
+    SCALE
+    DUMP_SCENE
+end
+
+@doc """
+    Command
+
+Enum type listing all commands of SceneLang.
+
+# Instances
+
+$(join( "- `" .* repr.(instances(Command)) .* "`", "\n"))
+""" Command
+
+@enum LiteralType begin
+    TransformationType
+    MaterialType
+    BrdfType
+    PigmentType
+    ImageType
+    RendererType
+    CameraType
+    ShapeType
+    LightType
+end
+
+@doc """
+    LiteralType
+
+Enum type listing all main types of SceneLang.
+
+# Instances
+
+$(join( "- `" .* repr.(instances(LiteralType)) .* "`", "\n"))
+""" LiteralType
 
 """
     Identifier
@@ -116,7 +160,7 @@ Union of all types that can be used as token values while interpreting a SceneLa
 - [`StopToken`](@ref)
 
 """
-const TokenValue = Union{Keyword, Identifier, MathExpression, LiteralString, LiteralNumber, LiteralSymbol, StopToken}
+const TokenValue = Union{Keyword, Command, LiteralType, Identifier, MathExpression, LiteralString, LiteralNumber, LiteralSymbol, StopToken}
 
 """
     Token{T <: TokenValue}
