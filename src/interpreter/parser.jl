@@ -1,4 +1,3 @@
-using Base: String, Float32
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
@@ -73,6 +72,33 @@ function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
     Expr(expr.head, expr.args[begin], args...) |> eval
 end
 
+function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
+    expect_symbol(stream, Symbol("("))
+    kwargs = Dict{Symbol, Any}()
+    sizehint!(kwargs, length(kw))
+    is_positional_allowed = true
+    for i ∈ SOneTo(length(kw))
+        token = read_token(stream)
+        unread_token(stream, token)
+        isa(token.value, LiteralSymbol) && (expect_symbol(stream, Symbol(")")); break)
+        key = if isa(token.value, Keyword)
+            local key = expect_keyword(stream, keys(kw)).value.value
+            haskey(kwargs, key) && 
+                throw(InvalidKeyword(token.loc, "Argument `$key` has already been defined", token.length))
+            is_positional_allowed = false
+            key
+        elseif is_positional_allowed
+            keys(kw)[i]
+        else
+            throw(InvalidKeyword(token.loc, "Positional arguments cannot follow keyword arguments", token.length))
+        end
+        value = kw[key](stream, table) 
+        push!(kwargs, key => value)
+        expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    kwargs
+end
+
 ##############
 # EXPECTATION
 
@@ -84,11 +110,11 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`Keyword`](@r
 function expect_keyword(stream::InputStream, keywords_list::Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
     token = read_token(stream)
     isa(token.value, Keyword) || throw(WrongTokenType(token.loc,
-                                                        "Expected a keyword instead of '$(typeof(token.value.value))'\nValid keywords: $(join(keywords_list, ", "))",
-                                                        token.length))
+                                                      "Expected a keyword instead of '$(typeof(token.value.value))'\nValid keywords: $(join(keywords_list, ", "))",
+                                                      token.length))
     token.value.value ∈ keywords_list || throw(InvalidKeyword(token.loc,
-                                                          "Invalid '$(token.value.value)' keyword\nValid keywords: $(join(keywords_list, ", "))",
-                                                          token.length))
+                                                              "Invalid '$(token.value.value)' keyword\nValid keywords: $(join(keywords_list, ", "))",
+                                                              token.length))
     token
 end
 
@@ -163,8 +189,8 @@ Read a token from an [`InputStream`](@ref) and check that it is an [`Identifier`
 function expect_identifier(stream::InputStream)
     token = read_token(stream)
     isa(token.value, Identifier) || throw(WrongTokenType(token.loc,
-                                                           "Got token '$(typeof(token.value))' instead of 'Identifier'",
-                                                           token.length))
+                                                         "Got token '$(typeof(token.value))' instead of 'Identifier'",
+                                                         token.length))
     token
 end
 
@@ -177,8 +203,8 @@ function expect_string(stream::InputStream, vars::IdTable)
     token = read_token(stream)
     isa(token.value, LiteralString) && return token.value.value
     isa(token.value, Identifier) || throw(WrongTokenType(token.loc,
-                                                           "Got token '$(typeof(token.value))' instead of 'LiteralString'",
-                                                           token.length))
+                                                         "Got token '$(typeof(token.value))' instead of 'LiteralString'",
+                                                         token.length))
     var_name = token.value.value
     if !haskey(vars[LiteralString], var_name) 
         (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || 
@@ -198,8 +224,8 @@ function expect_number(stream::InputStream, vars::IdTable)
     isa(token.value, LiteralNumber) && return token
     isa(token.value, MathExpression) && return Token(token.loc, LiteralNumber(evaluate_math_expression(token, vars)), token.length)
     isa(token.value, Identifier) || throw(WrongTokenType(token.loc,
-                                                           "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
-                                                           token.length))
+                                                         "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
+                                                         token.length))
     var_name = token.value.value
     if !haskey(vars[LiteralNumber], var_name) 
         (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || 
@@ -235,14 +261,277 @@ function expect_symbol(stream::InputStream, symbols::Union{Tuple{N, Symbol} wher
     token = read_token(stream)
     isa(token.value, LiteralSymbol) || throw(WrongTokenType(token.loc,
                                                             "Expected a symbol instead of '$(typeof(token.value.value))'\nValid symbols:\n\t$(join(symbols, "\n\t"))",
-                                                           token.length))
+                                                            token.length))
 
     token.value.value ∈ symbols || throw(InvalidSymbol(token.loc,
                                                        "Invalid symbol '$(token.value.value)'\nValid symbols:\n\t$(join(symbols, "\n\t"))",
-                                                    token.length))
+                                                       token.length))
     token
 end
 
 ##########
 # PARSING
 
+function parse_int(stream::InputStream, table::IdTable)
+    n_token = expect_number(stream, table)
+    try
+        convert(Int, n_token.value.value)    
+    catch e
+        isa(e, InexactError) || rethrow(e)
+        throw(WrongValueType(n_token.loc,"The given number is not convertible to an integer since it is not round",n_token.length))
+    end
+end
+
+function parse_float(stream::InputStream, table::IdTable)
+    expect_number(stream, table).value.value
+end
+
+# parse_vector(s: InputStream, scene: Scene) -> Vec
+
+function parse_list(stream::InputStream, table::IdTable, list_length::Int)
+    @assert list_length >= 1 "list must have size of at least 1"
+    expect_symbol(stream, Symbol("["))
+    vec = SVector{list_length, Float32}([expect_number(stream, table).value.value, 
+                                         ((expect_symbol(stream, Symbol(",")); expect_number(stream, table).value.value) for _ ∈ SOneTo(list_length - 1))...
+                                        ])
+
+    expect_symbol(stream, Symbol("]"))
+
+    vec
+end
+
+function parse_point(stream::InputStream, table::IdTable)
+    expect_symbol(stream, Symbol("{"))
+    x = expect_number(stream, table).value.value 
+    expect_symbol(stream, Symbol(","))
+    y = expect_number(stream, table).value.value 
+    expect_symbol(stream, Symbol(","))
+    z = expect_number(stream, table).value.value 
+    expect_symbol(stream, Symbol("}"))
+
+    Point(x, y, z)
+end
+
+# parse_color(s: InputStream, scene: Scene) -> Color
+function parse_color(stream::InputStream, table::IdTable)
+    expect_symbol(stream, Symbol("<"))
+    red = expect_number(stream, table).value.value
+    expect_symbol(stream, Symbol(","))
+    green = expect_number(stream, table).value.value
+    expect_symbol(stream, Symbol(","))
+    blue = expect_number(stream, table).value.value
+    expect_symbol(stream, Symbol(">"))
+    return RGB(red, green, blue)
+end
+
+# parse_pigment(s: InputStream, scene: Scene) -> Pigment
+function parse_pigment(stream::InputStream, table::IdTable)
+    expect_type(stream, PigmentType)
+
+    type_key = expect_keyword(stream, (
+        :Checkered,
+        :Image,
+        :Uniform
+    )).value.value
+
+    kw, res_type = if type_key == :Checkered
+        ((; N = parse_int, color_on = parse_color, color_off = parse_color), 
+         CheckeredPigment
+        )
+    elseif type_key == :Uniform
+        ((; color = parse_color),
+         UniformPigment
+        )
+    elseif type_key == :Image
+        ((; image = parse_image),
+         ImagePigment
+        )
+    else
+        @assert false "expect_keyword returned an invalid keyword"
+    end
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    res_type(; kwargs...)
+end
+
+# parse_brdf(s: InputStream, scene: Scene) -> BRDF
+function parse_brdf(stream::InputStream, table::IdTable)
+    expect_type(stream, BrdfType)
+
+    type_key = expect_keyword(stream, (
+        :Diffuse,
+        :Specular
+    )).value.value
+
+    kw, res_type = if type_key == :Diffuse
+        ((; pigment = parse_pigment), 
+         DiffuseBRDF
+        )
+    elseif type_key == :Specular
+        ((; pigment = parse_pigment, threshold_angle_rad = parse_float),
+         SpecularBRDF
+        )
+    else
+        @assert false "expect_keyword returned an invalid keyword"
+    end
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    res_type(; kwargs...)
+end
+
+# parse_material(s: InputStream, scene: Scene) -> Tuple[str, Material]
+function parse_material(stream::InputStream, table::IdTable)
+    expect_type(stream, MaterialType)
+
+    kw = (; brdf = parse_brdf, emitted_radiance = parse_pigment) 
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    Material(; kwargs...)
+end
+
+# parse_transformation(input_file, scene: Scene)
+function parse_transformation(stream::InputStream, table::IdTable)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    transformation = if isa(next_token.value, LiteralType)
+        parse_explicit_transformation(stream, table)
+    elseif isa(next_token.value, Command)
+        parse_transformation_from_command(stream, table)
+    else
+        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(eltype(next_token.value))'" , next_token.length))
+    end
+
+    next_token = read_token(stream)
+    next_token.value == LiteralSymbol(Symbol("*")) ? 
+        transformation * parse_transformation(stream, table) : 
+        (unread_token(stream, next_token); transformation)
+end
+
+function parse_explicit_transformation(stream::InputStream, table::IdTable)
+    expect_type(stream, TransformationType)
+    mat = reshape(parse_list(stream, table, 16), 4, 4)
+    Transformation(mat)
+end
+
+function parse_transformation_from_command(stream::InputStream, table::IdTable)
+    command_token = expect_command(stream, (ROTATE, TRANSLATE, SCALE))
+    unread_token(stream, command_token)
+    if command_token.value == ROTATE
+        parse_rotation(stream, table)
+    elseif command_token.value == TRANSLATE
+        parse_translation(stream, table)
+    elseif command_token.value == SCALE
+        parse_scaling(stream, table)
+    else
+        @assert false "command token has unknown value $(command_token.value)"
+    end
+end
+
+function parse_rotation(stream::InputStream, table::IdTable)
+    expect_command(stream, ROTATE)
+    expect_symbol(stream, Symbol("("))
+    transformation = Transformation()
+    while true
+        key = expect_keyword(stream, (:X, :Y, :Z)).value.value
+        angle_rad = deg2rad(parse_float(stream, table))
+        transformation *= if key == :X
+            println(angle_rad/π, "π")
+            rotationX(angle_rad)
+        elseif key == :Y
+            println(angle_rad/π, "π")
+            rotationY(angle_rad)
+        elseif key == :Z
+            println(angle_rad/π, "π")
+            rotationZ(angle_rad)
+        else
+            @assert false "expect_keyword returned an invalid keyword '$key'"
+        end
+        expect_symbol(stream, (Symbol("*"), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    transformation
+end
+
+function parse_translation(stream::InputStream, table::IdTable)
+    expect_command(stream, TRANSLATE)
+
+    kw = (; X = parse_float, Y = parse_float, Z = parse_float) 
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    translation(get(kwargs, :X, 0f0), get(kwargs, :Y, 0f0), get(kwargs, :Z, 0f0)) 
+end
+
+function parse_scaling(stream::InputStream, table::IdTable)
+    expect_command(stream, SCALE)
+
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    (isa(next_token.value, LiteralNumber) || isa(next_token.value, Identifier)) &&
+        return scaling(parse_float(stream, table))
+
+    kw = (; X = parse_float, Y = parse_float, Z = parse_float) 
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    scaling(get(kwargs, :X, 1f0), get(kwargs, :Y, 1f0), get(kwargs, :Z, 1f0)) 
+end
+
+# parse_camera(s: InputStream, scene) -> Camera
+function parse_camera(stream::InputStream, table::IdTable)
+    expect_type(stream, CameraType)
+    type_key = expect_keyword(stream, (
+        :Orthogonal, 
+        :Perspective
+    )).value.value
+
+    kw, res_type = if type_key == :Orthogonal
+        ((; aspect_ratio = parse_float, transformation = parse_transformation), 
+         OrthogonalCamera
+        )
+    elseif type_key == :Perspective
+        ((; aspect_ratio = parse_float, transformation = parse_transformation, screen_distance = parse_float), 
+         PerspectiveCamera
+        )
+    else
+        @assert false "expect_keyword returned an invalid keyword"
+    end
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    res_type(; kwargs...)
+end
+
+####################
+function parse_shape(stream::InputStream, table::IdTable)
+    expect_type(stream, ShapeType)
+    type_key = expect_keyword(stream, (
+        :Cube, 
+        :Cylinder, 
+        :Plane, 
+        :Sphere
+    )).value.value
+
+    res_type = eval(type_key)
+    kw = (; material = parse_material, transformation = parse_transformation)
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    res_type(; kwargs...)
+end
+
+function parse_shape(res_type::Type{<:Shape}, stream::InputStream, table::IdTable)
+    expect_type(stream, ShapeType)
+    expect_keyword(stream, (Symbol(res_type),)).value.value
+
+    kw = (; material = parse_material, transformation = parse_transformation)
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    res_type(; kwargs...)
+end
+
+# parse_sphere(s: InputStream, scene: Scene) -> Sphere
+# parse_plane(s: InputStream, scene: Scene) -> Plane
