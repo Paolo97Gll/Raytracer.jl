@@ -176,7 +176,6 @@ A class representing an ideal diffuse [`BRDF`](@ref) (also called "Lambertian").
 """
 Base.@kwdef struct DiffuseBRDF <: BRDF
     pigment::Pigment = UniformPigment()
-    reflectance::Float32 = 1f0
 end
 
 @doc """
@@ -198,8 +197,8 @@ Constructor for a [`DiffuseBRDF`](@ref) instance.
 Get the radiance, given a point `uv` ([`Vec2D`](@ref)) on the surface with a [`DiffuseBRDF`](@ref)., an incoming
 direction `in_dir` and outcoming direction ([`Vec`](@ref)), a `normal` of the surface point ([`Normal`](@ref)).
 """
-function at(brdf::DiffuseBRDF, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)
-    brdf.pigment(uv) * (brdf.reflectance / π)
+function at(brdf::DiffuseBRDF, #=normal=#::Normal, #=in_dir=#::Vec, #=out_dir=#::Vec, uv::Vec2D)
+    brdf.pigment(uv) / π
 end
 
 """
