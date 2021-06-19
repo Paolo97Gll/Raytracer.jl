@@ -43,7 +43,14 @@ Check if `c` is in a partucular set of characters used in a SceneLang script.
 """
 issymbol(c::Char) = c ∈ "()<>[],*"
 
-const valid_operations = (:+, :-, :*, :/, :%, :div, :^)
+const valid_operations = Dict(:+     => ( ::Int) -> true, 
+                              :-     => ( ::Int) -> true, 
+                              :*     => ( ::Int) -> true, 
+                              :/     => ( ::Int) -> true, 
+                              :%     => ( ::Int) -> true, 
+                              :^     => ( ::Int) -> true, 
+                              :div   => ( ::Int) -> true, 
+                              :round => (n::Int) -> n == 1)
 
 """
     isvalid(expr::Expr, str_len::Int)
@@ -52,35 +59,16 @@ Return `true` if the given expression is valid in a SceneLang script, else throw
 """
 function isvalid(expr::Expr, str_len::Int)
     expr.head == :call || 
-        throw(GrammarException(token_location, "Invalid mathematical expression: expression head is not a call", str_len + 1))
-    expr.args[begin] ∈ valid_operations || 
-        throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), str_len + 1))
+        throw(InvalidExpression(token_location, "Invalid mathematical expression: expression head is not a call", str_len + 1))
+    op_name = expr.args[begin]
+    isa(op_name, Symbol) ||
+        throw(InvalidExpression(token_location, "Invalid mathematical expression: operation name '$op_name' is not a symbol" , str_len + 1))
+    op_name ∈ keys(valid_operations) || 
+        throw(InvalidExpression(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), str_len + 1))
     (invalid = findfirst(arg -> !isa(arg, Union{Integer, AbstractFloat, Expr, Symbol}), expr.args[begin + 1:end])) |> isnothing || 
-        throw(GrammarException(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", str_len + 1))
+        throw(InvalidExpression(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", str_len + 1))
+    valid_operations[op_name](length(expr.args) - 1) ||
+        throw(invalidEcpression(token_location, "Invalid mathematical expression: operation '$op_name' takes only $(valid_operations[op_name]) arguments, got $(length(expr.args) -1)", str_len + 1))
     
     return all(arg -> (isa(arg, Expr) ? isvalid(arg, str_len) : true), expr.args[begin + 1:end])
-end
-
-"""
-    evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
-
-Replace all identifiers in the mathematical expression stored in the [`MathExpression`](@ref) token and then evaluate it.
-"""
-function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
-    expr = token.value.value
-    args = map(expr.args[begin + 1: end]) do arg
-        if isa(arg, Symbol)
-            if !haskey(vars[LiteralNumber], arg) 
-                (type = findfirst(type -> haskey(vars[type], arg), keys(vars))) |> isnothing || 
-                    throw(GrammarException(stream.location, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'"))
-                throw(GrammarException(stream.location, "Undefined variable '$arg' in 'MathExpression'", token.length))
-            end
-            return vars[arg]
-        elseif isa(arg, Expr)
-            return evaluate_math_expression(arg, vars)
-        else
-            return arg
-        end
-    end
-    Expr(expr.head, expr.args[begin], args...) |> eval
 end
