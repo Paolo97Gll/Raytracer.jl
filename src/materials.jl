@@ -101,12 +101,13 @@ function CheckeredPigment{N}(; color_on::RGB{Float32} = WHITE, color_off::RGB{Fl
 end
 
 """
-    CheckeredPigment(color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
+    CheckeredPigment(; N::Int = 2, color_on::RGB{Float32} = WHITE,
+                      color_off::RGB{Float32} = BLACK) where {N}
 
-Constructor for a [`CheckeredPigment{2}`](@ref) instance.
+Constructor for a [`CheckeredPigment`](@ref) instance.
 """
-function CheckeredPigment(color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
-    CheckeredPigment{2}(color_on, color_off)
+function CheckeredPigment(; N::Int = 2, color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
+    CheckeredPigment{N}(color_on, color_off)
 end
 
 """
@@ -137,6 +138,15 @@ end
 
 Constructor for a [`ImagePigment`](@ref) instance.
 """ ImagePigment(::HdrImage)
+
+"""
+    ImagePigment(; image::HdrImage = HdrImage(1, 1))
+
+Constructor for a [`ImagePigment`](@ref) instance.
+"""
+function ImagePigment(; image::HdrImage = HdrImage(1, 1))
+    ImagePigment(image)
+end
 
 """
     (ip::ImagePigment)(u::Float32, v::Float32)
