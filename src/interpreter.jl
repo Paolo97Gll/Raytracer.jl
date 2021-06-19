@@ -9,8 +9,10 @@ module Interpreter
 using Base:
     SizeUnknown
 
-using Raytracer:
-    ImageTracer, Renderer, Camera, HdrImage
+using StaticArrays:
+    SVector, @SVector, SOneTo
+
+using Raytracer
 
 import Base:
     show, showerror, print, eof, copy, IteratorSize
@@ -28,8 +30,7 @@ export # Interpreter
         read_token,
     read_at_line,
     isnewline, issymbol,
-    InterpreterException,
-        GrammarException
+    InterpreterException
 
 const interpreter_dir = "interpreter"
 include(joinpath(interpreter_dir, "sourcelocation.jl"))
