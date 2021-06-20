@@ -152,7 +152,7 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`Keyword`](@r
 function expect_keyword(stream::InputStream, keywords_list::Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
     token = read_token(stream)
     isa(token.value, Keyword) || throw(WrongTokenType(token.loc,
-                                                      "Expected a keyword instead of '$(typeof(token.value.value))'\nValid keywords: $(join(keywords_list, ", "))",
+                                                      "Expected a keyword instead of '$(typeof(token.value))'\nValid keywords: $(join(keywords_list, ", "))",
                                                       token.length))
     token.value.value ∈ keywords_list || throw(InvalidKeyword(token.loc,
                                                               "Invalid '$(token.value.value)' keyword\nValid keywords: $(join(keywords_list, ", "))",
@@ -168,7 +168,7 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`Command`](@r
 function expect_command(stream::InputStream)
     token = read_token(stream)
     isa(token.value, Command) || throw(WrongTokenType(token.loc,
-                                                      "Expected a command instead of '$(typeof(token.value.value))'",
+                                                      "Expected a command instead of '$(typeof(token.value))'",
                                                       token.length))
     token
 end
@@ -207,7 +207,7 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralType`
 function expect_type(stream::InputStream)
     token = read_token(stream)
     isa(token.value, LiteralType) || throw(WrongTokenType(token.loc,
-                                                          "Expected a type instead of '$(typeof(token.value.value))'",
+                                                          "Expected a type instead of '$(typeof(token.value))'",
                                                           token.length))
     token
 end
@@ -295,7 +295,7 @@ Read a token from an [`InputStream`](@ref) and check that it is one of the reque
 function expect_symbol(stream::InputStream, symbols::Union{Tuple{N, Symbol} where {N}, AbstractVector{Symbol}})
     token = read_token(stream)
     isa(token.value, LiteralSymbol) || throw(WrongTokenType(token.loc,
-                                                            "Expected a symbol instead of '$(typeof(token.value.value))'\nValid symbols:\n\t$(join(symbols, "\n\t"))",
+                                                            "Expected a symbol instead of '$(typeof(token.value))'\nValid symbols:\n\t$(join(symbols, "\n\t"))",
                                                             token.length))
 
     token.value.value ∈ symbols || throw(InvalidSymbol(token.loc,
