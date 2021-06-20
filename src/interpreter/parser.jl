@@ -265,16 +265,9 @@ function expect_number(stream::InputStream, vars::IdTable)
     token = read_token(stream)
     isa(token.value, LiteralNumber) && return token
     isa(token.value, MathExpression) && return Token(token.loc, LiteralNumber(evaluate_math_expression(token, vars)), token.length)
-    isa(token.value, Identifier) || throw(WrongTokenType(token.loc,
+    throw(WrongTokenType(token.loc,
                                                          "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
                                                          token.length))
-    var_name = token.value.value
-    if !haskey(vars[LiteralNumber], var_name) 
-        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || 
-            throw(WrongValueType(token.loc, "Variable '$var_name' is a '$type': expected 'LiteralNumber'"))
-        throw(UndefinedIdentifier(token.loc, "Undefined variable '$var_name'", token.length))
-    end
-    vars[LiteralNumber][var_name]
 end
 
 """
