@@ -74,7 +74,7 @@ end
 
 function quick_ray_intersection(ray::Ray, csg::CSG)
     inv_ray = inv(csg.transformation) * ray
-    ray_intersection(inv_ray, csg) |> isnothing |> !
+    ray_intersection(inv_ray, csg) |> !isnothing
 end
 
 """
