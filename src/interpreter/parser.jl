@@ -145,7 +145,7 @@ end
 # EXPECTATION
 
 """
-    expect_keyword(stream::InputStream, keywords_list::Vector{Symbol}Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
+    expect_keyword(stream::InputStream, keywords_list::Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
 
 Read a token from an [`InputStream`](@ref) and check that it is a [`Keyword`](@ref) in `keywords_list`.
 """
@@ -176,7 +176,7 @@ end
 """
     expect_command(stream::InputStream, command::Command)
 
-Read a token from an [`InputStream`](@ref) and check that it is a [`Command`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is a given [`Command`](@ref).
 """
 function expect_command(stream::InputStream, command::Command)
     token = expect_command(stream)
@@ -189,7 +189,7 @@ end
 """
     expect_command(stream::InputStream, commands::Union{NTuple{N, Command} where {N}, AbstractVector{Command}})
 
-Read a token from an [`InputStream`](@ref) and check that it is a [`Command`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is a [`Command`](@ref) in the given `commands`.
 """
 function expect_command(stream::InputStream, commands::Union{NTuple{N, Command} where {N}, AbstractVector{Command}})
     token = expect_command(stream)
@@ -215,7 +215,7 @@ end
 """
     expect_type(stream::InputStream, type::LiteralType)
 
-Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralType`](@ref), then check if its value is the given type.
+Read a token from an [`InputStream`](@ref) and check that it is a given [`LiteralType`](@ref).
 """
 function expect_type(stream::InputStream, type::LiteralType)
     token = expect_type(stream)
