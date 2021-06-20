@@ -666,3 +666,43 @@ end
 
 # parse_sphere(s: InputStream, scene: Scene) -> Sphere
 # parse_plane(s: InputStream, scene: Scene) -> Plane
+
+function parse_renderer_settings(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(RendererType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    expect_type(stream, RendererType)
+    type_key = expect_keyword(stream, (
+        :OnOff,
+        :Flat,
+        :PointLight,
+        :PathTracer
+    )).value.value
+
+    kw, res_type = if type_key == :OnOff
+        ((; on_color = parse_color, off_color = parse_color), 
+         OnOffRenderer
+        )
+    elseif type_key == :Flat
+        ((; background_bolor = parse_color), 
+         FlatRenderer
+        )
+    elseif type_key == :PointLight
+        ((; background_bolor = parse_color, ambient_color = parse_color), 
+         PointLightRenderer
+        )
+    elseif type_key == :PathTracer
+        ((; background_color = parse_color,
+            rng              = (stream::InputStream, table::IdTable) -> PCG(convert(UInt64, parse_int(stream, table)), convert(UInt64, parse_int(stream, table))),
+            n                = parse_int,
+            max_depth        = parse_int,
+            roulette_depth   = parse_int),
+         PathTracer
+        )
+    else
+        @assert false "expect_keyword returned an invalid keyword"
+    end
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    RendererSettings((res_type, kwargs))
+end
+
