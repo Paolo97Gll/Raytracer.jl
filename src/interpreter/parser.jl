@@ -145,6 +145,22 @@ end
 # EXPECTATION
 
 """
+    expect_keyword(stream::InputStream, keyword::Symbol)
+
+Read a token from an [`InputStream`](@ref) and check that it is a given [`Keyword`](@ref).
+"""
+function expect_keyword(stream::InputStream, keyword::Symbol)
+    token = read_token(stream)
+    isa(token.value, Keyword) || throw(WrongTokenType(token.loc,
+                                                      "Expected a keyword instead of '$(typeof(token.value))'\nValid keyword: $keyword",
+                                                      token.length))
+    token.value.value == keyword || throw(InvalidKeyword(token.loc,
+                                                         "Invalid '$(token.value.value)' keyword\nValid keyword: $keyword",
+                                                         token.length))
+    token
+end
+
+"""
     expect_keyword(stream::InputStream, keywords_list::Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
 
 Read a token from an [`InputStream`](@ref) and check that it is a [`Keyword`](@ref) in `keywords_list`.
