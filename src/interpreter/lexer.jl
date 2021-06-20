@@ -115,7 +115,9 @@ function _parse_number_token(stream::InputStream, first_char::Char, token_locati
         parse(Float32, str)
     catch e
         isa(e, ArgumentError) && 
-            rethrow(InvalidNumber(token_location, "'$str' is an invalid number format", length(str)))
+            rethrow(InvalidNumber(token_location, "'$str' is an invalid number format\n"*
+                    "Valid formats only include digits, '+' or '-', dots, and letters 'e' or 'E'\n"*
+                    "Examples: +9e3, -300.5, 5e-7", length(str)))
         rethrow(e)
     end
 
