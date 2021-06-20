@@ -87,8 +87,8 @@ function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
     args = map(expr.args[begin + 1: end]) do arg
         if isa(arg, Symbol)
             if !haskey(vars[LiteralNumber], arg) 
-                (type = findfirst(type -> haskey(vars[type], arg), keys(vars))) |> isnothing || 
-                    throw(WrongTokenType(token.loc, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'"))
+                (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing || 
+                    throw(WrongTokenType(token.loc, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'\nVariable '$arg' was declared at $(vars[type][arg].loc)", token.length))
                 throw(UndefinedIdentifier(token.loc, "Undefined variable '$arg' in 'MathExpression'", token.length))
             end
             return vars[arg]
@@ -249,7 +249,7 @@ function expect_string(stream::InputStream, vars::IdTable)
                                                          token.length))
     var_name = token.value.value
     if !haskey(vars[LiteralString], var_name) 
-        (type = findfirst(type -> haskey(vars[type], var_name), keys(vars))) |> isnothing || 
+        (type = findfirst(d -> haskey(d, var_name), vars)) |> isnothing || 
             throw(WrongValueType(token.loc, "Variable '$var_name' is a '$type': expected 'LiteralString'"))
         throw(UndefinedIdentifier(token.loc, "Undefined variable '$var_name'", token.length))
     end
