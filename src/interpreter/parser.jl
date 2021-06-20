@@ -323,6 +323,11 @@ end
 ##########
 # PARSING
 
+function parse_string(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(LiteralString, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    expect_string(stream, table).value.value
+end
+
 function parse_int(stream::InputStream, table::IdTable)
     n_token = if parse_by_identifier(LiteralNumber, stream, table) |> isnothing 
         expect_number(stream, table)
