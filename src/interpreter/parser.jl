@@ -91,7 +91,7 @@ function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
                     throw(WrongTokenType(token.loc, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'\nVariable '$arg' was declared at $(vars[type][arg].loc)", token.length))
                 throw(UndefinedIdentifier(token.loc, "Undefined variable '$arg' in 'MathExpression'", token.length))
             end
-            return vars[arg]
+            return vars[arg].value
         elseif isa(arg, Expr)
             return evaluate_math_expression(arg, vars)
         else
