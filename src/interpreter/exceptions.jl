@@ -74,16 +74,18 @@ function Base.showerror(io::IO, e::InterpreterException, bt; backtrace = false)
         nothing
     end
 end
-
-@make_exception BadCharacter         "There is an invalid character in the SceneLang script."
-@make_exception UnfinishedExpression "A special environment (e.g. a string, mathematical expression, list...) has been opened and not closed."
-@make_exception UndefinedIdentifier  "The given identifier has not been defined in the script."
-@make_exception WrongTokenType       "The given value is of a different type than expected by the syntax."
-@make_exception WrongValueType       "The given value has a different type than expected by the syntax."
-@make_exception InvalidKeyword       "The given keyword is not valid in the given context."
-@make_exception InvalidType          "The given type does not exist."
-@make_exception InvalidCommand       "The given command does not exist."
-@make_exception InvalidExpression    "The given expression contains invalid elements. Capabilities are restrained to contain malicious code injection."
-@make_exception InvalidSymbol        "The given symbol is not valid in the given context."
-@make_exception InvalidNumber        "The token has an invalid numerical format."
-@make_exception InvalidSize          "The given collection has an invalid size in the given context."
+ 
+@make_exception BadCharacter           "There is an invalid character in the SceneLang script."
+@make_exception UnfinishedExpression   "A special environment (e.g. a string, mathematical expression, list...) has been opened and not closed."
+@make_exception UndefinedIdentifier    "The given identifier has not been defined in the script."
+@make_exception WrongTokenType         "The given value is of a different type than expected by the syntax."
+@make_exception WrongValueType         "The given value has a different type than expected by the syntax."
+@make_exception InvalidKeyword         "The given keyword is not valid in the given context."
+@make_exception InvalidType            "The given type does not exist."
+@make_exception InvalidCommand         "The given command does not exist."
+@make_exception InvalidExpression      "The given expression contains invalid elements. Capabilities are restrained to contain malicious code injection."
+@make_exception InvalidSymbol          "The given symbol is not valid in the given context."
+@make_exception InvalidNumber          "The token has an invalid numerical format."
+@make_exception InvalidSize            "The given collection has an invalid size in the given context."
+@make_exception IdentifierRedefinition "An identifier is being redefined without being unset first."
+@make_exception SettingRedefinition    "A rendering setting is being defined multiple times."
