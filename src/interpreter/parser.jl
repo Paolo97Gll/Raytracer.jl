@@ -500,13 +500,10 @@ function parse_rotation(stream::InputStream, table::IdTable)
         key = expect_keyword(stream, (:X, :Y, :Z)).value.value
         angle_rad = deg2rad(parse_float(stream, table))
         transformation *= if key == :X
-            println(angle_rad/π, "π")
             rotationX(angle_rad)
         elseif key == :Y
-            println(angle_rad/π, "π")
             rotationY(angle_rad)
         elseif key == :Z
-            println(angle_rad/π, "π")
             rotationZ(angle_rad)
         else
             @assert false "expect_keyword returned an invalid keyword '$key'"
