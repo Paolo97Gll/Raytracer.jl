@@ -20,15 +20,15 @@ struct Keyword
 end
 
 @enum Command begin
-    USING
+    USING # TODO
     SET
     UNSET
-    SPAWN
-    LOAD
+    SPAWN # TODO
+    LOAD # TODO
     ROTATE
     TRANSLATE
     SCALE
-    DUMP_SCENE
+    DUMP
 end
 
 @doc """
