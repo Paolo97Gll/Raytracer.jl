@@ -344,6 +344,17 @@ function parse_float(stream::InputStream, table::IdTable)
 end
 
 # parse_vector(s: InputStream, scene: Scene) -> Vec
+function parse_list(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ListType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    vec = Vector{Float32}()
+    sizehint!(vec, 16) # I do not expect the users to define any list longer than 16, even if they have the ability to
+    expect_symbol(stream, Symbol("["))
+    push!(vec, expect_number(stream, table))
+    while expect_symbol(stream, (Symbol(","), Symbol("]"))).value.value == Symbol(",")
+        push!(vec, expect_number(stream, table))
+    end
+    vec
+end
 
 function parse_list(stream::InputStream, table::IdTable, list_length::Int)
     @assert list_length >= 1 "list must have size of at least 1"
