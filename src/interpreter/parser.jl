@@ -128,6 +128,19 @@ function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
     kwargs
 end
 
+function parse_by_identifier(expected_type::IdTableKey, stream::InputStream, table::IdTable)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    if !isa(next_token.value, Identifier)
+        return nothing
+    end
+    id_name = next_token.value.value
+    haskey(table[expected_type], id_name) && return table[expected_type][id_name].value
+    (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing || 
+        throw(WrongTokenType(next_token.loc, "Variable '$id_name' is of type '$type': expected '$expected_type'\nVariable '$id_name' was declared at $(table[type][id_name].loc)", next_token.length))
+    throw(UndefinedIdentifier(next_token.loc, "Undefined variable '$id_name'", next_token.length))
+end
+
 ##############
 # EXPECTATION
 
@@ -302,7 +315,12 @@ end
 # PARSING
 
 function parse_int(stream::InputStream, table::IdTable)
-    n_token = expect_number(stream, table)
+    n_token = if parse_by_identifier(LiteralNumber, stream, table) |> isnothing 
+        expect_number(stream, table)
+    else
+        read_token(stream)::Token{Identifier}
+    end
+
     try
         convert(Int, n_token.value.value)    
     catch e
@@ -312,6 +330,7 @@ function parse_int(stream::InputStream, table::IdTable)
 end
 
 function parse_float(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(LiteralNumber, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_number(stream, table).value.value
 end
 
@@ -319,6 +338,14 @@ end
 
 function parse_list(stream::InputStream, table::IdTable, list_length::Int)
     @assert list_length >= 1 "list must have size of at least 1"
+    if (from_id = parse_by_identifier(ListType, stream, table)) |> !isnothing 
+        token = read_token(stream)
+        if length(from_id) != list_length 
+            id_name = token.value.value
+            throw(InvalidSize(token.loc, "Variable '$(id_name)' stores a list of length $(length(from_id)): expected length $list_length.\nVariable '$id_name' was declared at $(table[ListType][id_name].loc)", token.length))
+        end
+        return from_id
+    end
     expect_symbol(stream, Symbol("["))
     vec = SVector{list_length, Float32}([expect_number(stream, table).value.value, 
                                          ((expect_symbol(stream, Symbol(",")); expect_number(stream, table).value.value) for _ ∈ SOneTo(list_length - 1))...
@@ -330,6 +357,7 @@ function parse_list(stream::InputStream, table::IdTable, list_length::Int)
 end
 
 function parse_point(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_symbol(stream, Symbol("{"))
     x = expect_number(stream, table).value.value 
     expect_symbol(stream, Symbol(","))
@@ -343,6 +371,7 @@ end
 
 # parse_color(s: InputStream, scene: Scene) -> Color
 function parse_color(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_symbol(stream, Symbol("<"))
     red = expect_number(stream, table).value.value
     expect_symbol(stream, Symbol(","))
@@ -355,6 +384,7 @@ end
 
 # parse_pigment(s: InputStream, scene: Scene) -> Pigment
 function parse_pigment(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(PigmentType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, PigmentType)
 
     type_key = expect_keyword(stream, (
@@ -386,6 +416,7 @@ end
 
 # parse_brdf(s: InputStream, scene: Scene) -> BRDF
 function parse_brdf(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(BrdfType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, BrdfType)
 
     type_key = expect_keyword(stream, (
@@ -412,6 +443,7 @@ end
 
 # parse_material(s: InputStream, scene: Scene) -> Tuple[str, Material]
 function parse_material(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(MaterialType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, MaterialType)
 
     kw = (; brdf = parse_brdf, emitted_radiance = parse_pigment) 
@@ -423,6 +455,7 @@ end
 
 # parse_transformation(input_file, scene: Scene)
 function parse_transformation(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(TransformationType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
     unread_token(stream, next_token)
     transformation = if isa(next_token.value, LiteralType)
@@ -510,6 +543,7 @@ end
 
 # parse_camera(s: InputStream, scene) -> Camera
 function parse_camera(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(CameraType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, CameraType)
     type_key = expect_keyword(stream, (
         :Orthogonal, 
@@ -535,6 +569,7 @@ end
 
 ####################
 function parse_shape(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, ShapeType)
     type_key = expect_keyword(stream, (
         :Cube, 
@@ -552,6 +587,7 @@ function parse_shape(stream::InputStream, table::IdTable)
 end
 
 function parse_shape(res_type::Type{<:Shape}, stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, ShapeType)
     expect_keyword(stream, (Symbol(res_type),)).value.value
 
