@@ -323,6 +323,50 @@ end
 ##########
 # PARSING
 
+###############
+## CONSTRUCTORS
+
+function parse_constructor(stream::InputStream, table::IdTable)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    next_val = next_token.value
+    if isa(next_val, Command)
+        next_val ∈ (ROTATE, TRANSLATE, SCALE) &&
+            return (parse_transformation(stream, table), TransformationType)
+        throw(InvalidCommand(next_token.loc, "Command '$next_val' is not a valid construction command."))
+    elseif isa(next_val, LiteralType)
+        for (type, parser) ∈ (TransformationType => parse_transformation,
+                              MaterialType       => parse_material,
+                              BrdfType           => parse_brdf,
+                              PigmentType        => parse_pigment,
+                              ShapeType          => parse_shape,
+                              #LightType          => parse_light, # TODO
+                              #ImageType          => parse_image, # TODO
+                              RendererType       => parse_renderer_settings,
+                              CameraType         => parse_camera)
+            next_val == type || continue
+            return (parser(stream, table), type)
+        end
+        throw(WrongValueType("LiteralType $next_val has no named constructor."))
+    elseif isa(next_val, LiteralNumber) || isa(next_val, MathExpression)
+        return (parse_float(stream, table), LiteralNumber)
+    elseif isa(next_val, LiteralSymbol)
+        next_sym = next_val.value
+        next_sym == Symbol("<") && return (parse_color(stream, table), ColorType)
+        next_sym == Symbol("{") && return (parse_point(stream, table), PointType)
+        next_sym == Symbol("[") && return (parse_list(stream, table),  ListType)
+        throw(InvalidSymbol(token.loc,
+                            "Invalid symbol '$(token.value.value)'\nValid symbols:\n\t$(join((Symbol("<"), Symbol("{"), Symbol("["), Symbol("\$")), "\n\t"))",
+                            token.length))
+    elseif isa(next_val, LiteralString)
+        return (parse_string(stream, table), LiteralString)
+    elseif isa(next_val, Identifier)
+        throw(WrongTokenType("Cannot construct from identifier."))
+    else
+        throw(WrongTokenType("Token '$next_val' is not a valid construction token."))
+    end
+end
+
 function parse_string(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(LiteralString, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_string(stream, table).value.value
