@@ -42,15 +42,18 @@ $(join( "- `" .* repr.(instances(Command)) .* "`", "\n"))
 """ Command
 
 @enum LiteralType begin
+    ColorType
+    PointType
+    ListType
     TransformationType
     MaterialType
     BrdfType
     PigmentType
+    ShapeType
+    LightType
     ImageType
     RendererType
     CameraType
-    ShapeType
-    LightType
 end
 
 @doc """
