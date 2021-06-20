@@ -3,6 +3,22 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Parser of SceneLang
+struct ValueLoc
+    value::Any
+    loc::SourceLocation
+end
+
+function Base.show(io::IO, valueloc::ValueLoc)
+    print(io, valueloc.value)
+    printstyled(io, " @ ", valueloc.loc, color = :light_black)
+end
+
+function Base.show(io::IO, ::MIME"text/plain", valueloc::ValueLoc)
+    print(io, valueloc.value)
+    printstyled(io, " @ ", valueloc.loc, color = :light_black)
+end
+
+const IdTableKey = Union{Type{<:TokenValue}, LiteralType}
 
 """
     IdTable
@@ -11,15 +27,28 @@ Alias to `Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}`.
 
 Dictionary with all the variables read from a SceneLang script.
 """
-const IdTable = Dict{Type{<:TokenValue}, Dict{Symbol, Token{TokenValue}}}
+const IdTable = Dict{IdTableKey, Dict{Symbol, ValueLoc}}
 
-const TableOrNot = Union{IdTable, Nothing}
+function Base.show(io::IO, ::MIME"text/plain", table::IdTable)
+    for (key, subdict) ∈ pairs(table)
+        printstyled(io, "#### ", key, " ####", color = :blue)
+        println()
+        for (id, value) ∈ pairs(subdict)
+            printstyled(io, id, color = :green)
+            println(io, " = ", value)
+        end
+        println(io)
+    end
+end
+
+const RendererSettings = NamedTuple{(:type, :kwargs), Tuple{Type{<:Renderer}, NamedTuple}}
+
 const CameraOrNot = Union{Camera, Nothing}
-const RendererOrNot = Union{Renderer, Nothing}
+const RendererOrNot = Union{RendererSettings, Nothing}
 const ImageOrNot = Union{HdrImage, Nothing}
 
 mutable struct Scene
-    variables::TableOrNot
+    variables::IdTable
     world::World
     lights::Lights
     image::ImageOrNot
@@ -27,7 +56,7 @@ mutable struct Scene
 	renderer::RendererOrNot
 end
 
-function Scene(; variables::TableOrNot = nothing, 
+function Scene(; variables::IdTable = IdTable(), 
                  world::World = World(), 
                  lights::Lights = Lights(), 
                  image::ImageOrNot = nothing, 
