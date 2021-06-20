@@ -282,8 +282,8 @@ function expect_number(stream::InputStream, vars::IdTable)
     isa(token.value, LiteralNumber) && return token
     isa(token.value, MathExpression) && return Token(token.loc, LiteralNumber(evaluate_math_expression(token, vars)), token.length)
     throw(WrongTokenType(token.loc,
-                                                         "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
-                                                         token.length))
+                         "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
+                         token.length))
 end
 
 """
@@ -706,3 +706,58 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
     RendererSettings((res_type, kwargs))
 end
 
+############
+## COMMANDS
+
+function parse_set_command(stream::InputStream, scene::Scene)
+    table = scene.variables
+    expect_command(stream, SET)
+    id = expect_identifier(stream)
+    id_name = id.value.value
+    if (type = findfirst(d -> haskey(d, id_name), table)) |> !isnothing 
+        preexisting = table[type][id_name]
+        iszero(preexisting.loc.line_num) && return # if identifier was defined at the command line level throw no error and return nothing
+        throw(IdentifierRedefinition(id.loc, "Identifier '$(id_name)' has alredy been set at\n$(preexisting.loc)\nIf you want to redefine it first UNSET it.", id.length))
+    end
+    value, id_type = parse_constructor(stream, table)
+    haskey(table, id_type) ?
+        push!(table[id_type], id_name => ValueLoc(value, id.loc)) :
+        push!(table, id_type => Dict([id_name => ValueLoc(value, id.loc)]))
+end
+
+function parse_unset_command(stream::InputStream, scene::Scene)
+    table = scene.variables
+    expect_command(stream, UNSET)
+    id = expect_identifier(stream)
+    id_name = id.value.value
+    type = findfirst(d -> haskey(d, id_name), table)
+    isnothing(type) && throw(UndefinedIdentifier(id.loc,"Undefined variable '$id_name'" ,id.length))
+    pop!(table[type], id_name)
+    return
+end
+
+function parse_dump_command(stream::InputStream, scene::Scene)
+    table = scene.variables
+    expect_command(stream, DUMP)
+    next_token = read_token(stream)
+    if isa(next_token.value, Keyword)
+        unread_token(stream, next_token)
+        keyword = expect_keyword(stream, (:variables, :world, :lights, :image, :camera, :renderer)).value.value
+        display(getproperty(scene, keyword))
+    elseif isa(next_token.value, Identifier)
+        unread_token(stream, next_token)
+        id_name = expect_identifier(stream).value.value
+        type = findfirst(d -> haskey(d, id_name), table)
+        display(table[type][id_name])
+    else
+        throw(WrongTokenType(next_token.loc, "Expected either a keyword or a valid identifier instead of '$(typeof(next_token.value))'\nValid keyword is: 'TABLE'", next_token.length)) 
+    end
+end
+
+function parse_spawn_command(stream::InputStream, scene::Scene)
+    table = scene.variables
+    expect_command(stream, SPAWN)
+    shape = parse_shape(stream, table)
+    push!(scene.world, shape)
+    return
+end
