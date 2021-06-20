@@ -157,7 +157,7 @@ function _parse_command_or_type_token(stream::InputStream, first_char::Char, tok
         str *= ch
     end
 
-    class, sym = all(isuppercase, str) ? 
+    class, sym = all(ch -> isuppercase(ch) || ch == '_', str) ? 
         (Command,     Symbol(str)) : 
         (LiteralType, Symbol(str * "Type"))
 
