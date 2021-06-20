@@ -140,7 +140,7 @@ function _parse_keyword_token(stream::InputStream, token_location::SourceLocatio
     end
 
     sym = Symbol(str)
-    Token(token_location, Keyword(sym), length(str))
+    Token(token_location, Keyword(sym), length(str) + 1)
 end
 
 """
