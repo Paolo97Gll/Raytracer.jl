@@ -41,7 +41,7 @@ isnewline(c::Char) = c ∈ ('\n', '\r')
 
 Check if `c` is in a partucular set of characters used in a SceneLang script.
 """
-issymbol(c::Char) = c ∈ "()<>[],*"
+issymbol(c::Char) = c ∈ "{}()<>[],*"
 
 const valid_operations = Dict(:+     => ( ::Int) -> true, 
                               :-     => ( ::Int) -> true, 
