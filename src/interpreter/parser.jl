@@ -655,7 +655,7 @@ function parse_transformation_from_command(stream::InputStream, table::IdTable)
     elseif command_token.value == SCALE
         parse_scaling(stream, table)
     else
-        @assert false "command token has unknown value $(command_token.value)"
+        @assert false "@ command_token.loc): command token has unknown value $(command_token.value)"
     end
 end
 
@@ -673,7 +673,7 @@ function parse_rotation(stream::InputStream, table::IdTable)
         elseif key == :Z
             rotationZ(angle_rad)
         else
-            @assert false "expect_keyword returned an invalid keyword '$key'"
+            @assert false "@ $(stream.loc): expect_keyword returned an invalid keyword '$key'"
         end
         expect_symbol(stream, (Symbol("*"), Symbol(")"))).value.value == Symbol(")") && break
     end
@@ -723,7 +723,7 @@ function parse_camera(stream::InputStream, table::IdTable)
          PerspectiveCamera
         )
     else
-        @assert false "expect_keyword returned an invalid keyword"
+        @assert false "@ $(stream.loc): expect_keyword returned an invalid keyword"
     end
 
     kwargs = generate_kwargs(stream, table, kw)
@@ -796,7 +796,7 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
          PathTracer
         )
     else
-        @assert false "expect_keyword returned an invalid keyword"
+        @assert false "@ $(stream.loc): expect_keyword returned an invalid keyword"
     end
 
     kwargs = generate_kwargs(stream, table, kw)
