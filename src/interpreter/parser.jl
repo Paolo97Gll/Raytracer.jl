@@ -335,7 +335,7 @@ end
 """
     expect_number(stream::InputStream, vars::IdTable)
 
-Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralNumber`](@ref) or a variable in [`IdTable`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralNumber`](@ref) or a valid ['MathExpression`](@ref).
 """
 function expect_number(stream::InputStream, vars::IdTable)
     token = read_token(stream)
