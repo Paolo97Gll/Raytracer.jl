@@ -87,5 +87,6 @@ end
 @make_exception InvalidSymbol          "The given symbol is not valid in the given context."
 @make_exception InvalidNumber          "The token has an invalid numerical format."
 @make_exception InvalidSize            "The given collection has an invalid size in the given context."
+@make_exception InvalidFilePath        "The given file path is invalid."
 @make_exception IdentifierRedefinition "An identifier is being redefined without being unset first."
 @make_exception SettingRedefinition    "A rendering setting is being defined multiple times."
