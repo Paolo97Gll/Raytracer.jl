@@ -45,11 +45,11 @@ function read_char!(stream::InputStream)
 end
 
 """
-    unread_char!(stream::InputStream, ch::Char)
+    unread_char!(stream::InputStream, ch::Union{Char, Nothing})
 
-Push a character back to the stream.
+Push a character back to the stream. Accepts a `nothing` value to deal with eof.
 """
-function unread_char!(stream::InputStream, ch::Char)
+function unread_char!(stream::InputStream, ch::Union{Char, Nothing})
     @assert isnothing(stream.saved_char)
     stream.saved_char = ch
     stream.location = copy(stream.saved_location)
