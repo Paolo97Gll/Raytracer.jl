@@ -920,7 +920,41 @@ end
 function parse_spawn_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, SPAWN)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    (isa(next_token.value, Identifier) || isa(next_token.value, LiteralType)) || 
+        throw(WrongTokenType(next_token.loc,"Expected either a constructor or a valid identifier instead of '$(typeof(next_token.value))'", next_token.length))
+    while true 
+        if isa(next_token.value, Identifier) 
+            id_name = expect_identifier(stream).value.value    
+            type = findfirst(d -> haskey(d, id_name), table)
+            if type == ShapeType
+                shape = table[type][id_name].value 
+                push!(scene.world, shape)
+            elseif type == LightType
+                light = table[type][id_name].value 
+                push!(scene.lights, light)
+            else
+                throw(WrongValueType(next_token.loc, "Identifier '$id_name' stores a non-spawnable '$type' object\n" * 
+                                    "Variable '$id_name' defined at $(table[type][id_name].loc)\n" *
+                                     "Spawnable types are:\n\tShapeType\n\tLightType", next_token.length))
+            end
+        elseif isa(next_token.value, LiteralType)
+            type = expect_type(stream, (ShapeType, LightType)).value
+            if type == ShapeType
     shape = parse_shape(stream, table)
     push!(scene.world, shape)
+            elseif type == LightType
+                light = parse_light(stream, table)
+                push!(scene.lights, light)
+            else
+                @assert false "@ $(next_token.loc): expect_type returned a non-spawnable type '$type'"
+            end
+        else
+            break
+        end
+        next_token = read_token(stream)
+        unread_token(stream, next_token)
+    end
     return
 end
