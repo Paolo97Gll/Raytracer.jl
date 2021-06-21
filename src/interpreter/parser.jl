@@ -958,3 +958,59 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
     end
     return
 end
+
+function parse_using_command(stream::InputStream, scene::Scene)
+    table = scene.variables
+    expect_command(stream, USING)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    function already_defined_exception(type::Union{CameraOrNot, ImageOrNot, RendererOrNot})
+        SettingRedefinition(next_token.loc, "Scene setting of type '$(type)' already set.", next_token.length)
+    end
+    if isa(next_token.value, Identifier) 
+        id_name = expect_identifier(stream).value.value    
+        type = findfirst(d -> haskey(d, id_name), table)
+        if type == CameraType
+            camera = table[type][id_name].value
+            isnothing(scene.camera) || throw(already_defined_exception(type)) 
+            scene.camera = camera
+        elseif type == ImageType
+            image = table[type][id_name].value 
+            isnothing(scene.image) || throw(already_defined_exception(type)) 
+            scene.image = image
+        elseif type == RendererType
+            renderer = table[type][id_name].value 
+            isnothing(scene.renderer) || throw(already_defined_exception(type)) 
+            scene.renderer = renderer
+        else
+            throw(WrongValueType(next_token.loc, "Variable '$id_name' stores a non-usable '$type' object\n" * 
+                                    "Variable '$id_name' defined at $(table[type][id_name].loc)\n" *
+                                    "Usable types are:\n\tCameraType\n\tImageType\n\tRendererType", next_token.length))
+        end
+    elseif isa(next_token.value, LiteralType)
+        type = expect_type(stream, (CameraType, ImageType, RendererType)).value
+        if type == CameraType
+            camera = parse_camera(stream, table)
+            isnothing(scene.camera) || throw(already_defined_exception(type)) 
+            scene.camera = camera
+        elseif type == ImageType
+            image = parse_explicit_image(stream, table)
+            isnothing(scene.image) || throw(already_defined_exception(type)) 
+            scene.image = image
+        elseif type == RendererType
+            renderer = parse_renderer_settings(stream, table)
+            isnothing(scene.renderer) || throw(already_defined_exception(type)) 
+            scene.renderer = renderer
+        else
+            @assert false "@ $(next_token.loc): expect_type returned a non-spawnable type '$type'"
+        end
+    elseif isa(next_token.value, Command)
+        image = parse_image_from_command(stream, table)
+        isnothing(scene.image) || throw(already_defined_exception(type)) 
+        scene.image = image
+    else
+        throw(WrongTokenType(next_token.loc,"Expected either a constructor or a valid identifier instead of '$(typeof(next_token.value))'", next_token.length))
+    end
+    return
+end
+
