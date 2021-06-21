@@ -50,6 +50,8 @@ const valid_operations = Dict(:+     => ( ::Int) -> true,
                               :%     => ( ::Int) -> true, 
                               :^     => ( ::Int) -> true, 
                               :div   => ( ::Int) -> true, 
+                              :floor => (n::Int) -> n == 1,
+                              :ceil  => (n::Int) -> n == 1,
                               :round => (n::Int) -> n == 1)
 
 """
