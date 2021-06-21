@@ -627,15 +627,19 @@ end
 
 # parse_transformation(input_file, scene: Scene)
 function parse_transformation(stream::InputStream, table::IdTable)
-    (from_id = parse_by_identifier(TransformationType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    transformation = if (from_id = parse_by_identifier(TransformationType, stream, table)) |> isnothing
     next_token = read_token(stream)
     unread_token(stream, next_token)
-    transformation = if isa(next_token.value, LiteralType)
+        if isa(next_token.value, LiteralType)
         parse_explicit_transformation(stream, table)
     elseif isa(next_token.value, Command)
         parse_transformation_from_command(stream, table)
     else
         throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
+    end
+    else
+        read_token(stream) 
+        from_id
     end
 
     next_token = read_token(stream)
