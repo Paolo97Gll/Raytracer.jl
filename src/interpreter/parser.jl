@@ -395,7 +395,10 @@ function parse_constructor(stream::InputStream, table::IdTable)
             return (parse_transformation(stream, table), TransformationType)
         throw(InvalidCommand(next_token.loc, "Command '$next_val' is not a valid construction command."))
     elseif isa(next_val, LiteralType)
-        for (type, parser) ∈ (TransformationType => parse_transformation,
+        for (type, parser) ∈ (ListType           => parse_list,
+                              ColorType          => parse_color,
+                              PointType          => parse_point,
+                              TransformationType => parse_transformation,
                               MaterialType       => parse_material,
                               BrdfType           => parse_brdf,
                               PigmentType        => parse_pigment,
@@ -455,11 +458,22 @@ end
 # parse_vector(s: InputStream, scene: Scene) -> Vec
 function parse_list(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ListType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    delim = if isa(next_token.value, LiteralType) 
+        expect_type(stream, ListType)
+        expect_symbol(stream, Symbol("("))
+        Symbol(")")
+    elseif isa(next_token.value, LiteralSymbol)
+        expect_symbol(stream, Symbol("["))
+        Symbol("]") 
+    else
+        throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
+    end
     vec = Vector{Float32}()
     sizehint!(vec, 16) # I do not expect the users to define any list longer than 16, even if they have the ability to
-    expect_symbol(stream, Symbol("["))
     push!(vec, expect_number(stream, table))
-    while expect_symbol(stream, (Symbol(","), Symbol("]"))).value.value == Symbol(",")
+    while expect_symbol(stream, (Symbol(","), delim)).value.value == Symbol(",")
         push!(vec, expect_number(stream, table))
     end
     vec
@@ -487,13 +501,24 @@ end
 
 function parse_point(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    delim = if isa(next_token.value, LiteralType) 
+        expect_type(stream, PointType)
+        expect_symbol(stream, Symbol("("))
+        Symbol(")")
+    elseif isa(next_token.value, LiteralSymbol)
     expect_symbol(stream, Symbol("{"))
+        Symbol("}") 
+    else
+        throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
+    end
     x = expect_number(stream, table).value.value 
     expect_symbol(stream, Symbol(","))
     y = expect_number(stream, table).value.value 
     expect_symbol(stream, Symbol(","))
     z = expect_number(stream, table).value.value 
-    expect_symbol(stream, Symbol("}"))
+    expect_symbol(stream, delim)
 
     Point(x, y, z)
 end
@@ -501,13 +526,24 @@ end
 # parse_color(s: InputStream, scene: Scene) -> Color
 function parse_color(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    delim = if isa(next_token.value, LiteralType) 
+        expect_type(stream, ColorType)
+        expect_symbol(stream, Symbol("("))
+        Symbol(")")
+    elseif isa(next_token.value, LiteralSymbol)
     expect_symbol(stream, Symbol("<"))
+        Symbol(">") 
+    else
+        throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
+    end
     red = expect_number(stream, table).value.value
     expect_symbol(stream, Symbol(","))
     green = expect_number(stream, table).value.value
     expect_symbol(stream, Symbol(","))
     blue = expect_number(stream, table).value.value
-    expect_symbol(stream, Symbol(">"))
+    expect_symbol(stream, delim)
     return RGB(red, green, blue)
 end
 
