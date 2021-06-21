@@ -13,6 +13,7 @@ using StaticArrays:
     SVector, @SVector, SOneTo
 
 using Raytracer
+using FileIO
 
 import Base:
     show, showerror, print, eof, copy, IteratorSize
