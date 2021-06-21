@@ -1155,6 +1155,11 @@ end
 ############
 ## COMMANDS
 
+"""
+    parse_set_command(stream::InputStream, scene::Scene)
+
+Push to the 'scene.variables' [`IdTable`](@ref) a constructed value and its identifier variable.
+"""
 function parse_set_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, SET)
@@ -1171,6 +1176,11 @@ function parse_set_command(stream::InputStream, scene::Scene)
         push!(table, id_type => Dict([id_name => ValueLoc(value, copy(id.loc))]))
 end
 
+"""
+    parse_unset_command(stream::InputStream, scene::Scene)
+
+Pop identifier variable from the `scene.variables` [`IdTable`](@ref).
+"""
 function parse_unset_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, UNSET)
@@ -1182,6 +1192,13 @@ function parse_unset_command(stream::InputStream, scene::Scene)
     return
 end
 
+"""
+    parse_dump_command(stream::InputStream, scene::Scene)
+
+Show the contents of the [`Scene`](@ref). What is shown depends on the [`Keyword`](@ref) following the `DUMP` [`Command`](@ref).
+
+The valid [`Keyword`](@ref)s are `.ALL` for showing the whole [`Scene`](@ref), or the name of one of its fields (in lowercase letters) to show that specific field.
+"""
 function parse_dump_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, DUMP)
@@ -1204,6 +1221,13 @@ function parse_dump_command(stream::InputStream, scene::Scene)
     end
 end
 
+"""
+    parse_spawn_command(stream::InputStream, scene::Scene)
+
+Push the given `ShapeType` or `LightType` to the `scene.world` [`World`](@ref) or `scene.lights` [`Lights`](@ref) respectively.
+
+See also: [`Scene`](@ref)
+"""
 function parse_spawn_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, SPAWN)
@@ -1246,6 +1270,15 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
     return
 end
 
+"""
+    parse_using_command(stream::InputStream, scene::Scene)
+
+Set the given `CameraType`, `ImageType` or `RendererType` to the `scene.camera`, `scene.image`, or `scene.renderer` respectively.
+
+Can only be used once per type in a SceneLang script.
+
+See also: [`Scene`](@ref)
+"""
 function parse_using_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, USING)
@@ -1304,6 +1337,11 @@ end
 ################
 # SCENE PARSING
 
+"""
+    parse_scene(stream::InputStream, scene::Scene = Scene())
+
+Return the [`Scene`](@ref) instance resulting parsing the SceneLang script associated with the given [`InputStream`](@ref).
+"""
 function parse_scene(stream::InputStream, scene::Scene = Scene())
     while !eof(stream)
         command_token = expect_command(stream, (USING, SET, UNSET, SPAWN, DUMP))
