@@ -429,7 +429,7 @@ end
 
 function parse_string(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(LiteralString, stream, table)) |> isnothing || (read_token(stream); return from_id)
-    expect_string(stream, table).value.value
+    expect_string(stream).value.value
 end
 
 function parse_int(stream::InputStream, table::IdTable)
