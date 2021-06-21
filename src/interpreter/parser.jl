@@ -151,10 +151,15 @@ function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
         elseif isa(arg, Expr)
             return evaluate_math_expression(Token(token.loc, MathExpression(arg), token.length), vars)
         else
+            isfinite(arg) || 
+                throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
             return arg
         end
     end
-    Expr(expr.head, expr.args[begin], args...) |> eval
+    res = Expr(expr.head, expr.args[begin], args...) |> eval
+    isfinite(res) || 
+        throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
+    res
 end
 
 function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
