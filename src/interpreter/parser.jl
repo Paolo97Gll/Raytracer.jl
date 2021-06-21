@@ -29,9 +29,13 @@ Dictionary with all the variables read from a SceneLang script.
 """
 const IdTable = Dict{IdTableKey, Dict{Symbol, ValueLoc}}
 
+function Base.show(io::IO, table::IdTable)
+    show(io, MIME("text/plain"), table)
+end
+
 function Base.show(io::IO, ::MIME"text/plain", table::IdTable)
     for (key, subdict) ∈ pairs(table)
-        printstyled(io, "#### ", key, " ####", color = :blue)
+        printstyled(io, "#### ", key, " ####", color = :blue, bold = true)
         println()
         for (id, value) ∈ pairs(subdict)
             printstyled(io, id, color = :green)
@@ -72,6 +76,58 @@ function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, To
                renderer::RendererOrNot = nothing)
 	variables =  Dict(zip(first.(variables), (Dict(last(pair)) for pair ∈ variables)))
 	Scene(variables, world, lights, image, camera, renderer)
+end
+
+function Base.show(io::IO, ::MIME"text/plain", scene::Scene)
+    printstyled(io, ".VARIABLES\n\n", color = :magenta, bold= true)
+    show(io, scene.variables)
+    println(io)
+
+    printstyled(io, ".WORLD\n\n", color = :magenta, bold= true)
+    if !isempty(scene.world)
+        for (i, shape) ∈ enumerate(scene.world)
+            printstyled(io, i, color = :green)
+            println(io, ": ", shape)
+        end
+        println(io)
+    end
+    println(io)
+
+    printstyled(io, ".LIGHTS\n\n", color = :magenta, bold= true)
+    if !isempty(scene.lights)
+        for (i, light) ∈ enumerate(scene.lights)
+            printstyled(io, i, color = :green)
+            println(io, ": ", light)
+        end
+        println(io)
+    end
+    println(io)
+
+    printstyled(io, ".IMAGE\n\n", color = :magenta, bold= true)
+    if !isnothing(scene.image)
+        printstyled(io, "image", color = :green)
+        println(io, " = ", scene.image)
+        println(io)
+    end
+    println(io)
+
+    printstyled(io, ".CAMERA\n\n", color = :magenta, bold= true)
+    if !isnothing(scene.camera)
+        printstyled(io, "camera", color = :green)
+        println(io, " = ", scene.camera)
+        println(io)
+    end
+    println(io)
+
+    printstyled(io, ".RENDERER\n\n", color = :magenta, bold= true)
+    if !isnothing(scene.renderer)
+        printstyled(io, "type", color = :green)
+        println(io, " = ", scene.renderer.type)
+        for (kw, value) ∈ pairs(scene.renderer.kwargs)
+            printstyled(io, kw, color = :green)
+            println(io, " = ", value)
+        end
+    end
 end
 
 ########
