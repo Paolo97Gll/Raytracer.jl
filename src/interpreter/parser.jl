@@ -898,10 +898,13 @@ end
 function parse_dump_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, DUMP)
+    valid_keywords = (:ALL, :variables, :world, :lights, :image, :camera, :renderer)
     next_token = read_token(stream)
     if isa(next_token.value, Keyword)
         unread_token(stream, next_token)
-        keyword = expect_keyword(stream, (:variables, :world, :lights, :image, :camera, :renderer)).value.value
+        keyword = expect_keyword(stream, valid_keywords).value.value
+        keyword == :ALL ? 
+            display(scene) :
         display(getproperty(scene, keyword))
     elseif isa(next_token.value, Identifier)
         unread_token(stream, next_token)
@@ -909,7 +912,8 @@ function parse_dump_command(stream::InputStream, scene::Scene)
         type = findfirst(d -> haskey(d, id_name), table)
         display(table[type][id_name])
     else
-        throw(WrongTokenType(next_token.loc, "Expected either a keyword or a valid identifier instead of '$(typeof(next_token.value))'\nValid keyword is: 'TABLE'", next_token.length)) 
+        throw(WrongTokenType(next_token.loc, "Expected either a keyword or a valid identifier instead of '$(typeof(next_token.value))'\n"*
+                             "Valid keywords: \n\t$(join(valid_keywords, "\n\t"))",next_token.length))
     end
 end
 
