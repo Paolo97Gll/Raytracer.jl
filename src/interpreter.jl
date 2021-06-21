@@ -25,12 +25,7 @@ export # Interpreter
     Token,
     InputStream,
         open_stream,
-        read_char!, unread_char!,
-        skip_whitespaces_and_comments,
-    #    _update_pos!, _parse_float_token, _parse_keyword_or_identifier_token, _parse_string_token,
-        read_token,
-    read_at_line,
-    isnewline, issymbol,
+    Scene,
     InterpreterException
 
 const interpreter_dir = "interpreter"
