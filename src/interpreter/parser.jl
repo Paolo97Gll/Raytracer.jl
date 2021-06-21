@@ -639,7 +639,9 @@ end
 
 function parse_explicit_transformation(stream::InputStream, table::IdTable)
     expect_type(stream, TransformationType)
+    expect_symbol(stream, Symbol("("))
     mat = reshape(parse_list(stream, table, 16), 4, 4)
+    expect_symbol(stream, Symbol(")"))
     Transformation(mat)
 end
 
