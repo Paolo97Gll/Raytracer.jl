@@ -880,8 +880,8 @@ function parse_set_command(stream::InputStream, scene::Scene)
     end
     value, id_type = parse_constructor(stream, table)
     haskey(table, id_type) ?
-        push!(table[id_type], id_name => ValueLoc(value, id.loc)) :
-        push!(table, id_type => Dict([id_name => ValueLoc(value, id.loc)]))
+        push!(table[id_type], id_name => ValueLoc(value, copy(id.loc))) :
+        push!(table, id_type => Dict([id_name => ValueLoc(value, copy(id.loc))]))
 end
 
 function parse_unset_command(stream::InputStream, scene::Scene)
