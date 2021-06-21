@@ -571,7 +571,7 @@ function parse_pigment(stream::InputStream, table::IdTable)
          ImagePigment
         )
     else
-        @assert false "expect_keyword returned an invalid keyword"
+        @assert false "@ $(stream.loc): expect_keyword returned an invalid keyword"
     end
 
     kwargs = generate_kwargs(stream, table, kw)
@@ -598,7 +598,7 @@ function parse_brdf(stream::InputStream, table::IdTable)
          SpecularBRDF
         )
     else
-        @assert false "expect_keyword returned an invalid keyword"
+        @assert false "@ $(stream.loc): expect_keyword returned an invalid keyword"
     end
 
     kwargs = generate_kwargs(stream, table, kw)
@@ -628,7 +628,7 @@ function parse_transformation(stream::InputStream, table::IdTable)
     elseif isa(next_token.value, Command)
         parse_transformation_from_command(stream, table)
     else
-        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(eltype(next_token.value))'" , next_token.length))
+        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
     end
 
     next_token = read_token(stream)
