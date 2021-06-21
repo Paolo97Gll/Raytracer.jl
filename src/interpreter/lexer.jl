@@ -213,7 +213,7 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
     end
 
     expr = Meta.parse(str)
-    isvalid(expr, length(str))
+    Raytracer.isvalid(expr, length(str), token_location)
     return Token(token_location, MathExpression(expr), length(str) + 2)
 end
 
