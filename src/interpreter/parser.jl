@@ -322,23 +322,14 @@ function expect_identifier(stream::InputStream)
 end
 
 """
-    expect_string(stream::InputStream, vars::IdTable)
+    expect_string(stream::InputStream)
 
-Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralString`](@ref) or a variable in [`IdTable`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralString`](@ref).
 """
-function expect_string(stream::InputStream, vars::IdTable)
+function expect_string(stream::InputStream)
     token = read_token(stream)
-    isa(token.value, LiteralString) && return token.value.value
-    isa(token.value, Identifier) || throw(WrongTokenType(token.loc,
-                                                         "Got token '$(typeof(token.value))' instead of 'LiteralString'",
-                                                         token.length))
-    var_name = token.value.value
-    if !haskey(vars[LiteralString], var_name) 
-        (type = findfirst(d -> haskey(d, var_name), vars)) |> isnothing || 
-            throw(WrongValueType(token.loc, "Variable '$var_name' is a '$type': expected 'LiteralString'"))
-        throw(UndefinedIdentifier(token.loc, "Undefined variable '$var_name'", token.length))
-    end
-    vars[LiteralString][var_name]
+    isa(token.value, LiteralString) && return token
+    throw(WrongTokenType(token.loc,"Got token '$(typeof(token.value))' instead of 'LiteralString'", token.length))
 end
 
 """
