@@ -20,11 +20,11 @@ struct Keyword
 end
 
 @enum Command begin
-    USING # TODO
+    USING
     SET
     UNSET
-    SPAWN # TODO
-    LOAD # TODO
+    SPAWN
+    LOAD
     ROTATE
     TRANSLATE
     SCALE
