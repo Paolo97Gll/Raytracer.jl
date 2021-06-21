@@ -9,7 +9,7 @@ using Base: Symbol, Number
 """
     Keyword
 
-Type wrapping a `Symbol` representing a command or type in a SceneLangscript.
+Type wrapping a `Symbol` representing a command or type in a SceneLang script.
 
 # Fields
 

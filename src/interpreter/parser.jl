@@ -1306,7 +1306,7 @@ end
 
 function parse_scene(stream::InputStream, scene::Scene = Scene())
     while !eof(stream)
-        command_token = expect_command(stream, (USING, SET, UNSET,SPAWN, DUMP))
+        command_token = expect_command(stream, (USING, SET, UNSET, SPAWN, DUMP))
         unread_token(stream, command_token)
         command = command_token.value
         if command == USING
