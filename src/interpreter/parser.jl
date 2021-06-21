@@ -510,7 +510,7 @@ function parse_point(stream::InputStream, table::IdTable)
         expect_symbol(stream, Symbol("("))
         Symbol(")")
     elseif isa(next_token.value, LiteralSymbol)
-    expect_symbol(stream, Symbol("{"))
+        expect_symbol(stream, Symbol("{"))
         Symbol("}") 
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
@@ -535,7 +535,7 @@ function parse_color(stream::InputStream, table::IdTable)
         expect_symbol(stream, Symbol("("))
         Symbol(")")
     elseif isa(next_token.value, LiteralSymbol)
-    expect_symbol(stream, Symbol("<"))
+        expect_symbol(stream, Symbol("<"))
         Symbol(">") 
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
@@ -905,7 +905,7 @@ function parse_dump_command(stream::InputStream, scene::Scene)
         keyword = expect_keyword(stream, valid_keywords).value.value
         keyword == :ALL ? 
             display(scene) :
-        display(getproperty(scene, keyword))
+            display(getproperty(scene, keyword))
     elseif isa(next_token.value, Identifier)
         unread_token(stream, next_token)
         id_name = expect_identifier(stream).value.value
@@ -942,8 +942,8 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
         elseif isa(next_token.value, LiteralType)
             type = expect_type(stream, (ShapeType, LightType)).value
             if type == ShapeType
-    shape = parse_shape(stream, table)
-    push!(scene.world, shape)
+                shape = parse_shape(stream, table)
+                push!(scene.world, shape)
             elseif type == LightType
                 light = parse_light(stream, table)
                 push!(scene.lights, light)
@@ -1014,3 +1014,27 @@ function parse_using_command(stream::InputStream, scene::Scene)
     return
 end
 
+################
+# SCENE PARSING
+
+function parse_scene(stream::InputStream, scene::Scene = Scene())
+    while !eof(stream)
+        command_token = expect_command(stream, (USING, SET, UNSET,SPAWN, DUMP))
+        unread_token(stream, command_token)
+        command = command_token.value
+        if command == USING
+            parse_using_command(stream, scene)
+        elseif command == SET
+            parse_set_command(stream, scene)
+        elseif command == UNSET
+            parse_unset_command(stream, scene)
+        elseif command == SPAWN
+            parse_spawn_command(stream, scene)
+        elseif command == DUMP
+            parse_dump_command(stream, scene)
+        else
+            @assert false "Got unparsable command '$command' from expect_command."
+        end
+    end
+    scene
+end
