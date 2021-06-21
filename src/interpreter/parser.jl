@@ -846,14 +846,27 @@ function parse_explicit_image(stream::InputStream, table::IdTable)
     expect_symbol(stream, Symbol("("))
     next_token = read_token(stream)
     unread_token(stream, next_token)
+    type = isa(next_token.value, Identifier) ?
+        findfirst(d -> haskey(d, next_token.value.value), table) :
+        next_token.value
+
+    image = if isa(type, LiteralString)
     str_value = parse_string(stream, table)
     file_path = joinpath(split(str_value, "/")...)
     isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
-    image = try 
+        try 
         load(file_path)
     catch e
         isa(e, ErrorException) || rethrow(e)
         throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
+    end
+    elseif isa(type, LiteralNumber)
+        width = parse_int(stream, table)
+        expect_symbol(stream, Symbol(","))
+        height = parse_int(stream, table)
+        HdrImage(width, height)
+    else
+        throw(WrongTokenType(next_token.loc, "Expected a 'LiteralString' file path, a 'LiteralNumber', or an 'Identifier': got a $type", next_token.length))
     end
     expect_symbol(stream, Symbol(")"))
     image
