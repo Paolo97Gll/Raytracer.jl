@@ -53,11 +53,13 @@ const valid_operations = Dict(:+     => ( ::Int) -> true,
                               :round => (n::Int) -> n == 1)
 
 """
-    isvalid(expr::Expr, str_len::Int)
+    Raytracer.isvalid(expr::Expr, str_len::Int, token_location::SourceLocation)
 
-Return `true` if the given expression is valid in a SceneLang script, else throw an appropriate exception.
+Return `true` if the given expression is valid in a SceneLang script, else throw an appropriate exception using `str_len` and `token_location`.
+
+See also: [`valid_operations`](@ref)
 """
-function isvalid(expr::Expr, str_len::Int)
+function Raytracer.isvalid(expr::Expr, str_len::Int, token_location::SourceLocation)
     expr.head == :call || 
         throw(InvalidExpression(token_location, "Invalid mathematical expression: expression head is not a call", str_len + 1))
     op_name = expr.args[begin]
@@ -70,5 +72,5 @@ function isvalid(expr::Expr, str_len::Int)
     valid_operations[op_name](length(expr.args) - 1) ||
         throw(invalidEcpression(token_location, "Invalid mathematical expression: operation '$op_name' takes only $(valid_operations[op_name]) arguments, got $(length(expr.args) -1)", str_len + 1))
     
-    return all(arg -> (isa(arg, Expr) ? isvalid(arg, str_len) : true), expr.args[begin + 1:end])
+    return all(arg -> (isa(arg, Expr) ? Raytracer.isvalid(arg, str_len, token_location) : true), expr.args[begin + 1:end])
 end
