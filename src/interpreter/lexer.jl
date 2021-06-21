@@ -52,7 +52,7 @@ Push a character back to the stream.
 function unread_char!(stream::InputStream, ch::Char)
     @assert isnothing(stream.saved_char)
     stream.saved_char = ch
-    stream.location = stream.saved_location
+    stream.location = copy(stream.saved_location)
 end
 
 """
@@ -149,7 +149,7 @@ end
 Parse the stream into a [`Token`](@ref) with [`Command`](@ref) or [`Type`](@ref) value.
 """
 function _parse_command_or_type_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
-    start_loc = copy(stream.location)
+    start_loc = copy(stream.saved_location)
     str = first_char |> string
     while true
         ch = read_char!(stream)
@@ -244,7 +244,7 @@ function read_token(stream::InputStream)
     # At this point we must check what kind of token begins with the "ch" character
     # (which has been put back in the stream with stream.unread_char). First,
     # we save the position in the stream
-    token_location = copy(stream.location)
+    token_location = copy(stream.saved_location)
 
     if issymbol(ch)
         # One-character symbol, like '(' or ','

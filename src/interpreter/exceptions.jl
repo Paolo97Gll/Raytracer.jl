@@ -62,9 +62,8 @@ function Base.showerror(io::IO, e::InterpreterException)
     println(io)
     printstyled(io, "source: ", color=:light_black)
     println(io, read_at_line(e.location.file_name, e.location.line_num))
-    printstyled(io, " " ^ (e.location.col_num + 6), color=:light_black)
+    printstyled(io, " " ^ (e.location.col_num + 7), color=:light_black)
     printstyled(io, "^" ^ e.len, color=:red)
-    println(io)
 end
 
 function Base.showerror(io::IO, e::InterpreterException, bt; backtrace = false)
