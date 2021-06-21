@@ -392,7 +392,9 @@ function parse_constructor(stream::InputStream, table::IdTable)
     next_val = next_token.value
     if isa(next_val, Command)
         next_val ∈ (ROTATE, TRANSLATE, SCALE) &&
-            return (parse_transformation(stream, table), TransformationType)
+            return (parse_transformation_from_command(stream, table), TransformationType)
+        next_val == LOAD &&
+            return (parse_image_from_command(stream, table), ImageType)
         throw(InvalidCommand(next_token.loc, "Command '$next_val' is not a valid construction command."))
     elseif isa(next_val, LiteralType)
         for (type, parser) ∈ (ListType           => parse_list,
@@ -403,14 +405,14 @@ function parse_constructor(stream::InputStream, table::IdTable)
                               BrdfType           => parse_brdf,
                               PigmentType        => parse_pigment,
                               ShapeType          => parse_shape,
-                              #LightType          => parse_light, # TODO
-                              #ImageType          => parse_image, # TODO
+                              LightType          => parse_light,
+                              ImageType          => parse_image,
                               RendererType       => parse_renderer_settings,
                               CameraType         => parse_camera)
             next_val == type || continue
             return (parser(stream, table), type)
         end
-        throw(WrongValueType("LiteralType $next_val has no named constructor."))
+        @assert false "@ $(next_token.loc): LiteralType $next_val has no named constructor."
     elseif isa(next_val, LiteralNumber) || isa(next_val, MathExpression)
         return (parse_float(stream, table), LiteralNumber)
     elseif isa(next_val, LiteralSymbol)
@@ -802,6 +804,65 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
     kwargs = generate_kwargs(stream, table, kw)
 
     RendererSettings((res_type, kwargs))
+end
+
+function parse_light(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(RendererType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    expect_type(stream, LightType)
+
+    kw =  (; position = parse_point,
+             color = parse_color,
+             linear_radius = parse_float)
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    PointLight(; kwargs...)
+end
+
+function parse_image(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ImageType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    if isa(next_token.value, LiteralType)
+        parse_explicit_image(stream, table)
+    elseif isa(next_token.value, Command)
+        parse_image_from_command(stream, table)
+    else
+        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
+    end
+end
+
+function parse_explicit_image(stream::InputStream, table::IdTable)
+    expect_type(stream, ImageType)
+    expect_symbol(stream, Symbol("("))
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    str_value = parse_string(stream, table)
+    file_path = joinpath(split(str_value, "/")...)
+    isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
+    image = try 
+        load(file_path)
+    catch e
+        isa(e, ErrorException) || rethrow(e)
+        throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
+    end
+    expect_symbol(stream, Symbol(")"))
+    image
+end
+
+function parse_image_from_command(stream::InputStream, table::IdTable)
+    expect_command(stream, LOAD)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    str_value = parse_string(stream, table)
+    file_path = joinpath(split(str_value, "/")...)
+    isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
+    try 
+        load(file_path)
+    catch e
+        isa(e, ErrorException) || rethrow(e)
+        throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
+    end
 end
 
 ############
