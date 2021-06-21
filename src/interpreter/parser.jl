@@ -224,10 +224,10 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`Keyword`](@r
 function expect_keyword(stream::InputStream, keywords_list::Union{NTuple{N, Symbol} where {N}, AbstractVector{Symbol}})
     token = read_token(stream)
     isa(token.value, Keyword) || throw(WrongTokenType(token.loc,
-                                                      "Expected a keyword instead of '$(typeof(token.value))'\nValid keywords: $(join(keywords_list, ", "))",
+                                                      "Expected a keyword instead of '$(typeof(token.value))'\nValid keywords:\n\t$(join(keywords_list, "\n\t"))",
                                                       token.length))
     token.value.value ∈ keywords_list || throw(InvalidKeyword(token.loc,
-                                                              "Invalid '$(token.value.value)' keyword\nValid keywords: $(join(keywords_list, ", "))",
+                                                              "Invalid '$(token.value.value)' keyword\nValid keywords:\n\t$(join(keywords_list, "\n\t"))",
                                                               token.length))
     token
 end
@@ -252,8 +252,8 @@ Read a token from an [`InputStream`](@ref) and check that it is a given [`Comman
 """
 function expect_command(stream::InputStream, command::Command)
     token = expect_command(stream)
-    token.value == command || throw(InvalidSymbol(token.loc,
-                                                  "Invalid command '$(token.value)'\nValid commands: $command",
+    token.value == command || throw(InvalidCommand(token.loc,
+                                                  "Invalid command '$(token.value)'\nValid command: $command",
                                                   token.length))
     token
 end
@@ -265,8 +265,8 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`Command`](@r
 """
 function expect_command(stream::InputStream, commands::Union{NTuple{N, Command} where {N}, AbstractVector{Command}})
     token = expect_command(stream)
-    token.value ∈ commands || throw(InvalidSymbol(token.loc,
-                                                  "Invalid command '$(token.value.value)'\nValid commands:\n\t$(join(commands, "\n\t"))",
+    token.value ∈ commands || throw(InvalidCommand(token.loc,
+                                                  "Invalid command '$(token.value)'\nValid commands:\n\t$(join(commands, "\n\t"))",
                                                   token.length))
     token
 end
