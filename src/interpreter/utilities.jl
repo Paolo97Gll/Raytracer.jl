@@ -43,6 +43,16 @@ Check if `c` is in a partucular set of characters used in a SceneLang script.
 """
 issymbol(c::Char) = c ∈ "{}()<>[],*"
 
+"""
+    valid_operations
+
+A dictionary storing the operation `Symbol` and a function `::Int -> ::Bool` that return true when the number of arguments is under a threshold.
+
+For example the pair `:+ => ( ::Int) -> true` indicates that the operation `+` is valid with any number of arguments, 
+while the pair `:floor => (n::Int) -> n == 1` indicates that the operation `floor` is valid only if it has one argument.
+
+See also: [`Raytracer.isvalid`](@ref)
+"""
 const valid_operations = Dict(:+     => ( ::Int) -> true, 
                               :-     => ( ::Int) -> true, 
                               :*     => ( ::Int) -> true, 

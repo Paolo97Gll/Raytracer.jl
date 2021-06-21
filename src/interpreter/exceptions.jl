@@ -11,7 +11,21 @@ using Base: String
 
 Abstract type for all SceneLang interpreter errors.
 
-See also: [`GrammarException`](@ref)
+See also:
+[`BadCharacter`](@ref),
+[`UnfinishedExpression`](@ref),
+[`UndefinedIdentifier`](@ref),
+[`WrongTokenType`](@ref),
+[`WrongValueType`](@ref),
+[`InvalidKeyword`](@ref),
+[`InvalidType`](@ref),
+[`InvalidCommand`](@ref),
+[`InvalidExpression`](@ref),
+[`InvalidSymbol`](@ref),
+[`InvalidNumber`](@ref),
+[`InvalidSize`](@ref),
+[`InvalidFilePath`](@ref),
+[`IdentifierRedefinition`](@ref)
 """
 abstract type InterpreterException <: Exception end
 

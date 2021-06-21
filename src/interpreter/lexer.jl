@@ -200,6 +200,11 @@ function _parse_identifier_token(stream::InputStream, first_char::Char, token_lo
     Token(token_location, Identifier(sym), length(str))
 end
 
+"""
+    _parse_math_expression_token(stream::InputStream, token_location::SourceLocation)
+
+Parse the stream into a [`Token`](@ref) with [`MathExpression`](@ref) value.
+"""
 function _parse_math_expression_token(stream::InputStream, token_location::SourceLocation)
     str = ""
     while true

@@ -3,6 +3,11 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Parser of SceneLang
+"""
+    ValueLoc
+
+Stores a Julia value and the source location of its declaration.
+"""
 struct ValueLoc
     value::Any
     loc::SourceLocation
@@ -18,14 +23,20 @@ function Base.show(io::IO, ::MIME"text/plain", valueloc::ValueLoc)
     printstyled(io, " @ ", valueloc.loc, color = :light_black)
 end
 
+"""
+    IdTableKey
+
+Alias for `Union{Type{<:TokenValue}, LiteralType}`. Used as the key type for [`IdTable`](@ref).
+"""
 const IdTableKey = Union{Type{<:TokenValue}, LiteralType}
 
 """
     IdTable
 
-Alias to `Dict{Type{<:TokenValue}, Dict{Symbol, Token{V} where {V}}}`.
+Alias to `Dict{IdTableKey, Dict{Symbol, ValueLoc}}`.
 
-Dictionary with all the variables read from a SceneLang script.
+Dictionary with all the variables set in a SceneLang script. 
+Keys represent the equivalent [`TokenValue`](@ref) or [`LiteralType`](@ref) type to the Julia type stored in [`ValueLoc`](@ref).
 """
 const IdTable = Dict{IdTableKey, Dict{Symbol, ValueLoc}}
 
@@ -45,12 +56,58 @@ function Base.show(io::IO, ::MIME"text/plain", table::IdTable)
     end
 end
 
-const RendererSettings = NamedTuple{(:type, :kwargs), Tuple{Type{<:Renderer}, NamedTuple}}
+"""
+    RendererSettings
 
+Struct containing a renderer type and a `NamedTuple` of the named arguments needed for its construction.
+
+Since a [`Renderer`](@ref) type cannot be directly stored into a [`Scene`](@ref) due to it needing at least the [`World`](@ref) argument,
+we can use this struct to store everything else, ready to be constructed.
+"""
+struct RendererSettings
+    type::Type{<:Renderer}
+    kwargs::NamedTuple
+end
+
+"""
+    CameraOrNot
+
+Alias for `Union{Camera, Nothing}`.
+
+See also: [`Scene`](@ref)
+"""
 const CameraOrNot = Union{Camera, Nothing}
+"""
+    RendererOrNot
+
+Alias for `Union{RendererSettings, Nothing}`.
+
+See also: [`Scene`](@ref)
+"""
 const RendererOrNot = Union{RendererSettings, Nothing}
+"""
+    ImageOrNot
+
+Alias for `Union{HdrImage, Nothing}`.
+
+See also: [`Scene`](@ref)
+"""
 const ImageOrNot = Union{HdrImage, Nothing}
 
+"""
+    Scene
+
+A mutable struct containing all the significant elements of a renderable scene and all the declared variables of the SceneLang script.
+
+# Fields
+
+`variables::`[`IdTable`](@ref): stores all the variables declared in the script
+`world::`[`World`](@ref): stores all the spawned [`Shape`](@ref)s
+`lights::`[`Lights`](@ref): stores all the spawned [`PointLight`](@ref)s
+`image::`[`ImageOrNot`](@ref): stores either the [`HdrImage`](@ref) to impress or `nothing`
+`camera::`[`CameraOrNot`](@ref): stores either the [`Camera`](@ref) or `nothing`
+`renderer::`[`RendererOrNot`](@ref): stores either the [`RendererSettings`](@ref) for the [`Renderer`](@ref) or `nothing`
+"""
 mutable struct Scene
     variables::IdTable
     world::World
@@ -60,6 +117,16 @@ mutable struct Scene
 	renderer::RendererOrNot
 end
 
+"""
+    Scene(; variables::IdTable = IdTable(), 
+            world::World = World(), 
+            lights::Lights = Lights(), 
+            image::ImageOrNot = nothing, 
+            camera::CameraOrNot = nothing, 
+            renderer::RendererOrNot = nothing)
+
+Constructor for a [`Scene`](@ref) instance.
+"""
 function Scene(; variables::IdTable = IdTable(), 
                  world::World = World(), 
                  lights::Lights = Lights(), 
@@ -69,6 +136,18 @@ function Scene(; variables::IdTable = IdTable(),
 	Scene(variables, world, lights, image, camera, renderer)
 end
 
+"""
+    Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, Token}}}}; 
+          world::World = World(), 
+          lights::Lights = Lights(), 
+          image::ImageOrNot = nothing, 
+          camera::CameraOrNot = nothing, 
+          renderer::RendererOrNot = nothing)
+
+Constructor for a [`Scene`](@ref) instance.
+
+Slightly more convenient than the default constructor to manually construct in a Julia code.
+"""
 function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, Token}}}}; 
                world::World = World(), lights::Lights = Lights(), 
                image::ImageOrNot = nothing, 
@@ -162,6 +241,16 @@ function evaluate_math_expression(token::Token{MathExpression}, vars::IdTable)
     res
 end
 
+"""
+    function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
+
+Return a `Dict{Symbol, Any}` as instructed by the given `kw` `NamedTuple`.
+
+The argument `kw` pairs all the keywords a constructor need with the parsing functions they need.
+This function parses keywords and/or values until it reaches the end of the constructor.
+The arguments may also be positional, but positional arguments must not follow keyword arguments.
+If a keyword is used more than once an exception is thrown.
+"""
 function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
     expect_symbol(stream, Symbol("("))
     kwargs = Dict{Symbol, Any}()
@@ -189,6 +278,11 @@ function generate_kwargs(stream::InputStream, table::IdTable, kw::NamedTuple)
     kwargs
 end
 
+"""
+    parse_by_identifier(expected_type::IdTableKey, stream::InputStream, table::IdTable)
+
+If the next token is an [`Identifier`](@ref), check that its type is coherent with `expected_type` and return its value.
+"""
 function parse_by_identifier(expected_type::IdTableKey, stream::InputStream, table::IdTable)
     next_token = read_token(stream)
     unread_token(stream, next_token)
@@ -391,6 +485,13 @@ end
 ###############
 ## CONSTRUCTORS
 
+"""
+    parse_constructor(stream::InputStream, table::IdTable)
+
+Return a `Tuple{Any, IdTableKey}` containing the result of the construction and its type.
+
+If the expression from the `stream` is not a valid constructor an exception is thrown.
+"""
 function parse_constructor(stream::InputStream, table::IdTable)
     next_token = read_token(stream)
     unread_token(stream, next_token)
@@ -437,11 +538,23 @@ function parse_constructor(stream::InputStream, table::IdTable)
     end
 end
 
+"""
+    parse_string(stream::InputStream, table::IdTable)
+
+Return a `String` value from either a [`LiteralString`](@ref) constructor or an appropriate [`Identifier`](@ref).
+"""
 function parse_string(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(LiteralString, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_string(stream).value.value
 end
 
+"""
+    parse_int(stream::InputStream, table::IdTable)
+
+Return a `Int` value from either a [`LiteralNumber`](@ref) constructor or an appropriate [`Identifier`](@ref).
+
+If the `Float32` number is not exactly representing an integer number an exception is thrown.
+"""
 function parse_int(stream::InputStream, table::IdTable)
     n_token = if parse_by_identifier(LiteralNumber, stream, table) |> isnothing 
         expect_number(stream, table)
@@ -457,12 +570,21 @@ function parse_int(stream::InputStream, table::IdTable)
     end
 end
 
+"""
+    parse_float(stream::InputStream, table::IdTable)
+
+Return a `Float32` value from either a [`LiteralNumber`](@ref) constructor or an appropriate [`Identifier`](@ref).
+"""
 function parse_float(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(LiteralNumber, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_number(stream, table).value.value
 end
 
-# parse_vector(s: InputStream, scene: Scene) -> Vec
+"""
+    parse_list(stream::InputStream, table::IdTable)
+
+Return a `Vector{Float32}` value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+"""
 function parse_list(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ListType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
@@ -486,6 +608,13 @@ function parse_list(stream::InputStream, table::IdTable)
     vec
 end
 
+"""
+    parse_list(stream::InputStream, table::IdTable, list_length::Int)
+
+Return a `SVector{list_length, Float32}` value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+
+If the list is not exactly `list_length` long an exception will be thrown.
+"""
 function parse_list(stream::InputStream, table::IdTable, list_length::Int)
     @assert list_length >= 1 "list must have size of at least 1"
     if (from_id = parse_by_identifier(ListType, stream, table)) |> !isnothing 
@@ -506,6 +635,13 @@ function parse_list(stream::InputStream, table::IdTable, list_length::Int)
     vec
 end
 
+"""
+    parse_point(stream::InputStream, table::IdTable)
+
+Return a [`Point`](@ref) value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+
+If the constructor has not exactly three arguments an exception will be thrown.
+"""
 function parse_point(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
@@ -530,7 +666,13 @@ function parse_point(stream::InputStream, table::IdTable)
     Point(x, y, z)
 end
 
-# parse_color(s: InputStream, scene: Scene) -> Color
+"""
+    parse_color(stream::InputStream, table::IdTable)
+
+Return a `RGB{Float32}` value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+
+If the constructor has not exactly three arguments an exception will be thrown.
+"""
 function parse_color(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
@@ -554,7 +696,14 @@ function parse_color(stream::InputStream, table::IdTable)
     return RGB(red, green, blue)
 end
 
-# parse_pigment(s: InputStream, scene: Scene) -> Pigment
+"""
+    parse_pigment(stream::InputStream, table::IdTable)
+
+Return a [`Pigment`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+
+The concrete type is determined by the first keyword after the `PigmentType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
+"""
 function parse_pigment(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(PigmentType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, PigmentType)
@@ -586,7 +735,14 @@ function parse_pigment(stream::InputStream, table::IdTable)
     res_type(; kwargs...)
 end
 
-# parse_brdf(s: InputStream, scene: Scene) -> BRDF
+"""
+    parse_brdf(stream::InputStream, table::IdTable)
+
+Return a [`BRDF`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+
+The concrete type is determined by the first keyword after the `BrdfType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
+"""
 function parse_brdf(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(BrdfType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, BrdfType)
@@ -613,7 +769,14 @@ function parse_brdf(stream::InputStream, table::IdTable)
     res_type(; kwargs...)
 end
 
-# parse_material(s: InputStream, scene: Scene) -> Tuple[str, Material]
+"""
+    parse_material(stream::InputStream, table::IdTable)
+
+Return a [`Material`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+
+The concrete type is determined by the first keyword after the `MaterialType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
+"""
 function parse_material(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(MaterialType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, MaterialType)
@@ -625,18 +788,29 @@ function parse_material(stream::InputStream, table::IdTable)
     Material(; kwargs...)
 end
 
-# parse_transformation(input_file, scene: Scene)
+"""
+    parse_transformation(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from either a named constructor,
+a construction command, or an appropriate [`Identifier`](@ref).
+
+If the constructor/command/identifier is followed by an `*` operator the transformations will be
+concatenated following the usual matrix multiplication rules (i.e. the rightmost transformation will
+be applied first).
+
+See also: [`parse_explicit_transformation`](@ref), [`parse_transformation_from_command`](@ref)
+"""
 function parse_transformation(stream::InputStream, table::IdTable)
     transformation = if (from_id = parse_by_identifier(TransformationType, stream, table)) |> isnothing
-    next_token = read_token(stream)
-    unread_token(stream, next_token)
+        next_token = read_token(stream)
+        unread_token(stream, next_token)
         if isa(next_token.value, LiteralType)
-        parse_explicit_transformation(stream, table)
-    elseif isa(next_token.value, Command)
-        parse_transformation_from_command(stream, table)
-    else
-        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
-    end
+            parse_explicit_transformation(stream, table)
+        elseif isa(next_token.value, Command)
+            parse_transformation_from_command(stream, table)
+        else
+            throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
+        end
     else
         read_token(stream) 
         from_id
@@ -648,6 +822,15 @@ function parse_transformation(stream::InputStream, table::IdTable)
         (unread_token(stream, next_token); transformation)
 end
 
+"""
+    parse_explicit_transformation(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from a named constructor taking a 16-long list as the only argument.
+
+There is no way to set the inverse matrix, so it will be calculated by the `inv` algorithm upon construction.
+
+See also: [`parse_transformation`](@ref)
+"""
 function parse_explicit_transformation(stream::InputStream, table::IdTable)
     expect_type(stream, TransformationType)
     expect_symbol(stream, Symbol("("))
@@ -656,6 +839,13 @@ function parse_explicit_transformation(stream::InputStream, table::IdTable)
     Transformation(mat)
 end
 
+"""
+    parse_transformation_from_command(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from the `ROTATE`, `TRANSLATE`, and `SCALE` [`Command`](@ref)s.
+
+See also: [`parse_transformation`](@ref), [`parse_rotation`](@ref), [`parse_translation`](@ref), [`parse_scaling`](@ref)
+"""
 function parse_transformation_from_command(stream::InputStream, table::IdTable)
     command_token = expect_command(stream, (ROTATE, TRANSLATE, SCALE))
     unread_token(stream, command_token)
@@ -670,6 +860,17 @@ function parse_transformation_from_command(stream::InputStream, table::IdTable)
     end
 end
 
+"""
+    parse_rotation(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from the `ROTATE` [`Command`](@ref).
+
+The argument of this command is a sequence of keyword arguments, with keywords representing the three axes of rotation `.X`, `.Y`, and `.Z`,
+followed by a number representing the rotation angle in degrees. Each of these keyword arguments are separated by a `*` operator
+which behaves as a concatenation of rotation following the usual rules of matrix multiplication (i.e. the rightmost rotation will be the first to be applied)
+
+See also: [`parse_transformation_from_command`](@ref)
+"""
 function parse_rotation(stream::InputStream, table::IdTable)
     expect_command(stream, ROTATE)
     expect_symbol(stream, Symbol("("))
@@ -691,6 +892,17 @@ function parse_rotation(stream::InputStream, table::IdTable)
     transformation
 end
 
+"""
+    parse_translation(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from the `TRANSLATE` [`Command`](@ref).
+
+The arguments of this command are a sequence of keyword arguments, with keywords representing the three axes of translation `.X`, `.Y`, and `.Z`,
+followed by a number representing the displacement. Each of these keyword arguments are separated by a `,`. 
+The order of these arguments is indifferent since, in our euclidean space, translations are commutative transformations.
+
+See also: [`parse_transformation_from_command`](@ref)
+"""
 function parse_translation(stream::InputStream, table::IdTable)
     expect_command(stream, TRANSLATE)
 
@@ -701,6 +913,19 @@ function parse_translation(stream::InputStream, table::IdTable)
     translation(get(kwargs, :X, 0f0), get(kwargs, :Y, 0f0), get(kwargs, :Z, 0f0)) 
 end
 
+"""
+    parse_scaling(stream::InputStream, table::IdTable)
+
+Return a [`Transformation`](@ref) value from the `SCALE` [`Command`](@ref).
+
+The arguments of this command are a sequence of keyword arguments, with keywords representing the three axes of scaling `.X`, `.Y`, and `.Z`,
+followed by a number representing the scaling factor. Each of these keyword arguments are separated by a `,`. 
+The order of these arguments is indifferent since, in our euclidean space, scalings are commutative transformations.
+
+An alternate form of this command sees only one numeric argument, without parenthesis, and indicates uniform scaling in all directions.
+
+See also: [`parse_transformation_from_command`](@ref)
+"""
 function parse_scaling(stream::InputStream, table::IdTable)
     expect_command(stream, SCALE)
 
@@ -716,7 +941,14 @@ function parse_scaling(stream::InputStream, table::IdTable)
     scaling(get(kwargs, :X, 1f0), get(kwargs, :Y, 1f0), get(kwargs, :Z, 1f0)) 
 end
 
-# parse_camera(s: InputStream, scene) -> Camera
+"""
+    parse_camera(stream::InputStream, table::IdTable)
+
+Return a [`Camera`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+
+The concrete type is determined by the first keyword after the `CameraType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
+"""
 function parse_camera(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(CameraType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, CameraType)
@@ -742,7 +974,14 @@ function parse_camera(stream::InputStream, table::IdTable)
     res_type(; kwargs...)
 end
 
-####################
+"""
+    parse_shape(stream::InputStream, table::IdTable)
+
+Return a [`Shape`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+
+The concrete type is determined by the first keyword after the `ShapeType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
+"""
 function parse_shape(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, ShapeType)
@@ -761,21 +1000,14 @@ function parse_shape(stream::InputStream, table::IdTable)
     res_type(; kwargs...)
 end
 
-function parse_shape(res_type::Type{<:Shape}, stream::InputStream, table::IdTable)
-    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
-    expect_type(stream, ShapeType)
-    expect_keyword(stream, (Symbol(res_type),)).value.value
+"""
+    parse_renderer_settings(stream::InputStream, table::IdTable)
 
-    kw = (; material = parse_material, transformation = parse_transformation)
+Return a [`RendererSettings`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
 
-    kwargs = generate_kwargs(stream, table, kw)
-
-    res_type(; kwargs...)
-end
-
-# parse_sphere(s: InputStream, scene: Scene) -> Sphere
-# parse_plane(s: InputStream, scene: Scene) -> Plane
-
+The renderer type is determined by the first keyword after the `RendererType` token, 
+which also determines the keyword arguments to be read by [`generate_kwargs`](@ref) and stored in the `kwargs` field of the result.
+"""
 function parse_renderer_settings(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(RendererType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, RendererType)
@@ -812,9 +1044,14 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
 
     kwargs = generate_kwargs(stream, table, kw)
 
-    RendererSettings((res_type, kwargs))
+    RendererSettings(res_type, kwargs)
 end
 
+"""
+    parse_light(stream::InputStream, table::IdTable)
+
+Return a [`PointLight`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+"""
 function parse_light(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(RendererType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     expect_type(stream, LightType)
@@ -828,6 +1065,14 @@ function parse_light(stream::InputStream, table::IdTable)
     PointLight(; kwargs...)
 end
 
+"""
+    parse_image(stream::InputStream, table::IdTable)
+
+Return an [`HdrImage`](@ref) value from either a named constructor,
+a construction command, or an appropriate [`Identifier`](@ref).
+
+See also: [`parse_explicit_image`](@ref), [`parse_image_from_command`](@ref)
+"""
 function parse_image(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ImageType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
@@ -841,6 +1086,17 @@ function parse_image(stream::InputStream, table::IdTable)
     end
 end
 
+"""
+    parse_explicit_image(stream::InputStream, table::IdTable)
+
+Return an [`HdrImage`](@ref) value from a named constructor.
+
+There are two versions of the constructor:
+- one taking a valid file path [`LiteralString`](@ref) as the only argument and loading the image stored in that file
+- the other taking two integer [`LiteralNumber`](@ref)s as width and height and constructing an empty image.
+
+See also: [`parse_image`](@ref)
+"""
 function parse_explicit_image(stream::InputStream, table::IdTable)
     expect_type(stream, ImageType)
     expect_symbol(stream, Symbol("("))
@@ -851,15 +1107,15 @@ function parse_explicit_image(stream::InputStream, table::IdTable)
         next_token.value
 
     image = if isa(type, LiteralString)
-    str_value = parse_string(stream, table)
-    file_path = joinpath(split(str_value, "/")...)
-    isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
+        str_value = parse_string(stream, table)
+        file_path = joinpath(split(str_value, "/")...)
+        isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
         try 
-        load(file_path)
-    catch e
-        isa(e, ErrorException) || rethrow(e)
-        throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
-    end
+            load(file_path)
+        catch e
+            isa(e, ErrorException) || rethrow(e)
+            throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
+        end
     elseif isa(type, LiteralNumber)
         width = parse_int(stream, table)
         expect_symbol(stream, Symbol(","))
@@ -872,6 +1128,15 @@ function parse_explicit_image(stream::InputStream, table::IdTable)
     image
 end
 
+"""
+    parse_image_from_command(stream::InputStream, table::IdTable)
+
+Return an [`HdrImage`](@ref) value from the `LOAD` [`Command`](@ref).
+
+The `LOAD` [`Command`](@ref) takes only one [`LiteralString`](@ref) representing a valid file path to an image file as an argument.
+
+See also: [`parse_image`](@ref)
+"""
 function parse_image_from_command(stream::InputStream, table::IdTable)
     expect_command(stream, LOAD)
     next_token = read_token(stream)
