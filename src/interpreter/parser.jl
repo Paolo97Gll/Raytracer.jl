@@ -296,6 +296,19 @@ function expect_type(stream::InputStream, type::LiteralType)
 end
 
 """
+    expect_type(stream::InputStream, types::Union{NTuple{N, LiteralType} where {N}, AbstractVector{LiteralType}})
+
+Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralType`](@ref) in the given `types`.
+"""
+function expect_type(stream::InputStream, types::Union{NTuple{N, LiteralType} where {N}, AbstractVector{LiteralType}})
+    token = expect_type(stream)
+    token.value ∈ types || throw(WrongValueType(token.loc,
+                                               "Invalid type '$(token.value)'\nValid types:\n\t$(join(commands, "\n\t"))",
+                                               token.length))
+    token
+end
+
+"""
     expect_identifier(stream::InputStream)
 
 Read a token from an [`InputStream`](@ref) and check that it is an [`Identifier`](@ref).
