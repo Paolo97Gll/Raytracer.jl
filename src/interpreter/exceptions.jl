@@ -103,3 +103,11 @@ end
 @make_exception InvalidFilePath        "The given file path is invalid."
 @make_exception IdentifierRedefinition "An identifier is being redefined without being unset first."
 @make_exception SettingRedefinition    "A rendering setting is being defined multiple times."
+@make_exception UndefinedSetting       "One or more necessary rendering settings have not been set up in the SceneLang script."
+
+function Base.showerror(io::IO, e::UndefinedSetting)
+    print(io, typeof(e))
+    printstyled(io, " @ ", e.location.file_name, color=:light_black)
+    println(io)
+    printstyled(io, e.msg, color=:red)
+end
