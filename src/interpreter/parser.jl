@@ -70,6 +70,18 @@ struct RendererSettings
 end
 
 """
+    TracerSettings
+
+Struct containing a `NamedTuple` of the named arguments needed to construct an [`ImageTracer`](@ref).
+
+Since a [`ImageTracer`](@ref) type cannot be directly stored into a [`Scene`](@ref) due to it needing at least the [`Camera`](@ref) 
+and [`Image`](@ref) arguments, we can use this struct to store everything else, ready to be constructed.
+"""
+struct TracerSettings
+    kwargs::NamedTuple
+end
+
+"""
     CameraOrNot
 
 Alias for `Union{Camera, Nothing}`.
@@ -93,6 +105,14 @@ Alias for `Union{HdrImage, Nothing}`.
 See also: [`Scene`](@ref)
 """
 const ImageOrNot = Union{HdrImage, Nothing}
+"""
+    TracerOrNot
+
+Alias for `Union{TracerSettings, Nothing}`.
+
+See also: [`Scene`](@ref)
+"""
+const TracerOrNot = Union{TracerSettings, Nothing}
 
 """
     Scene
@@ -101,12 +121,13 @@ A mutable struct containing all the significant elements of a renderable scene a
 
 # Fields
 
-`variables::`[`IdTable`](@ref): stores all the variables declared in the script
-`world::`[`World`](@ref): stores all the spawned [`Shape`](@ref)s
-`lights::`[`Lights`](@ref): stores all the spawned [`PointLight`](@ref)s
-`image::`[`ImageOrNot`](@ref): stores either the [`HdrImage`](@ref) to impress or `nothing`
-`camera::`[`CameraOrNot`](@ref): stores either the [`Camera`](@ref) or `nothing`
-`renderer::`[`RendererOrNot`](@ref): stores either the [`RendererSettings`](@ref) for the [`Renderer`](@ref) or `nothing`
+- `variables::`[`IdTable`](@ref): stores all the variables declared in the script
+- `world::`[`World`](@ref): stores all the spawned [`Shape`](@ref)s
+- `lights::`[`Lights`](@ref): stores all the spawned [`PointLight`](@ref)s
+- `image::`[`ImageOrNot`](@ref): stores either the [`HdrImage`](@ref) to impress or `nothing`
+- `camera::`[`CameraOrNot`](@ref): stores either the [`Camera`](@ref) or `nothing`
+- `renderer::`[`RendererOrNot`](@ref): stores either the [`RendererSettings`](@ref) for the [`Renderer`](@ref) or `nothing`
+- `tracer::`[`TracerOrNot`](@ref): strores either the [`TracerSettings`](@ref) for the [`ImageTracer`](@ref) or `nothing`
 """
 mutable struct Scene
     variables::IdTable
@@ -115,6 +136,7 @@ mutable struct Scene
     image::ImageOrNot
 	camera::CameraOrNot
 	renderer::RendererOrNot
+    tracer::TracerOrNot
 end
 
 """
@@ -123,7 +145,9 @@ end
             lights::Lights = Lights(), 
             image::ImageOrNot = nothing, 
             camera::CameraOrNot = nothing, 
-            renderer::RendererOrNot = nothing)
+            renderer::RendererOrNot = nothing,
+            tracer::TracerOrNot = nothing)
+
 
 Constructor for a [`Scene`](@ref) instance.
 """
@@ -132,8 +156,9 @@ function Scene(; variables::IdTable = IdTable(),
                  lights::Lights = Lights(), 
                  image::ImageOrNot = nothing, 
                  camera::CameraOrNot = nothing, 
-                 renderer::RendererOrNot = nothing)
-	Scene(variables, world, lights, image, camera, renderer)
+                 renderer::RendererOrNot = nothing,
+                 tracer::TracerOrNot = nothing)
+	Scene(variables, world, lights, image, camera, renderer, tracer)
 end
 
 """
@@ -142,7 +167,9 @@ end
           lights::Lights = Lights(), 
           image::ImageOrNot = nothing, 
           camera::CameraOrNot = nothing, 
-          renderer::RendererOrNot = nothing)
+          renderer::RendererOrNot = nothing,
+          tracer::TracerOrNot = nothing)
+
 
 Constructor for a [`Scene`](@ref) instance.
 
@@ -152,9 +179,11 @@ function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, To
                world::World = World(), lights::Lights = Lights(), 
                image::ImageOrNot = nothing, 
                camera::CameraOrNot = nothing, 
-               renderer::RendererOrNot = nothing)
+               renderer::RendererOrNot = nothing,
+               tracer::TracerOrNot = nothing)
+
 	variables =  Dict(zip(first.(variables), (Dict(last(pair)) for pair ∈ variables)))
-	Scene(variables, world, lights, image, camera, renderer)
+	Scene(variables, world, lights, image, camera, renderer, tracer)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", scene::Scene)
@@ -202,9 +231,25 @@ function Base.show(io::IO, ::MIME"text/plain", scene::Scene)
     if !isnothing(scene.renderer)
         printstyled(io, "type", color = :green)
         println(io, " = ", scene.renderer.type)
+        if isempty(scene.renderer.kwargs)
+            printstyled(io, "default kwargs\n\n", color=:light_black)
+        else
         for (kw, value) ∈ pairs(scene.renderer.kwargs)
             printstyled(io, kw, color = :green)
             println(io, " = ", value)
+        end
+    end
+end
+
+    printstyled(io, ".TRACER\n\n", color = :magenta, bold= true)
+    if !isnothing(scene.tracer)
+        if isempty(scene.tracer.kwargs)
+            printstyled(io, "default kwargs\n\n", color=:light_black)
+        else
+            for (kw, value) ∈ pairs(scene.tracer.kwargs)
+                printstyled(io, kw, color = :green)
+                println(io, " = ", value)
+            end
         end
     end
 end
@@ -514,7 +559,9 @@ function parse_constructor(stream::InputStream, table::IdTable)
                               LightType          => parse_light,
                               ImageType          => parse_image,
                               RendererType       => parse_renderer_settings,
-                              CameraType         => parse_camera)
+                              CameraType         => parse_camera,
+                              PcgType            => parse_pcg,
+                              TracerType         => parse_tracer_settings)
             next_val == type || continue
             return (parser(stream, table), type)
         end
@@ -975,6 +1022,22 @@ function parse_camera(stream::InputStream, table::IdTable)
 end
 
 """
+    parse_pcg(stream::InputStream, table::IdTable)
+
+Return a [`PCG`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+"""
+function parse_pcg(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    expect_type(stream, PcgType)
+
+    kw = (; state = parse_int, inc = parse_int)
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    PCG(values(kwargs)...)
+end
+
+"""
     parse_shape(stream::InputStream, table::IdTable)
 
 Return a [`Shape`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
@@ -1044,7 +1107,23 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
 
     kwargs = generate_kwargs(stream, table, kw)
 
-    RendererSettings(res_type, kwargs)
+    RendererSettings(res_type, NamedTuple(pairs(kwargs)))
+end
+
+"""
+    parse_tracer_settings(stream::InputStream, table::IdTable)
+
+Return a [`TracerSettings`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
+"""
+function parse_tracer_settings(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(RendererType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    expect_type(stream, TracerType)
+
+    kw = (; samples_per_side = parse_int, rng = parse_pcg)
+
+    kwargs = generate_kwargs(stream, table, kw)
+
+    TracerSettings(NamedTuple(pairs(kwargs)))
 end
 
 """
@@ -1302,13 +1381,19 @@ function parse_using_command(stream::InputStream, scene::Scene)
             renderer = table[type][id_name].value 
             isnothing(scene.renderer) || throw(already_defined_exception(type)) 
             scene.renderer = renderer
+        elseif type == TracerType
+            tracer = table[type][id_name].value 
+            isnothing(scene.tracer) || throw(already_defined_exception(type)) 
+            scene.tracer = tracer
         else
             throw(WrongValueType(next_token.loc, "Variable '$id_name' stores a non-usable '$type' object\n" * 
                                     "Variable '$id_name' defined at $(table[type][id_name].loc)\n" *
                                     "Usable types are:\n\tCameraType\n\tImageType\n\tRendererType", next_token.length))
         end
     elseif isa(next_token.value, LiteralType)
-        type = expect_type(stream, (CameraType, ImageType, RendererType)).value
+        type_token = expect_type(stream, (CameraType, ImageType, RendererType, TracerType))
+        unread_token(stream, type_token)
+        type =type_token.value
         if type == CameraType
             camera = parse_camera(stream, table)
             isnothing(scene.camera) || throw(already_defined_exception(type)) 
@@ -1321,6 +1406,10 @@ function parse_using_command(stream::InputStream, scene::Scene)
             renderer = parse_renderer_settings(stream, table)
             isnothing(scene.renderer) || throw(already_defined_exception(type)) 
             scene.renderer = renderer
+        elseif type == TracerType
+            tracer = parse_tracer_settings(stream, table)
+            isnothing(scene.tracer) || throw(already_defined_exception(type)) 
+            scene.tracer = tracer
         else
             @assert false "@ $(next_token.loc): expect_type returned a non-spawnable type '$type'"
         end
