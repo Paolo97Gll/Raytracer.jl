@@ -336,7 +336,7 @@ function parse_by_identifier(expected_type::IdTableKey, stream::InputStream, tab
     end
     id_name = next_token.value.value
     haskey(table[expected_type], id_name) && return table[expected_type][id_name].value
-    (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing || 
+    (type = findfirst(d -> haskey(d, id_name), table)) |> isnothing || 
         throw(WrongTokenType(next_token.loc, "Variable '$id_name' is of type '$type': expected '$expected_type'\nVariable '$id_name' was declared at $(table[type][id_name].loc)", next_token.length))
     throw(UndefinedIdentifier(next_token.loc, "Undefined variable '$id_name'", next_token.length))
 end
@@ -447,7 +447,7 @@ Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralType`
 function expect_type(stream::InputStream, types::Union{NTuple{N, LiteralType} where {N}, AbstractVector{LiteralType}})
     token = expect_type(stream)
     token.value ∈ types || throw(WrongValueType(token.loc,
-                                               "Invalid type '$(token.value)'\nValid types:\n\t$(join(commands, "\n\t"))",
+                                               "Invalid type '$(token.value)'\nValid types:\n\t$(join(types, "\n\t"))",
                                                token.length))
     token
 end
@@ -903,7 +903,7 @@ function parse_transformation_from_command(stream::InputStream, table::IdTable)
     elseif command_token.value == SCALE
         parse_scaling(stream, table)
     else
-        @assert false "@ command_token.loc): command token has unknown value $(command_token.value)"
+        @assert false "@ $(command_token.loc): command token has unknown value $(command_token.value)"
     end
 end
 
@@ -1186,11 +1186,10 @@ function parse_explicit_image(stream::InputStream, table::IdTable)
         next_token.value
 
     image = if isa(type, LiteralString)
-        str_value = parse_string(stream, table)
-        file_path = joinpath(split(str_value, "/")...)
+        file_path = parse_string(stream, table)
         isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
         try 
-            load(file_path)
+            load(file_path) |> HdrImage
         catch e
             isa(e, ErrorException) || rethrow(e)
             throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
@@ -1220,11 +1219,10 @@ function parse_image_from_command(stream::InputStream, table::IdTable)
     expect_command(stream, LOAD)
     next_token = read_token(stream)
     unread_token(stream, next_token)
-    str_value = parse_string(stream, table)
-    file_path = joinpath(split(str_value, "/")...)
+    file_path = parse_string(stream, table)
     isfile(file_path) || throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\ndoes not lead to a file" ,next_token.length))
     try 
-        load(file_path)
+        load(file_path) |> HdrImage
     catch e
         isa(e, ErrorException) || rethrow(e)
         throw(InvalidFilePath(next_token.loc,"The file path\n$file_path\nleads to a file of invalid format",next_token.length))
@@ -1364,7 +1362,7 @@ function parse_using_command(stream::InputStream, scene::Scene)
     next_token = read_token(stream)
     unread_token(stream, next_token)
     function already_defined_exception(type::Union{CameraOrNot, ImageOrNot, RendererOrNot})
-        SettingRedefinition(next_token.loc, "Scene setting of type '$(type)' already set.", next_token.length)
+        SettingRedefinition(next_token.loc, "Scene setting of type '$(type)' already in use.", next_token.length)
     end
     if isa(next_token.value, Identifier) 
         id_name = expect_identifier(stream).value.value    
