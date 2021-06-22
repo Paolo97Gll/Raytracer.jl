@@ -234,12 +234,12 @@ function Base.show(io::IO, ::MIME"text/plain", scene::Scene)
         if isempty(scene.renderer.kwargs)
             printstyled(io, "default kwargs\n\n", color=:light_black)
         else
-        for (kw, value) ∈ pairs(scene.renderer.kwargs)
-            printstyled(io, kw, color = :green)
-            println(io, " = ", value)
+            for (kw, value) ∈ pairs(scene.renderer.kwargs)
+                printstyled(io, kw, color = :green)
+                println(io, " = ", value)
+            end
         end
     end
-end
 
     printstyled(io, ".TRACER\n\n", color = :magenta, bold= true)
     if !isnothing(scene.tracer)
@@ -1574,4 +1574,67 @@ function parse_scene(stream::InputStream, scene::Scene = Scene())
         end
     end
     scene
+end
+
+function print_subsequent_lexer_exceptions(stream::InputStream, except::InterpreterException)
+    is_first_exception = true
+    while true
+        try
+            iterate(stream) |> isnothing && break
+        catch e
+            if is_first_exception 
+                is_first_exception = false
+                printstyled(stderr, "### OTHER LEXER ERRORS ###\n\n", color = :magenta)
+            end
+            isa(e, InterpreterException) || rethrow(e)
+            showerror(stderr, e)
+            println(stderr)
+        end
+    end
+    if !is_first_exception
+        println(stderr)
+        printstyled(stderr, "### MAIN PARSER ERROR ###\n\n", color = :magenta)
+    end
+    except
+end
+
+function render_scene_from_script(file_name::AbstractString; scene::Scene = Scene(), output_file_path::AbstractString = "out.pfm")
+    scene = open_stream(file_name) do stream
+        try
+            parse_scene(stream, scene)
+        catch e
+            isa(e, InterpreterException) || rethrow(e)
+            print_subsequent_lexer_exceptions(stream, e) |> rethrow
+        end
+    end
+
+    needs_lights = !isnothing(scene.renderer) && scene.renderer.type ∈ (PointLightRenderer,)
+
+    let are_not_defined = (isempty(scene.world)                  => "No shapes have been spawned.", 
+                           needs_lights && isempty(scene.lights) => "No lights have been spawned",
+                           isnothing(scene.camera)               => "No camera is being used.", 
+                           isnothing(scene.image)                => "No image is being used", 
+                           isnothing(scene.renderer)             => "No renderer is being used",
+                           isnothing(scene.tracer)               => "No tracer is being used")
+        if any(first.(are_not_defined))
+            throw(UndefinedSetting(SourceLocation(file_name = file_name), """
+            One or more necessary settings have not bene set by a USING or SPAWN command in the given SceneLang script.
+            in particular:\n\t$(join(last.(filter(first, are_not_defined)), "\n\t"))
+            """))
+        end
+    end
+
+    renderer = if needs_lights 
+        scene.renderer.type(scene.world, scene.lights; scene.renderer.kwargs...)
+    else
+        scene.renderer.type(scene.world; scene.renderer.kwargs...)
+    end
+
+    tracer = ImageTracer(scene.image, scene.camera; scene.tracer.kwargs...)
+    fire_all_rays!(tracer, renderer)
+    image = tracer.image
+    output_file_path = endswith(output_file_path, ".pfm") ? 
+        output_file_path : 
+        output_file_path * ".pfm"
+    save(output_file_path, permutedims(image.pixel_matrix))
 end
