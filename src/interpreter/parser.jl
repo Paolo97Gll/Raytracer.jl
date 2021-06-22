@@ -546,6 +546,8 @@ function parse_constructor(stream::InputStream, table::IdTable)
             return (parse_transformation_from_command(stream, table), TransformationType)
         next_val == LOAD &&
             return (parse_image_from_command(stream, table), ImageType)
+        next_val ∈ (UNITE, INTERSECT, DIFF, FUSE) &&
+            return (parse_shape_from_command(stream, table), ShapeType)
         throw(InvalidCommand(next_token.loc, "Command '$next_val' is not a valid construction command."))
     elseif isa(next_val, LiteralType)
         for (type, parser) ∈ (ListType           => parse_list,
@@ -1040,13 +1042,33 @@ end
 """
     parse_shape(stream::InputStream, table::IdTable)
 
+Return a [`Shape`](@ref) value from either a named constructor,
+a construction command, or an appropriate [`Identifier`](@ref).
+
+See also: [`parse_explicit_shape`](@ref), [`parse_shape_from_command`](@ref)
+"""
+function parse_shape(stream::InputStream, table::IdTable)
+    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    if isa(next_token.value, LiteralType)
+        parse_explicit_shape(stream, table)
+    elseif isa(next_token.value, Command)
+        parse_shape_from_command(stream, table)
+    else
+        throw(WrongTokenType(next_token.loc, "Expected either a 'LiteralType' or a 'Command', got '$(typeof(next_token.value))'" , next_token.length))
+    end
+end
+
+"""
+    parse_explicit_shape(stream::InputStream, table::IdTable)
+
 Return a [`Shape`](@ref) value from either a named constructor or an appropriate [`Identifier`](@ref).
 
 The concrete type is determined by the first keyword after the `ShapeType` token, 
 which also determines the keyword arguments to be read by [`generate_kwargs`](@ref).
 """
-function parse_shape(stream::InputStream, table::IdTable)
-    (from_id = parse_by_identifier(ShapeType, stream, table)) |> isnothing || (read_token(stream); return from_id)
+function parse_explicit_shape(stream::InputStream, table::IdTable)
     expect_type(stream, ShapeType)
     type_key = expect_keyword(stream, (
         :Cube, 
@@ -1061,6 +1083,101 @@ function parse_shape(stream::InputStream, table::IdTable)
     kwargs = generate_kwargs(stream, table, kw)
 
     res_type(; kwargs...)
+end
+
+"""
+    parse_shape_from_command(stream::InputStream, table::IdTable)
+
+Return a [`Shape`](@ref) value from the `UNITE`, `INTERSECT`, `DIFF`, and `FUSE` [`Command`](@ref)s.
+
+See also: [`parse_shape`](@ref), [`parse_union`](@ref), [`parse_intersection`](@ref), [`parse_setdiff`](@ref), [`parse_fusion`](@ref)
+"""
+function parse_shape_from_command(stream::InputStream, table::IdTable)
+    command_token = expect_command(stream, (UNITE, INTERSECT, DIFF, FUSE))
+    unread_token(stream, command_token)
+    if command_token.value == UNITE
+        parse_union(stream, table)
+    elseif command_token.value == INTERSECT
+        parse_intersection(stream, table)
+    elseif command_token.value == DIFF
+        parse_setdiff(stream, table)
+    elseif command_token.value == FUSE
+        parse_fusion(stream, table)
+    else
+        @assert false "@ $(command_token.loc): command token has unknown value $(command_token.value)"
+    end
+end
+
+"""
+    parse_union(stream::InputStream, table::IdTable)
+
+Return a [`UnionCSG`](@ref) value from the `UNITE` [`Command`](@ref).
+
+See also: [`parse_shape_from_command`](@ref)
+"""
+function parse_union(stream::InputStream, table::IdTable)
+    expect_command(stream, UNITE)
+    expect_symbol(stream, Symbol("("))
+    shapes = Vector{Shapes}()
+    while true
+        push!(shapes, parse_shape(stream, table))
+        expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    union(shapes...)
+end
+
+"""
+    parse_intersection(stream::InputStream, table::IdTable)
+
+Return a [`IntersectionCSG`](@ref) value from the `INTERSECT` [`Command`](@ref).
+
+See also: [`parse_shape_from_command`](@ref)
+"""
+function parse_intersection(stream::InputStream, table::IdTable)
+    expect_command(stream, INTERSECT)
+    expect_symbol(stream, Symbol("("))
+    shapes = Vector{Shapes}()
+    while true
+        push!(shapes, parse_shape(stream, table))
+        expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    intersection(shapes...)
+end
+
+"""
+    parse_setdiff(stream::InputStream, table::IdTable)
+
+Return a [`DiffCSG`](@ref) value from the `DIFF` [`Command`](@ref).
+
+See also: [`parse_shape_from_command`](@ref)
+"""
+function parse_setdiff(stream::InputStream, table::IdTable)
+    expect_command(stream, DIFF)
+    expect_symbol(stream, Symbol("("))
+    shapes = Vector{Shape}()
+    while true
+        push!(shapes, parse_shape(stream, table))
+        expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    setdiff(shapes...)
+end
+
+"""
+    parse_fusion(stream::InputStream, table::IdTable)
+
+Return a [`FusionCSG`](@ref) value from the `FUSE` [`Command`](@ref).
+
+See also: [`parse_shape_from_command`](@ref)
+"""
+function parse_fusion(stream::InputStream, table::IdTable)
+    expect_command(stream, FUSE)
+    expect_symbol(stream, Symbol("("))
+    shapes = Vector{Shapes}()
+    while true
+        push!(shapes, parse_shape(stream, table))
+        expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
+    end
+    fusion(shapes...)
 end
 
 """
@@ -1310,10 +1427,13 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
     expect_command(stream, SPAWN)
     next_token = read_token(stream)
     unread_token(stream, next_token)
-    (isa(next_token.value, Identifier) || isa(next_token.value, LiteralType)) || 
-        throw(WrongTokenType(next_token.loc,"Expected either a constructor or a valid identifier instead of '$(typeof(next_token.value))'", next_token.length))
+    next_val = next_token.value
+    (isa(next_val, Identifier) || 
+     isa(next_val, LiteralType) || 
+     next_val ∈ (UNITE, INTERSECT, DIFF, FUSE)) || 
+        throw(WrongTokenType(next_token.loc,"Expected either a constructor or a valid identifier instead of '$(typeof(next_val))'", next_token.length))
     while true 
-        if isa(next_token.value, Identifier) 
+        if isa(next_val, Identifier) 
             id_name = expect_identifier(stream).value.value    
             type = findfirst(d -> haskey(d, id_name), table)
             if type == ShapeType
@@ -1327,8 +1447,10 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
                                     "Variable '$id_name' defined at $(table[type][id_name].loc)\n" *
                                      "Spawnable types are:\n\tShapeType\n\tLightType", next_token.length))
             end
-        elseif isa(next_token.value, LiteralType)
-            type = expect_type(stream, (ShapeType, LightType)).value
+        elseif isa(next_val, LiteralType)
+            type_token = expect_type(stream, (ShapeType, LightType))
+            unread_token(stream, type_token)
+            type = type_token.value
             if type == ShapeType
                 shape = parse_shape(stream, table)
                 push!(scene.world, shape)
@@ -1338,11 +1460,14 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
             else
                 @assert false "@ $(next_token.loc): expect_type returned a non-spawnable type '$type'"
             end
+        elseif next_val ∈ (UNITE, INTERSECT, DIFF, FUSE)
+            push!(scene.world, parse_shape_from_command(stream, table))
         else
             break
         end
         next_token = read_token(stream)
         unread_token(stream, next_token)
+        next_val = next_token.value
     end
     return
 end
