@@ -53,16 +53,16 @@ while the pair `:floor => (n::Int) -> n == 1` indicates that the operation `floo
 
 See also: [`Raytracer.isvalid`](@ref)
 """
-const valid_operations = Dict(:+     => ( ::Int) -> true, 
-                              :-     => ( ::Int) -> true, 
-                              :*     => ( ::Int) -> true, 
-                              :/     => ( ::Int) -> true, 
-                              :%     => ( ::Int) -> true, 
-                              :^     => ( ::Int) -> true, 
-                              :div   => ( ::Int) -> true, 
-                              :floor => (n::Int) -> n == 1,
-                              :ceil  => (n::Int) -> n == 1,
-                              :round => (n::Int) -> n == 1)
+const valid_operations = Dict(:+     => (; f = ( ::Int) -> true,   signature = "+(x...)"),
+                              :-     => (; f = (n::Int) -> n == 2, signature = "-(x, y)"),
+                              :*     => (; f = ( ::Int) -> true,   signature = "*(x...)"),
+                              :/     => (; f = (n::Int) -> n == 2, signature = "/(x, y)"),
+                              :%     => (; f = (n::Int) -> n == 2, signature = "%(x, y)"),
+                              :^     => (; f = (n::Int) -> n == 2, signature = "^(x, y)"),
+                              :div   => (; f = (n::Int) -> n == 2, signature = "div(x, y)"), 
+                              :floor => (; f = (n::Int) -> n == 1, signature = "floor(x)"),
+                              :ceil  => (; f = (n::Int) -> n == 1, signature = "ceil(x)"),
+                              :round => (; f = (n::Int) -> n == 1, signature = "round(x)"))
 
 """
     Raytracer.isvalid(expr::Expr, str_len::Int, token_location::SourceLocation)
@@ -81,8 +81,8 @@ function Raytracer.isvalid(expr::Expr, str_len::Int, token_location::SourceLocat
         throw(InvalidExpression(token_location, "Invalid mathematical expression: contains invalid operation $(expr.args[begin])\nValid operations are: " * join(valid_operations, ", "), str_len + 1))
     (invalid = findfirst(arg -> !isa(arg, Union{Integer, AbstractFloat, Expr, Symbol}), expr.args[begin + 1:end])) |> isnothing || 
         throw(InvalidExpression(token_location, "Invalid mathematical expression: contains invalid operand $(expr.args[invalid + 1])\nValid operands are instances of `Integer`, `AbstractFloat`, `Symbol` or `Expr`", str_len + 1))
-    valid_operations[op_name](length(expr.args) - 1) ||
-        throw(invalidEcpression(token_location, "Invalid mathematical expression: operation '$op_name' takes only $(valid_operations[op_name]) arguments, got $(length(expr.args) -1)", str_len + 1))
+    valid_operations[op_name].f(length(expr.args) - 1) ||
+        throw(InvalidExpression(token_location, "Invalid mathematical expression: operation signature is '$(valid_operations[op_name].signature)', got '$(op_name)' with $(length(expr.args[begin+1:end])) arguments", str_len + 1))
     
     return all(arg -> (isa(arg, Expr) ? Raytracer.isvalid(arg, str_len, token_location) : true), expr.args[begin + 1:end])
 end
