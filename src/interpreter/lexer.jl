@@ -207,10 +207,14 @@ Parse the stream into a [`Token`](@ref) with [`MathExpression`](@ref) value.
 """
 function _parse_math_expression_token(stream::InputStream, token_location::SourceLocation)
     str = ""
+    endcol = 0
     while true
         ch = read_char!(stream)
 
-        ch == '$' && break
+        if ch == '$'
+            endcol = stream.saved_location.col_num
+            break
+        end
 
         (isnothing(ch) || isnewline(ch)) && throw(UnfinishedExpression(token_location, "Unterminated mathematical expression", length(str) + 1))
 
@@ -218,8 +222,9 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
     end
 
     expr = Meta.parse(str)
-    Raytracer.isvalid(expr, length(str), token_location)
-    return Token(token_location, MathExpression(expr), length(str) + 2)
+    len = endcol - token_location.col_num
+    Raytracer.isvalid(expr, len, token_location)
+    return Token(token_location, MathExpression(expr), len)
 end
 
 """
@@ -244,7 +249,7 @@ function read_token(stream::InputStream)
     end
 
     # Check if we got some non ASCII character
-    isascii(ch) || throw(BadCharacter(stream.location, "Invalid character $ch: only ASCII charachters are supported"))
+    isascii(ch) || throw(BadCharacter(stream.saved_location, "Invalid character $ch: only ASCII charachters are supported"))
     
     # At this point we must check what kind of token begins with the "ch" character
     # (which has been put back in the stream with stream.unread_char). First,
