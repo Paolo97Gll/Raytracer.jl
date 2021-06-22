@@ -24,11 +24,16 @@ end
     SET
     UNSET
     SPAWN
+    DUMP
+    #construction commands
     LOAD
     ROTATE
     TRANSLATE
     SCALE
-    DUMP
+    UNITE
+    INTERSECT
+    DIFF
+    FUSE
 end
 
 @doc """
@@ -54,6 +59,8 @@ $(join( "- `" .* repr.(instances(Command)) .* "`", "\n"))
     ImageType
     RendererType
     CameraType
+    PcgType
+    TracerType
 end
 
 @doc """
