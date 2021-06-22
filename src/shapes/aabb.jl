@@ -24,7 +24,9 @@ Return the parameter `t` at which [`Ray`](@ref) first hits the [`AABB`](@ref). I
 function get_t(ray::Ray, aabb::AABB)
     dir = ray.dir
     o = ray.origin
-    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
+    min_point = replace((aabb.p_m - o) ./ dir, NaN32 => 0)
+    max_point = replace((aabb.p_M - o) ./ dir, NaN32 => 0)
+    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip(min_point, max_point)))
     isempty(overlap) && return Inf32
     t1, t2 = overlap.first, overlap.last
     ray.tmin < t1 < ray.tmax && return t1
@@ -35,7 +37,9 @@ end
 function get_all_ts(ray::Ray, aabb::AABB)
     dir = ray.dir
     o = ray.origin
-    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip((aabb.p_m - o) ./ dir, (aabb.p_M - o) ./ dir)))
+    min_point = replace((aabb.p_m - o) ./ dir, NaN32 => 0)
+    max_point = replace((aabb.p_M - o) ./ dir, NaN32 => 0)
+    overlap = reduce(intersect, map(t -> Interval(extrema(t)...), zip(min_point, max_point)))
     isempty(overlap) && return Vector{Float32}()
     t1, t2 = overlap.first, overlap.last
     isfinite(t1) && (@assert isfinite(t2); return [t1, t2])
