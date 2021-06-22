@@ -208,7 +208,7 @@ Get the radiance, given a point `uv` ([`Vec2D`](@ref)) on the surface with a [`D
 direction `in_dir` and outcoming direction ([`Vec`](@ref)), a `normal` of the surface point ([`Normal`](@ref)).
 """
 function at(brdf::DiffuseBRDF, #=normal=#::Normal, #=in_dir=#::Vec, #=out_dir=#::Vec, uv::Vec2D)
-    brdf.pigment(uv) / π
+    brdf.pigment(uv) * (1f0 / π)
 end
 
 """
