@@ -1357,17 +1357,20 @@ Push to the 'scene.variables' [`IdTable`](@ref) a constructed value and its iden
 function parse_set_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, SET)
-    id = expect_identifier(stream)
-    id_name = id.value.value
-    if (type = findfirst(d -> haskey(d, id_name), table)) |> !isnothing 
-        preexisting = table[type][id_name]
-        iszero(preexisting.loc.line_num) && return # if identifier was defined at the command line level throw no error and return nothing
-        throw(IdentifierRedefinition(id.loc, "Identifier '$(id_name)' has alredy been set at\n$(preexisting.loc)\nIf you want to redefine it first UNSET it.", id.length))
+    while true
+        id = read_token(stream)
+        isa(id.value, Identifier) || (unread_token(stream, id); break)
+        id_name = id.value.value
+        if (type = findfirst(d -> haskey(d, id_name), table)) |> !isnothing 
+            preexisting = table[type][id_name]
+            iszero(preexisting.loc.line_num) && return # if identifier was defined at the command line level throw no error and return nothing
+            throw(IdentifierRedefinition(id.loc, "Identifier '$(id_name)' has alredy been set at\n$(preexisting.loc)\nIf you want to redefine it first UNSET it.", id.length))
+        end
+        value, id_type = parse_constructor(stream, table)
+        haskey(table, id_type) ?
+            push!(table[id_type], id_name => ValueLoc(value, copy(id.loc))) :
+            push!(table, id_type => Dict([id_name => ValueLoc(value, copy(id.loc))]))
     end
-    value, id_type = parse_constructor(stream, table)
-    haskey(table, id_type) ?
-        push!(table[id_type], id_name => ValueLoc(value, copy(id.loc))) :
-        push!(table, id_type => Dict([id_name => ValueLoc(value, copy(id.loc))]))
 end
 
 """
@@ -1378,11 +1381,14 @@ Pop identifier variable from the `scene.variables` [`IdTable`](@ref).
 function parse_unset_command(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, UNSET)
-    id = expect_identifier(stream)
-    id_name = id.value.value
-    type = findfirst(d -> haskey(d, id_name), table)
-    isnothing(type) && throw(UndefinedIdentifier(id.loc,"Undefined variable '$id_name'" ,id.length))
-    pop!(table[type], id_name)
+    while true
+        id = read_token(stream)
+        isa(id.value, Identifier) || (unread_token(stream, id); break)
+        id_name = id.value.value
+        type = findfirst(d -> haskey(d, id_name), table)
+        isnothing(type) && throw(UndefinedIdentifier(id.loc,"Undefined variable '$id_name'" ,id.length))
+        pop!(table[type], id_name)
+    end
     return
 end
 
