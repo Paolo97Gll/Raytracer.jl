@@ -64,7 +64,17 @@ function skip_whitespaces_and_comments(stream::InputStream)
     ch = read_char!(stream)
     isnothing(ch) && return
     while isspace(ch) || ch == '#'
-        ch == '#' && while (dump = read_char!(stream); !isnothing(dump) && !isnewline(dump)) end
+        if ch == '#'
+            dump = read_char!(stream)
+            exit_condition::Function = if dump == '='
+                dump::Char -> dump != '=' ?
+                    false :
+                    read_char!(stream) == '#'
+            else
+                isnewline
+            end
+            while (dump = read_char!(stream); !isnothing(dump) && !exit_condition(dump)) end
+        end
         ch = read_char!(stream)
         isnothing(ch) && return
     end
