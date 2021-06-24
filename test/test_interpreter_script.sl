@@ -3,6 +3,10 @@ SET material Material(.emitted_radiance Pigment.Image(cathedral))
 SET sky_sphere Shape.Sphere(.material material, .transformation SCALE 10)
 UNSET material
 
+#= a block comment =#
+#= this even spans 
+   multiple lines =#
+
 SET 
 	red   <1,0,0>
 	green <0,1,0>
