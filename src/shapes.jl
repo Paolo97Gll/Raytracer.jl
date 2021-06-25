@@ -91,7 +91,7 @@ Abstract type representing a [`Shape`](@ref) that can be represented as transfor
 An example of simple shape is the parallelepiped: every instance of this shape can be transformed back into a cube of unitary size.
 Therefore, these shapes are univocally determined by their type (e.g. a cuboid) and the transformation that morphs the unitary shape in the desired shape.
 
-See also: [`Cone`](@ref), [`Cube`](@ref), [`Cylinder`](@ref), [`Plane`](@ref), [`Sphere`](@ref)
+See also: [`Cube`](@ref), [`Cylinder`](@ref), [`Plane`](@ref), [`Sphere`](@ref)
 """
 abstract type SimpleShape <: Shape end
 
