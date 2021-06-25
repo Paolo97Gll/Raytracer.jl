@@ -226,15 +226,21 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
             break
         end
 
-        (isnothing(ch) || isnewline(ch)) && throw(UnfinishedExpression(token_location, "Unterminated mathematical expression", length(str) + 1))
+        (isnothing(ch) || isnewline(ch)) && 
+            throw(UnfinishedExpression(token_location, "Unterminated mathematical expression", stream.saved_location.col_num - token_location.col_num + 1))
 
         str *= ch
     end
 
-    expr = Meta.parse(str)
     len = endcol - token_location.col_num
+    expr = try
+        Meta.parse(str)
+    catch e
+        isa(e, Base.Meta.ParseError) || rethrow(e)
+        throw(InvalidExpression(token_location,"Mathemathical expression cannot be parsed:\n$(e.msg)", len + 1))
+    end
     Raytracer.isvalid(expr, len, token_location)
-    return Token(token_location, MathExpression(expr), len)
+    return Token(token_location, MathExpression(expr), len + 1)
 end
 
 """
