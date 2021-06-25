@@ -674,14 +674,27 @@ function parse_list(stream::InputStream, table::IdTable, list_length::Int)
         end
         return from_id
     end
-    expect_symbol(stream, Symbol("["))
+
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    delim = if isa(next_token.value, ListType) 
+        expect_type(stream, ListType)
+        expect_symbol(stream, Symbol("("))
+        Symbol(")")
+    elseif isa(next_token.value, LiteralSymbol)
+        expect_symbol(stream, Symbol("["))
+        Symbol("]")
+    else
+        throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
+    end
+
     vec = SVector{list_length, Float32}([expect_number(stream, table).value.value, 
                                          ((expect_symbol(stream, Symbol(",")); expect_number(stream, table).value.value) for _ ∈ SOneTo(list_length - 1))...
                                         ])
 
-    expect_symbol(stream, Symbol("]"))
+    expect_symbol(stream, delim)
 
-    vec
+    vec 
 end
 
 """
@@ -695,22 +708,25 @@ function parse_point(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
     unread_token(stream, next_token)
-    delim = if isa(next_token.value, LiteralType) 
+    if isa(next_token.value, PointType) 
         expect_type(stream, PointType)
-        expect_symbol(stream, Symbol("("))
-        Symbol(")")
+        kw = (; X = parse_float, Y = parse_float, Y = parse_float)
+
+        kwargs = generate_kwargs(stream, table, kw)
+        x = get(kwargs, :X, 0)
+        y = get(kwargs, :Y, 0)
+        z = get(kwargs, :Z, 0)
     elseif isa(next_token.value, LiteralSymbol)
         expect_symbol(stream, Symbol("{"))
-        Symbol("}") 
+        x = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol(","))
+        y = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol(","))
+        z = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol("}"))
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
     end
-    x = expect_number(stream, table).value.value 
-    expect_symbol(stream, Symbol(","))
-    y = expect_number(stream, table).value.value 
-    expect_symbol(stream, Symbol(","))
-    z = expect_number(stream, table).value.value 
-    expect_symbol(stream, delim)
 
     Point(x, y, z)
 end
@@ -726,22 +742,25 @@ function parse_color(stream::InputStream, table::IdTable)
     (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
     unread_token(stream, next_token)
-    delim = if isa(next_token.value, LiteralType) 
+    if isa(next_token.value, LiteralType) 
         expect_type(stream, ColorType)
-        expect_symbol(stream, Symbol("("))
-        Symbol(")")
+        kw = (; R = parse_float, G = parse_float, B = parse_float)
+
+        kwargs = generate_kwargs(stream, table, kw)
+        red   = get(kwargs, :R, 0)
+        green = get(kwargs, :G, 0)
+        blue  = get(kwargs, :B, 0)
     elseif isa(next_token.value, LiteralSymbol)
         expect_symbol(stream, Symbol("<"))
-        Symbol(">") 
+        red = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol(","))
+        green = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol(","))
+        blue = expect_number(stream, table).value.value
+        expect_symbol(stream, Symbol(">"))
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
     end
-    red = expect_number(stream, table).value.value
-    expect_symbol(stream, Symbol(","))
-    green = expect_number(stream, table).value.value
-    expect_symbol(stream, Symbol(","))
-    blue = expect_number(stream, table).value.value
-    expect_symbol(stream, delim)
     return RGB(red, green, blue)
 end
 
