@@ -35,7 +35,8 @@ SPAWN Light(.position pos, .color <5, 5, 5>)
 SET camera Camera.Perspective(.transformation ROTATE(.Z 20) * TRANSLATE(.X -1.5))
 
 # DUMP.ALL
-USING camera 
-USING Renderer.PointLight()
-USING Image(1000, 1000)
-USING Tracer()
+USING
+	camera 
+	Renderer.PointLight()
+	Image(1000, 1000)
+	Tracer()
