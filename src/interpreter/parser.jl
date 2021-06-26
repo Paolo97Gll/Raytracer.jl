@@ -710,7 +710,7 @@ function parse_point(stream::InputStream, table::IdTable)
     unread_token(stream, next_token)
     if isa(next_token.value, PointType) 
         expect_type(stream, PointType)
-        kw = (; X = parse_float, Y = parse_float, Y = parse_float)
+        kw = (; X = parse_float, Y = parse_float, Z = parse_float)
 
         kwargs = generate_kwargs(stream, table, kw)
         x = get(kwargs, :X, 0)
