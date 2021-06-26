@@ -62,7 +62,11 @@ const valid_operations = Dict(:+     => (; f = ( ::Int) -> true,   signature = "
                               :div   => (; f = (n::Int) -> n == 2, signature = "div(x, y)"), 
                               :floor => (; f = (n::Int) -> n == 1, signature = "floor(x)"),
                               :ceil  => (; f = (n::Int) -> n == 1, signature = "ceil(x)"),
-                              :round => (; f = (n::Int) -> n == 1, signature = "round(x)"))
+                              :round => (; f = (n::Int) -> n == 1, signature = "round(x)"),
+                              :exp   => (; f = (n::Int) -> n == 1, signature = "exp(x)"),
+                              :exp2  => (; f = (n::Int) -> n == 1, signature = "exp2(x)"),
+                              :exp10 => (; f = (n::Int) -> n == 1, signature = "exp10(x)")
+                             )
 
 """
     Raytracer.isvalid(expr::Expr, str_len::Int, token_location::SourceLocation)
