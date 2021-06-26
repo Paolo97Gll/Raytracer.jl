@@ -30,7 +30,7 @@ SPAWN
 	sky_sphere
 
 SET pos {-1, -0.3, 1}
-SPAWN Light(.position pos, .color <5, 5, 5>)
+SPAWN Light(.position pos, .color Color(5, 5, 5))
 
 SET camera Camera.Perspective(.transformation ROTATE(.Z 20) * TRANSLATE(.X -1.5))
 
