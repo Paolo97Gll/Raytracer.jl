@@ -1222,11 +1222,11 @@ function parse_renderer_settings(stream::InputStream, table::IdTable)
          OnOffRenderer
         )
     elseif type_key == :Flat
-        ((; background_bolor = parse_color), 
+        ((; background_color = parse_color), 
          FlatRenderer
         )
     elseif type_key == :PointLight
-        ((; background_bolor = parse_color, ambient_color = parse_color), 
+        ((; background_color = parse_color, ambient_color = parse_color), 
          PointLightRenderer
         )
     elseif type_key == :PathTracer
