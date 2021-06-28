@@ -273,7 +273,7 @@ function (plr::PointLightRenderer)(ray::Ray)
         distance_vec = hit_record.world_point - cur_light.position
         distance = norm(distance_vec)
         in_dir = distance_vec * (1f0 / distance)
-        cos_theta = max(0f0, normalized_dot(-ray.dir, hit_record.normal))
+        cos_theta = max(0f0, normalized_dot(-distance_vec, hit_record.normal))
 
         distance_factor = cur_light.linear_radius > 0 ? (cur_light.linear_radius / distance)^2 : 1f0
 
