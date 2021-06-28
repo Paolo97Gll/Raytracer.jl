@@ -78,8 +78,7 @@ function demo_load_scene(renderer_type::Type{<:Renderer},
         return FlatRenderer(world)
     elseif renderer_type <: PathTracer
         ground = [Plane(transformation = translation([0f0, 0f0, -1f0]),
-                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{6}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)),
-                                                               reflectance = 1f0)))]
+                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{6}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)))))]
         sky = [Sphere(transformation = translation([0f0, 0f0, 0f0]) * scaling(100),
                       material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(BLACK)),
                                           emitted_radiance = UniformPigment(WHITE)))]
@@ -101,8 +100,7 @@ function demo_load_scene(renderer_type::Type{<:Renderer},
         return PathTracer(world, n = pt_n, max_depth=pt_max_depth, roulette_depth = pt_roulette_depth)
     elseif renderer_type <: PointLightRenderer
         ground = [Plane(transformation = translation([0f0, 0f0, -1f0]),
-                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{6}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)),
-                                                               reflectance = 1f0)))]
+                        material = Material(brdf = DiffuseBRDF(pigment = CheckeredPigment{6}(color_on = RGB(0.3f0, 0.5f0, 0.1f0), color_off = RGB(0.1f0, 0.2f0, 0.5f0)))))]
         sky = [Sphere(transformation = translation([0f0, 0f0, 0f0]) * scaling(100),
                       material = Material(brdf = DiffuseBRDF(pigment = UniformPigment(WHITE * 1f-2))))]
         other_spheres = [Sphere(transformation = translation([0.5f0, 0.7f0, 0.1f0]),
