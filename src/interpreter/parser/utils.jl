@@ -16,12 +16,9 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
     args = map(expr.args[begin + 1: end]) do arg
         if isa(arg, Symbol)
             arg === :TIME && return scene.time
-            if !haskey(vars[LiteralNumber], arg)
-                (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing ||
-                    throw(WrongTokenType(token.loc, "Variable '$arg' is a '$type' in 'MathExpression': expected 'LiteralNumber'\nVariable '$arg' was declared at $(vars[type][arg].loc)", token.length))
+            (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing && 
                 throw(UndefinedIdentifier(token.loc, "Undefined variable '$arg' in 'MathExpression'", token.length))
-            end
-            return vars[LiteralNumber][arg].value
+            return vars[type][arg].value
         elseif isa(arg, Expr)
             return evaluate_math_expression(Token(token.loc, MathExpression(arg), token.length), vars)
         else
@@ -44,8 +41,9 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
         end
         rethrow(e)
     end
-    isfinite(res) ||
-        throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
+    hasmethod(isfinite, Tuple{typeof(res)}) &&
+        isfinite(res) ||
+            throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
     res
 end
 

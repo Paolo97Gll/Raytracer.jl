@@ -73,6 +73,8 @@ const valid_operations = Dict(:+     => (; f = ( ::Int) -> true,   signature = "
                               :sin   => (; f = (n::Int) -> n == 1, signature = "sin(x)"),
                               :cos   => (; f = (n::Int) -> n == 1, signature = "cos(x)"),
                               :tan   => (; f = (n::Int) -> n == 1, signature = "tan(x)"),
+                              :Point => (; f = (n::Int) -> n == 3, signature = "Point(x, y, z)"),
+                              :RGB   => (; f = (n::Int) -> n == 3, signature = "RGB(r, g, b)"),
                              )
 
 """
