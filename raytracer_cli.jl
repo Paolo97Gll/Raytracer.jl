@@ -31,7 +31,8 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
 
     if parameter == "input_file"
         @error "the parameter $(parameter) (\"$(value)\") must be a PFM file"
-    elseif parameter ∈ ["--alpha", "-a", "--gamma", "-g", "--screen_distance", "-d", "--pt_n", "--pt_max_depth", "--pt_roulette_depth", "--fps", "-f"]
+    elseif parameter ∈ ["--alpha", "-a", "--gamma", "-g", "--luminosity", "-l", "--screen_distance", "-d", "--pt_n",
+                        "--pt_max_depth", "--pt_roulette_depth", "--fps", "-f"]
         @error "the parameter $(parameter) (\"$(value)\") must be > 0"
     elseif parameter ∈ ["--camera_type", "-t"]
         @error "the parameter $(parameter) (\"$(value)\") must be \"perspective\" or \"orthogonal\""
@@ -90,6 +91,11 @@ function parse_commandline()
             arg_type = Float32
             default = 1f0
             range_tester = x -> x > 0
+        "--luminosity", "-l"
+            help = "luminosity for the tone mapping process"
+            arg_type = Union{Float32, Nothing}
+            default = nothing
+            range_tester = x -> isnothing(x) || x > 0
     end
     add_arg_group!(s["tonemapping"], "files");
     @add_arg_table! s["tonemapping"] begin
@@ -193,6 +199,11 @@ function parse_commandline()
             arg_type = Float32
             default = 1f0
             range_tester = x -> x > 0
+        "--luminosity", "-l"
+            help = "luminosity for the tone mapping process"
+            arg_type = Union{Float32, Nothing}
+            default = nothing
+            range_tester = x -> isnothing(x) || x > 0
     end
     add_arg_group!(s["demo"]["image"], "files");
     @add_arg_table! s["demo"]["image"] begin
@@ -278,6 +289,11 @@ function parse_commandline()
             arg_type = Float32
             default = 1f0
             range_tester = x -> x > 0
+        "--luminosity", "-l"
+            help = "luminosity for the tone mapping process"
+            arg_type = Union{Float32, Nothing}
+            default = nothing
+            range_tester = x -> isnothing(x) || x > 0
     end
     add_arg_group!(s["demo"]["animation"], "animation parameter");
     @add_arg_table! s["demo"]["animation"] begin
@@ -321,10 +337,11 @@ function tonemapping(options::Dict{String, Any})
     options["input_file"] = normpath(options["input_file"])
     options["output_file"] = normpath(options["output_file"])
     Raytracer.tonemapping(
-        options["input_file"],
-        options["output_file"],
-        options["alpha"],
-        options["gamma"]
+        input_file = options["input_file"],
+        output_file = options["output_file"],
+        α = options["alpha"],
+        γ = options["gamma"],
+        luminosity = options["luminosity"]
     )
 end
 
@@ -357,7 +374,8 @@ function demoimage(options::Dict{String, Any})
         pt_max_depth = options["pt_max_depth"],
         pt_roulette_depth = options["pt_roulette_depth"],
         α = options["alpha"],
-        γ = options["gamma"]
+        γ = options["gamma"],
+        luminosity = options["luminosity"]
     )
 end
 
@@ -379,6 +397,7 @@ function demoanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, options:
         pt_roulette_depth = options["pt_roulette_depth"],
         α = options["alpha"],
         γ = options["gamma"],
+        luminosity = options["luminosity"],
         use_threads = false,
         disable_output = true
     )
