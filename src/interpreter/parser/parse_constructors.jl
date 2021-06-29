@@ -106,7 +106,7 @@ function parse_float(stream::InputStream, scene::Scene)
     (from_id = parse_by_identifier(LiteralNumber, stream, table)) |> isnothing || (read_token(stream); return from_id)
     token = read_token(stream)
     if isa(token.value, MathExpression) 
-        res = evaluate_math_expression(token, vars)
+        res = evaluate_math_expression(token, scene)
         isa(res, Number) ||
         throw(InvalidExpression(token.loc, "`MathExpression` should return a `Number`: got a `$(typeof(res))`" , token.length))
         return res
@@ -162,7 +162,6 @@ function parse_list(stream::InputStream, scene::Scene, list_length::Int)
         end
         return from_id
     end
-    table = scene.variables
 
     next_token = read_token(stream)
     unread_token(stream, next_token)
@@ -198,7 +197,7 @@ function parse_point(stream::InputStream, scene::Scene)
     (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
     if isa(next_token.value, MathExpression) 
-        res = evaluate_math_expression(next_token, vars)
+        res = evaluate_math_expression(next_token, scene)
         isa(res, Point) ||
         throw(InvalidExpression(next_token.loc, "`MathExpression` should return a `Point`: got a `$(typeof(res))`" , next_token.length))
         return res
@@ -239,7 +238,7 @@ function parse_color(stream::InputStream, scene::Scene)
     (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
     if isa(next_token.value, MathExpression) 
-        res = evaluate_math_expression(next_token, vars)
+        res = evaluate_math_expression(next_token, scene)
         isa(res, RGB) ||
         throw(InvalidExpression(next_token.loc, "`MathExpression` should return a `RGB`: got a `$(typeof(res))`" , next_token.length))
         return res
