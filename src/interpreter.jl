@@ -26,6 +26,7 @@ export # Interpreter
     InputStream,
         open_stream,
     Scene,
+        parse_scene,
     InterpreterException
 
 let interpreter_dir = "interpreter"
