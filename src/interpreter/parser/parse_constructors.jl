@@ -21,7 +21,7 @@ function parse_constructor(stream::InputStream, scene::Scene)
         next_val == TIME &&
             return(scene.time, LiteralNumber)
         next_val ∈ (ROTATE, TRANSLATE, SCALE) &&
-            return (parse_transformation_from_command(stream, scene), TransformationType)
+            return (parse_transformation(stream, scene), TransformationType)
         next_val == LOAD &&
             return (parse_image_from_command(stream, scene), ImageType)
         next_val ∈ (UNITE, INTERSECT, DIFF, FUSE) &&
