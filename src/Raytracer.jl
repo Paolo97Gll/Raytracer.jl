@@ -56,7 +56,6 @@ import Random:
 
 using Intervals, ProgressMeter
 
-
 ##########
 # Exports
 
@@ -126,7 +125,7 @@ export # Random number generation
     PCG
 
 export # High level API
-    demo, tonemapping
+    render, demo, tonemapping, render_scene_from_script
 
 export # image tools
     clamp_image, normalize_image, γ_correction, load, save
@@ -159,6 +158,13 @@ include("renderers.jl")
 include("imagetracer.jl")
 
 include("interpreter.jl")
+
+using .Interpreter:
+    print_subsequent_lexer_exceptions,
+    Scene,
+    open_stream,
+    InterpreterException,
+    parse_scene
 
 include("user_utils.jl")
 
