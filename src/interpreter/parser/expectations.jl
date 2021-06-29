@@ -140,14 +140,11 @@ end
 """
     expect_number(stream::InputStream, scene::Scene)
 
-Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralNumber`](@ref) or a valid [`MathExpression`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is a [`LiteralNumber`](@ref).
 """
 function expect_number(stream::InputStream, scene::Scene)
-    vars =scene.variables
     token = read_token(stream)
     isa(token.value, LiteralNumber) && return token
-    isa(token.value, MathExpression) && return Token(token.loc, LiteralNumber(evaluate_math_expression(token, vars)), token.length)
-    token.value == TIME && return Token(token.loc, scene.time, token.length)
     throw(WrongTokenType(token.loc,
                          "Got '$(typeof(token.value))' instead of 'LiteralNumber'",
                          token.length))

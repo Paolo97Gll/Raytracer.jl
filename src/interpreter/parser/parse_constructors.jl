@@ -79,34 +79,40 @@ end
 """
     parse_int(stream::InputStream, scene::Scene)
 
-Return a `Int` value from either a [`LiteralNumber`](@ref) constructor or an appropriate [`Identifier`](@ref).
+Return a `Int` value from either a [`LiteralNumber`](@ref) constructor, the `TIME` command, an appropriate [`MathExpression`](@ref), or an appropriate [`Identifier`](@ref).
 
 If the `Float32` number is not exactly representing an integer number an exception is thrown.
 """
 function parse_int(stream::InputStream, scene::Scene)
-    table = scene.variables
-    n_token = if parse_by_identifier(LiteralNumber, stream, table) |> isnothing
-        expect_number(stream, scene)
-    else
-        read_token(stream)::Token{Identifier}
-    end
+    next_token = read_token(stream)
+    unread_token(stream, next_token)
+    n = parse_float(stream, scene)
 
     try
-        convert(Int, n_token.value.value)
+        convert(Int, n)
     catch e
         isa(e, InexactError) || rethrow(e)
-        throw(WrongValueType(n_token.loc,"The given number is not convertible to an integer since it is not round",n_token.length))
+        throw(WrongValueType(next_token.loc,"The given number is not convertible to an integer since it is not round",next_token.length))
     end
 end
 
 """
     parse_float(stream::InputStream, scene::Scene)
 
-Return a `Float32` value from either a [`LiteralNumber`](@ref) constructor or an appropriate [`Identifier`](@ref).
+Return a `Float32` value from either a [`LiteralNumber`](@ref) constructor, the `TIME` command, an appropriate [`MathExpression`](@ref), or an appropriate [`Identifier`](@ref).
 """
 function parse_float(stream::InputStream, scene::Scene)
     table = scene.variables
     (from_id = parse_by_identifier(LiteralNumber, stream, table)) |> isnothing || (read_token(stream); return from_id)
+    token = read_token(stream)
+    if isa(token.value, MathExpression) 
+        res = evaluate_math_expression(token, vars)
+        isa(res, Number) ||
+        throw(InvalidExpression(token.loc, "`MathExpression` should return a `Number`: got a `$(typeof(res))`" , token.length))
+        return res
+    end
+    token.value == TIME && return scene.time
+    unread_token(stream, token)
     expect_number(stream, scene).value.value
 end
 
@@ -183,7 +189,7 @@ end
 """
     parse_point(stream::InputStream, scene::Scene)
 
-Return a [`Point`](@ref) value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+Return a [`Point`](@ref) value from either a named constructor, a symbolic constructor, an appropriate [`MathExpression`](@ref), or an appropriate [`Identifier`](@ref).
 
 If the constructor has not exactly three arguments an exception will be thrown.
 """
@@ -191,6 +197,12 @@ function parse_point(stream::InputStream, scene::Scene)
     table = scene.variables
     (from_id = parse_by_identifier(PointType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
+    if isa(token.value, MathExpression) 
+        res = evaluate_math_expression(next_token, vars)
+        isa(res, Point) ||
+        throw(InvalidExpression(next_token.loc, "`MathExpression` should return a `Point`: got a `$(typeof(res))`" , next_token.length))
+        return res
+    end
     unread_token(stream, next_token)
     if isa(next_token.value, LiteralType)
         expect_type(stream, PointType)
@@ -218,7 +230,7 @@ end
 """
     parse_color(stream::InputStream, scene::Scene)
 
-Return a `RGB{Float32}` value from either a named constructor, a symbolic constructor or an appropriate [`Identifier`](@ref).
+Return a `RGB{Float32}` value from either a named constructor, a symbolic constructor, an appropriate [`MathExpression`](@ref), or an appropriate [`Identifier`](@ref).
 
 If the constructor has not exactly three arguments an exception will be thrown.
 """
@@ -226,6 +238,12 @@ function parse_color(stream::InputStream, scene::Scene)
     table = scene.variables
     (from_id = parse_by_identifier(ColorType, stream, table)) |> isnothing || (read_token(stream); return from_id)
     next_token = read_token(stream)
+    if isa(token.value, MathExpression) 
+        res = evaluate_math_expression(next_token, vars)
+        isa(res, RGB) ||
+        throw(InvalidExpression(next_token.loc, "`MathExpression` should return a `RGB`: got a `$(typeof(res))`" , next_token.length))
+        return res
+    end
     unread_token(stream, next_token)
     if isa(next_token.value, LiteralType)
         expect_type(stream, ColorType)
