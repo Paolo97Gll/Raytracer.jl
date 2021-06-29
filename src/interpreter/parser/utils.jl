@@ -22,8 +22,9 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
         elseif isa(arg, Expr)
             return evaluate_math_expression(Token(token.loc, MathExpression(arg), token.length), vars)
         else
-            isfinite(arg) ||
-                throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
+            hasmethod(isfinite, Tuple{typeof(arg)}) &&(
+                isfinite(arg) ||
+                    throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length)))
             return arg
         end
     end
@@ -42,8 +43,8 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
         rethrow(e)
     end
     hasmethod(isfinite, Tuple{typeof(res)}) &&
-        isfinite(res) ||
-            throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length))
+        (isfinite(res) ||
+            throw(InvalidExpression(token.loc, "'MathExpression' should not return or contain infinite or NaN values.", token.length)))
     res
 end
 
