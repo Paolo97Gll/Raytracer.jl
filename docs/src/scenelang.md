@@ -420,7 +420,7 @@ cos       | 1        | cos function (argument in radians)
 tan       | 1        | tan function (argument in radians)
 asin      | 1        | arcsine function
 acos      | 1        | arccos function 
-atan      | 1        | arctan function 
+atan      | 1 or 2   | arctan function 
 Point     | 3        | Julia `Point` constructor
 RGB       | 3        | Julia `RGB` constructor
 
