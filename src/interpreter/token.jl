@@ -34,6 +34,7 @@ end
     INTERSECT
     DIFF
     FUSE
+    TIME
 end
 
 @doc """
