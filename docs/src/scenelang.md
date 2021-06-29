@@ -189,41 +189,6 @@ This constructor supports integer notation `1`, dotted notations `1.0` and `1.`,
 !!! warning
     The notation `.1` is not supported, the parser would interpret it as a keyword, use `+.1`, `-.1`, or `0.1` instead.
 
-#### [MathExpressions](@id scenelang_syntax_structure_constructors_math_expressions)
-
-Numbers can also be constructed via a `MathExpression` token. Math expressions are sections of code surrounded by dollar signs `$`. They can contain only mathematical operations, numbers and identifiers storing numbers.
-
-These expressions are first checked for validity at lexing time, where it is ensured that they only contain numbers, identifiers, and valid operations and that these operations have the right amount of arguments to them. The valid operations are:
-
-op symbol | # of args| action
-----------|---------:|----------
-\+        | 1+       | add
-\-        | 2        | subtract
-\*        | 1+       | multiply
-/         | 2        | float divide
-div       | 2        | integer divide
-%         | 2        | modulo
-^         | 2        | raise to the power of
-floor     | 1        | approximate to integer by defect
-ceil      | 1        | approximate to integer by excess
-round     | 1        | approximate to nearest integer
-exp       | 1        | natural base exponential
-exp2      | 1        | binary base exponential
-exp10     | 1        | decimal base exponential
-
-After successful tokenization the expression is evaluated. Starting with the innermost expression all the identifiers are substituted with their value (if they are defined and contain a number, otherwise an exception will be thrown) an then the result of the expression is calculated. If the result is a finite number the second innermost expression is evaluated and so on until the outermost expression is evaluated. If the result is either infinite or `NaN` an exception will be thrown.
-
-The tokenization and evaluation processes make use of the `Meta.parse` and `eval` functions provided by the Julia language. Therefore every valid Julia syntax for mathematical expressions is considered valid as long as it respects the restrictions discussed previously in this section.
-
-###### Examples
-
-```julia
-SET a 9                   # set the `a` variable to be equal to 9
-SET res1 $1 + 2a$         # this will set `res1` to be equal to 19
-# SET res2 $1 + 2b$       # this would throw an `UndefinedIdentifier` exception
-# SET res3 $div(1, 2, 3)$ # this would throw an `InvalidExpression` exception
-```
-
 #### [Strings](@id scenelang_syntax_structure_constructors_strings)
 
 Being a primitive type, strings only have a symbolic constructor.
@@ -313,7 +278,7 @@ Therefore the `ROTATE` command has a peculiar syntax for its arguments: after th
 ROTATE(.X 45 * .Z 30 * .X 20 * .Y 15)
 ```
 
-You can clearly see that in this syntax keywords can be repeated and are, therefore, non-optional. Furthermore, the order in which they are written matters as the result of the construction will be the concatenation of all the individual rotations. This is the reason why the arguments are not separated by commas but by concatenation symbols.
+You can clearly see that in this syntax keywords can be repeated and are, therefore, non-optional. Furthermore, the order in which they are written matters as the result of the construction will be the concatenation of all the individual rotations. This is the reason why the arguments are not separated by commas but by concatenation symbols `*`.
 
 #### [Images](@id scenelang_syntax_structure_constructors_images)
 
@@ -336,7 +301,7 @@ Pigments have named constructors associated with each of their subtype specifier
 
 ```julia
 Pigment.Uniform(.color color::color = <1, 1, 1>)
-Pigment.Checkered(.color_on color_on::color = <1, 1, 1>, .color_off::color = <0, 0, 0>)
+Pigment.Checkered(.N::number.integer = 2 , .color_on color_on::color = <1, 1, 1>, .color_off::color = <0, 0, 0>)
 Pigment.Image(.image image::image = Image(1, 1))
 ```
 
@@ -423,6 +388,53 @@ Tracers have a named constructor with signature
 
 ```julia
 Tracer(.samples_per_side samples::number = 1, .rng rng::pcg = Pcg())
+```
+
+#### [MathExpressions](@id scenelang_syntax_structure_constructors_math_expressions)
+
+Numbers, points, and colors can also be constructed via a `MathExpression` token. Math expressions are sections of code surrounded by dollar signs `$`. They can contain only mathematical operations, numbers and identifiers storing numbers.
+
+These expressions are first checked for validity at lexing time, where it is ensured that they only contain numbers, identifiers, and valid operations and that these operations have the right amount of arguments to them. The valid operations are:
+
+op symbol | # of args| action
+----------|---------:|----------
+\+        |1+        | add
+\-        | 2        | subtract
+\*        | 1+       | multiply
+/         | 2        | float divide
+div       | 2        | integer divide
+%         | 2        | modulo
+^         | 2        | raise to the power of
+floor     | 1        | approximate to integer by defect
+ceil      | 1        | approximate to integer by excess
+round     | 1        | approximate to nearest integer
+exp       | 1        | natural base exponential
+exp2      | 1        | binary base exponential
+exp10     | 1        | decimal base exponential
+log       | 1        | natural base logarithm
+log2      | 1        | binary base logarithm
+log10     | 1        | decimal base logarithm
+log1p     | 1        | natural base logarithm of `arg + 1`
+sin       | 1        | sine function (argument in radians)
+cos       | 1        | cos function (argument in radians)
+tan       | 1        | tan function (argument in radians)
+asin      | 1        | arcsine function
+acos      | 1        | arccos function 
+atan      | 1        | arctan function 
+Point     | 3        | Julia `Point` constructor
+RGB       | 3        | Julia `RGB` constructor
+
+After successful tokenization the expression is evaluated. Starting with the innermost expression all the identifiers are substituted with their value (if they are defined and contain a number, otherwise an exception will be thrown) an then the result of the expression is calculated. If the result is a finite number the second innermost expression is evaluated and so on until the outermost expression is evaluated. If the result is either infinite or `NaN` an exception will be thrown.
+
+The tokenization and evaluation processes make use of the `Meta.parse` and `eval` functions provided by the Julia language. Therefore every valid Julia syntax for mathematical expressions is considered valid as long as it respects the restrictions discussed previously in this section.
+
+###### Examples
+
+```julia
+SET a 9                   # set the `a` variable to be equal to 9
+SET res1 $1 + 2a$         # this will set `res1` to be equal to 19
+# SET res2 $1 + 2b$       # this would throw an `UndefinedIdentifier` exception
+# SET res3 $div(1, 2, 3)$ # this would throw an `InvalidExpression` exception
 ```
 
 ### [Instructions](@id scenelang_syntax_structure_instructions)
