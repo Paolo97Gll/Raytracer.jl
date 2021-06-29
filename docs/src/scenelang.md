@@ -144,7 +144,7 @@ Color(.R 1)    # as above but with a keyword argument
 ```
 
 !!! tip
-    Keyword arguments may seem verbose at first but come in very handy both when trying to understand what the code is doing and when one wants to list arguments ina  different order than standard.
+    Keyword arguments may seem verbose at first but come in very handy both when trying to understand what the code is doing and when one wants to list arguments in a different order than standard.
 
 !!! warning
     Mixed positional and keyword argument types are allowed as long as the positional arguments precede the keyword ones and as long as the keyword arguments do not redefine positional arguments:

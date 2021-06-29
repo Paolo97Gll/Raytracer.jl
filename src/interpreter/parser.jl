@@ -75,7 +75,7 @@ end
 Struct containing a `NamedTuple` of the named arguments needed to construct an [`ImageTracer`](@ref).
 
 Since a [`ImageTracer`](@ref) type cannot be directly stored into a [`Scene`](@ref) due to it needing at least the [`Camera`](@ref) 
-and [`Image`](@ref) arguments, we can use this struct to store everything else, ready to be constructed.
+and [`HdrImage`](@ref) arguments, we can use this struct to store everything else, ready to be constructed.
 """
 struct TracerSettings
     kwargs::NamedTuple
@@ -479,7 +479,7 @@ end
 """
     expect_number(stream::InputStream, vars::IdTable)
 
-Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralNumber`](@ref) or a valid ['MathExpression`](@ref).
+Read a token from an [`InputStream`](@ref) and check that it is either a [`LiteralNumber`](@ref) or a valid [`MathExpression`](@ref).
 """
 function expect_number(stream::InputStream, vars::IdTable)
     token = read_token(stream)

@@ -156,7 +156,7 @@ end
 """
     _parse_command_or_type_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
 
-Parse the stream into a [`Token`](@ref) with [`Command`](@ref) or [`Type`](@ref) value.
+Parse the stream into a [`Token`](@ref) with [`Command`](@ref) or [`LiteralType`](@ref) value.
 """
 function _parse_command_or_type_token(stream::InputStream, first_char::Char, token_location::SourceLocation)
     start_loc = copy(stream.saved_location)
