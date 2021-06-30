@@ -9,9 +9,9 @@
 
 
 """
-    tonemapping(; input_file::String,
-                  output_file::String,
-                  α::Float32,
+    tonemapping(input_file::String,
+                output_file::String
+                ; α::Float32,
                   γ::Float32,
                   luminosity::Union{Float32, Nothing} = nothing,
                   disable_output::Bool = false)
@@ -25,13 +25,17 @@ Optional parameter `luminosity` can be used for better tuning.
 
 If `disable_output` is `true`, no message is printed.
 """
-function tonemapping(; input_file::String,
-                       output_file::String,
-                       α::Float32 = 0.5f0,
+function tonemapping(input_file::String,
+                     output_file::String
+                     ; α::Float32 = 0.5f0,
                        γ::Float32 = 1f0,
                        luminosity::Union{Float32, Nothing} = nothing,
                        disable_output::Bool = false)
-    @assert typeof(query(input_file))<:File{format"PFM"}
+    # check if valid input_file
+    if !(typeof(query(input_file))<:File{format"PFM"})
+        error("'$input_file' is not a pfm file!")
+    end
+    # apply tonemapping
     io = disable_output ? devnull : stdout
     println(io, "\n-> TONE MAPPING PROCESS")
     print(io, "Loading input file '$(input_file)'...")
@@ -39,26 +43,10 @@ function tonemapping(; input_file::String,
     print(io, " done!\nApplying tone mapping... ")
     image = (isnothing(luminosity) ? normalize(image, α) : normalize(image, α, luminosity=luminosity)) |> clamp
     image = γ_correction(image, γ)
+    # save image
     print(io, " done!\nSaving final image to '$(output_file)'...")
     save(output_file, image.pixel_matrix)
     println(io, " done!")
-end
-
-"""
-    function tonemapping(input_file::String,
-                         output_file::String,
-                         ; α::Float32 = 0.5f0,
-                           γ::Float32 = 1f0,
-                           luminosity::Union{Float32, Nothing} = nothing,
-                           disable_output::Bool = false)
-"""
-function tonemapping(input_file::String,
-                     output_file::String,
-                     ; α::Float32 = 0.5f0,
-                       γ::Float32 = 1f0,
-                       luminosity::Union{Float32, Nothing} = nothing,
-                       disable_output::Bool = false)
-    tonemapping(input_file=input_file, output_file=output_file, α=α, γ=γ, luminosity=luminosity, disable_output=disable_output)
 end
 
 
@@ -66,9 +54,9 @@ end
 
 
 """
-    render(; image_tracer::ImageTracer,
-             renderer::Renderer,
-             output_file::String
+    render(image_tracer::ImageTracer,
+           renderer::Renderer
+           ; output_file::String = "out.pfm"
              use_threads::Bool = true,
              disable_output::Bool = false)
 
@@ -76,12 +64,16 @@ Render an image given an [`ImageTracer`](@ref) and a [`Renderer`](@ref), and sav
 
 If `use_threads` is `true`, use macro `Threads.@threads`. If `disable_output` is `true`, no message is printed.
 """
-function render(; image_tracer::ImageTracer,
-                  renderer::Renderer,
-                  output_file::String = "out.pfm",
+function render(image_tracer::ImageTracer,
+                renderer::Renderer
+                ; output_file::String = "out.pfm",
                   use_threads::Bool = true,
                   disable_output::Bool = false)
-    @assert typeof(query(output_file))<:File{format"PFM"}
+    # check if valid output_file
+    if !(typeof(query(output_file))<:File{format"PFM"})
+        error("'$output_file' is not a pfm file!")
+    end
+    # render image
     io = disable_output ? devnull : stdout
     println(io, "\n-> RENDERING")
     println(io, "Rendering image...")
@@ -93,23 +85,23 @@ end
 
 
 """
-    function render_scene_from_script(input_script::String,
-                                      ; output_file::String = "out.jpg",
-                                        α::Float32 = 0.75f0,
-                                        γ::Float32 = 1f0,
-                                        luminosity::Union{Float32, Nothing} = nothing,
-                                        use_threads::Bool = true,
-                                        disable_output::Bool = false)
+    function render_from_script(input_script::String,
+                                ; output_file::String = "out.pfm",
+                                  use_threads::Bool = true,
+                                  disable_output::Bool = false)
 
-Render and image given a SceneLang script, and save the output in `output_file`.
+Render an image given an `input_script` written in SceneLang and save the generated hdr image in `output_file`.
+
+If `use_threads` is `true`, use macro `Threads.@threads`. If `disable_output` is `true`, no message is printed.
 """
-function render_scene_from_script(input_script::String,
-                                  ; output_file::String = "out.jpg",
-                                    α::Float32 = 0.75f0,
-                                    γ::Float32 = 1f0,
-                                    luminosity::Union{Float32, Nothing} = nothing,
-                                    use_threads::Bool = true,
-                                    disable_output::Bool = false)
+function render_from_script(input_script::String,
+                            ; output_file::String = "out.pfm",
+                              use_threads::Bool = true,
+                              disable_output::Bool = false)
+    # check if valid output_file
+    if !(typeof(query(output_file))<:File{format"PFM"})
+        error("'$output_file' is not a pfm file!")
+    end
     # parse scene
     scene = Scene()
     scene = open_stream(input_script) do stream
@@ -134,7 +126,6 @@ function render_scene_from_script(input_script::String,
             """))
         end
     end
-
     # extract render informations
     renderer = if needs_lights
         scene.renderer.type(scene.world, scene.lights; scene.renderer.kwargs...)
@@ -142,10 +133,6 @@ function render_scene_from_script(input_script::String,
         scene.renderer.type(scene.world; scene.renderer.kwargs...)
     end
     image_tracer = ImageTracer(scene.image, scene.camera; scene.tracer.kwargs...)
-
-    # render and apply tonemapping
-    output_file_hdr = join([split(output_file, ".")[begin:end-1]..., "pfm"], ".")
-    output_file_ldr = output_file
-    render(image_tracer=image_tracer, renderer=renderer, output_file=output_file_hdr, use_threads=use_threads, disable_output=disable_output)
-    tonemapping(input_file=output_file_hdr, output_file=output_file_ldr, α=α, γ=γ, luminosity=luminosity, disable_output=disable_output)
+    # render
+    render(image_tracer=image_tracer, renderer=renderer, output_file=output_file, use_threads=use_threads, disable_output=disable_output)
 end
