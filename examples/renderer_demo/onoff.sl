@@ -32,5 +32,5 @@ SPAWN
 USING
     Camera.Perspective(.transformation TRANSLATE(.X -3), .screen_distance 2)
     Renderer.OnOff()
-    Image(1000, 1000)
+    Image(500, 500)
     Tracer()
