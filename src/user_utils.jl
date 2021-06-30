@@ -44,7 +44,7 @@ function tonemapping(input_file::String,
     image = (isnothing(luminosity) ? normalize(image, α) : normalize(image, α, luminosity=luminosity)) |> clamp
     image = γ_correction(image, γ)
     # save image
-    print(io, " done!\nSaving final image to '$(output_file)'...")
+    print(io, " done!\nSaving final image to \"$(output_file)\"...")
     save(output_file, image.pixel_matrix)
     println(io, " done!")
 end
@@ -96,6 +96,7 @@ If `use_threads` is `true`, use macro `Threads.@threads`. If `disable_output` is
 """
 function render_from_script(input_script::String,
                             ; output_file::String = "out.pfm",
+                              time::Float32 = 0f0,
                               use_threads::Bool = true,
                               disable_output::Bool = false)
     # check if valid output_file
@@ -103,7 +104,7 @@ function render_from_script(input_script::String,
         error("'$output_file' is not a pfm file!")
     end
     # parse scene
-    scene = Scene()
+    scene = Scene(time=time)
     scene = open_stream(input_script) do stream
         try
             parse_scene(stream, scene)
@@ -134,5 +135,5 @@ function render_from_script(input_script::String,
     end
     image_tracer = ImageTracer(scene.image, scene.camera; scene.tracer.kwargs...)
     # render
-    render(image_tracer=image_tracer, renderer=renderer, output_file=output_file, use_threads=use_threads, disable_output=disable_output)
+    render(image_tracer, renderer, output_file=output_file, use_threads=use_threads, disable_output=disable_output)
 end
