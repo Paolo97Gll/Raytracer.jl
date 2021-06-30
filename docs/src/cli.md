@@ -14,7 +14,7 @@ The CLI tool is named `raytracer_cli.jl` and is placed in the root of the reposi
 This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run almost all these commands also from the REPL, by calling the same functions called by the tool.
 
 !!! note
-    For now, the command [`demo animation`](@ref raytracer_cli_demo_animation) is available only with the CLI tool.
+    For now, the command [`render animation`](@ref raytracer_cli_render_animation) is available only with the CLI tool.
 
 ## Installation
 
@@ -28,27 +28,59 @@ See [CLI tool installation](@ref cli_tool_installation).
 The CLI tool is based on a series of commands, in a similar way to the `git` and `docker` CLI tools. The menu tree is:
 
 - [`raytracer_cli.jl`](@ref raytracer_cli)
+  - [`render`](@ref raytracer_cli_render)
+    - [`image`](@ref raytracer_cli_render_image)
+    - [`animation`](@ref raytracer_cli_render_animation)
   - [`tonemapping`](@ref raytracer_cli_tonemapping)
-  - [`demo`](@ref raytracer_cli_demo)
-    - [`image`](@ref raytracer_cli_demo_image)
-    - [`animation`](@ref raytracer_cli_demo_animation)
   - [`docs`](@ref raytracer_cli_docs)
 
 ### [`raytracer_cli.jl`](@id raytracer_cli)
 
 ```text
-usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo|docs}
+usage: raytracer_cli.jl [--version] [-h] {render|tonemapping|docs}
 
 Raytracing for the generation of photorealistic images in Julia.
 
 commands:
+  render       render an image from a SceneLang script
   tonemapping  apply tone mapping to a pfm image and save it to file
-  demo         show a demo of Raytracer.jl
   docs         show the documentation link
 
 optional arguments:
   --version    show version information and exit
   -h, --help   show this help message and exit
+```
+
+### [`raytracer_cli.jl render`](@id raytracer_cli_render)
+
+```text
+usage: raytracer_cli.jl render [--version] [-h] {image|animation}
+
+Render an image from a SceneLang script.
+
+commands:
+  image       render an image from a SceneLang script
+  animation   create an animation as mp4 video from a SceneLang script
+              (require ffmpeg)
+
+optional arguments:
+  --version   show version information and exit
+  -h, --help  show this help message and exit
+```
+
+### [`raytracer_cli.jl render image`](@id raytracer_cli_render_image)
+
+```text
+```
+
+### [`raytracer_cli.jl render animation`](@id raytracer_cli_render_animation)
+
+This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to be installed on the local machine and to be in the PATH. It generates an H.264 mp4 video containing the animation.
+
+!!! note
+    For now, the generation of animations is available only with the CLI tool.
+
+```text
 ```
 
 ### [`raytracer_cli.jl tonemapping`](@id raytracer_cli_tonemapping)
@@ -57,207 +89,40 @@ optional arguments:
     We support as output image type all the formats supported by the packages [ImageIO](https://github.com/JuliaIO/ImageIO.jl), [ImageMagick](https://github.com/JuliaIO/ImageMagick.jl) and [QuartzImageIO](https://github.com/JuliaIO/QuartzImageIO.jl), including: jpg, png, tiff, ppm, bmp, gif, ...
 
 ```text
-usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [--version]
-                        [-h] input_file output_file
+usage: raytracer_cli.jl tonemapping [-f] [-a ALPHA] [-g GAMMA]
+                        [-l LUMINOSITY] [--version] [-h] input-file
+                        output-file
 
 Apply tone mapping to a pfm image and save it to file.
 
+positional arguments:
+  input-file            path to input file, it must be a PFM file
+  output-file           output file name
+
 optional arguments:
-  --version          show version information and exit
-  -h, --help         show this help message and exit
+  -f, --force           force overwrite
+  --version             show version information and exit
+  -h, --help            show this help message and exit
 
 tonemapping settings:
-  -a, --alpha ALPHA  scaling factor for the normalization process
-                     (type: Float32, default: 0.5)
-  -g, --gamma GAMMA  gamma value for the tone mapping process (type:
-                     Float32, default: 1.0)
-
-files:
-  input_file         path to input file, it must be a PFM file
-  output_file        output file name
-```
-
-### [`raytracer_cli.jl demo`](@id raytracer_cli_demo)
-
-```text
-usage: raytracer_cli.jl demo [--version] [-h] {image|animation}
-
-Show a demo of Raytracer.jl.
-
-commands:
-  image       render a demo image of Raytracer.jl
-  animation   create a demo animation of Raytracer.jl (require ffmpeg)
-
-optional arguments:
-  --version   show version information and exit
-  -h, --help  show this help message and exit
-```
-
-### [`raytracer_cli.jl demo image`](@id raytracer_cli_demo_image)
-
-!!! note
-    The options `camera_position` and `camera_orientation` represent the camera transformations. The application order is: first the translation, then the rotation.
-
-```text
-usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
-                        [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
-                        [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
-                        [-R RENDERER] [-A ANTIALIASING] [--pt_n PT_N]
-                        [--pt_max_depth PT_MAX_DEPTH]
-                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
-                        [-a ALPHA] [-g GAMMA] [-O OUTPUT_FILE]
-                        [--version] [-h]
-
-Render a demo image of Raytracer.jl.
-
-optional arguments:
-  --force               force overwrite
-  --version             show version information and exit
-  -h, --help            show this help message and exit
-
-camera:
-  -t, --camera_type CAMERA_TYPE
-                        choose camera type ("perspective" or
-                        "orthogonal") (default: "perspective")
-  -p, --camera_position CAMERA_POSITION
-                        camera position in the scene as "X,Y,Z"
-                        (default: "-3,0,0")
-  -o, --camera_orientation CAMERA_ORIENTATION
-                        camera orientation as "angX,angY,angZ"
-                        (default: "0,0,0")
-  -d, --screen_distance SCREEN_DISTANCE
-                        only for "perspective" camera: distance
-                        between camera and screen (type: Float32,
-                        default: 2.0)
-
-rendering:
-  -r, --image_resolution IMAGE_RESOLUTION
-                        resolution of the rendered image (default:
-                        "540:540")
-  -R, --renderer RENDERER
-                        type of renderer to use ("onoff", "flat",
-                        "path" or "pointlight") (default: "path")
-  -A, --antialiasing ANTIALIASING
-                        number of samples per pixel (must be a perfect
-                        square) (type: Int64, default: 0)
-
-path-tracer options (only for "path" renderer):
-  --pt_n PT_N           number of rays fired for mc integration (type:
-                        Int64, default: 10)
-  --pt_max_depth PT_MAX_DEPTH
-                        maximum number of reflections for each ray
-                        (type: Int64, default: 2)
-  --pt_roulette_depth PT_ROULETTE_DEPTH
-                        depth of the russian-roulette algorithm (type:
-                        Int64, default: 3)
-
-tonemapping:
   -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float32, default: 0.75)
+                        (type: Float32, default: 0.5)
   -g, --gamma GAMMA     gamma value for the tone mapping process
                         (type: Float32, default: 1.0)
-
-files:
-  -O, --output_file OUTPUT_FILE
-                        output LDR file name (the HDR file will have
-                        the same name, but with "pfm" extension)
-                        (default: "demo.jpg")
-```
-
-### [`raytracer_cli.jl demo animation`](@id raytracer_cli_demo_animation)
-
-This is an advanced function that requires [ffmpeg](https://www.ffmpeg.org/) to be installed on the local machine and to be in the PATH. It generates an H.264 mp4 video containing the animation.
-
-!!! note
-    For now, the generation of animations is available only with the CLI tool.
-
-!!! note
-    The parameter `camera_orientation` is not present since the animation is done by rotating the camera around the Z axis and therefore there isn't a fixed camera orientation.
-
-```text
-usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
-                        [-p CAMERA_POSITION] [-d SCREEN_DISTANCE]
-                        [-r IMAGE_RESOLUTION] [-R RENDERER]
-                        [-A ANTIALIASING] [--pt_n PT_N]
-                        [--pt_max_depth PT_MAX_DEPTH]
-                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
-                        [-a ALPHA] [-g GAMMA] [-D DELTA_THETA]
-                        [-f FPS] [-F OUTPUT_DIR] [-O OUTPUT_FILE]
-                        [--version] [-h]
-
-Create a demo animation of Raytracer.jl, by generating n images with
-different camera orientation and merging them into an mp4 video.
-Require ffmpeg installed on local machine.
-
-optional arguments:
-  --force               force overwrite
-  --version             show version information and exit
-  -h, --help            show this help message and exit
-
-frame camera:
-  -t, --camera_type CAMERA_TYPE
-                        choose camera type ("perspective" or
-                        "orthogonal") (default: "perspective")
-  -p, --camera_position CAMERA_POSITION
-                        camera position in the scene as "X,Y,Z"
-                        (default: "-3,0,0")
-  -d, --screen_distance SCREEN_DISTANCE
-                        only for "perspective" camera: distance
-                        between camera and screen (type: Float32,
-                        default: 2.0)
-
-frame rendering:
-  -r, --image_resolution IMAGE_RESOLUTION
-                        resolution of the rendered image (default:
-                        "540:540")
-  -R, --renderer RENDERER
-                        type of renderer to use ("onoff", "flat",
-                        "path" or "pointlight") (default: "path")
-  -A, --antialiasing ANTIALIASING
-                        number of samples per pixel (must be a perfect
-                        square) (type: Int64, default: 0)
-
-path-tracer options (only for "path" renderer):
-  --pt_n PT_N           number of rays fired for mc integration (type:
-                        Int64, default: 10)
-  --pt_max_depth PT_MAX_DEPTH
-                        maximum number of reflections for each ray
-                        (type: Int64, default: 2)
-  --pt_roulette_depth PT_ROULETTE_DEPTH
-                        depth of the russian-roulette algorithm (type:
-                        Int64, default: 3)
-
-frame tonemapping:
-  -a, --alpha ALPHA     scaling factor for the normalization process
-                        (type: Float32, default: 0.75)
-  -g, --gamma GAMMA     gamma value for the tone mapping process
-                        (type: Float32, default: 1.0)
-
-animation parameter:
-  -D, --delta_theta DELTA_THETA
-                        Δθ in camera orientation (around z axis)
-                        between each frame; the number of frames
-                        generated is [360/Δθ] (type: Float32, default:
-                        10.0)
-  -f, --fps FPS         FPS (frame-per-second) of the output video
-                        (type: Int64, default: 15)
-
-files:
-  -F, --output_dir OUTPUT_DIR
-                        output directory (default: "demo_animation")
-  -O, --output_file OUTPUT_FILE
-                        name of output frames and animation without
-                        extension (default: "demo")
+  -l, --luminosity LUMINOSITY
+                        luminosity for the tone mapping process (type:
+                        Union{Nothing, Float32})
 ```
 
 ### [`raytracer_cli.jl docs`](@id raytracer_cli_docs)
 
 ```text
-usage: raytracer_cli.jl docs [--version] [-h]
+usage: raytracer_cli.jl docs [--dev] [--version] [-h]
 
 Show the documentation link.
 
 optional arguments:
+  --dev       documentation of the dev version
   --version   show version information and exit
   -h, --help  show this help message and exit
 ```
@@ -302,7 +167,7 @@ julia raytracer_cli.jl tonemapping --alpha 0.2 --gamma 1.8 test/memorial.pfm mem
 
 ### Generate a demo image
 
-You can use the [`demo image`](@ref raytracer_cli_demo_image) command to render a demo image:
+You can use the [`demo image`](@ref raytracer_cli_render_image) command to render a demo image:
 
 ```shell
 julia raytracer_cli.jl demo image
@@ -318,7 +183,7 @@ You can change the output file name, the LDR extension and other rendering param
 
 ### Generate a demo animation
 
-To create a demo animation, use the command [`demo animation`](@ref raytracer_cli_demo_animation):
+To create a demo animation, use the command [`demo animation`](@ref raytracer_cli_render_animation):
 
 ```shell
 julia raytracer_cli.jl demo animation
