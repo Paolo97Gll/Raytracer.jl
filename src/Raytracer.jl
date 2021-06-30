@@ -126,7 +126,7 @@ export # Random number generation
     PCG
 
 export # High level API
-    render, demo, tonemapping, render_scene_from_script
+    tonemapping, render, render_from_script
 
 export # image tools
     clamp_image, normalize_image, γ_correction, load, save
