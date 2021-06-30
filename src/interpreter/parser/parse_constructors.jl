@@ -652,7 +652,7 @@ function parse_union(stream::InputStream, scene::Scene)
     table = scene.variables
     expect_command(stream, UNITE)
     expect_symbol(stream, Symbol("("))
-    shapes = Vector{Shapes}()
+    shapes = Vector{Shape}()
     while true
         push!(shapes, parse_shape(stream, scene))
         expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
