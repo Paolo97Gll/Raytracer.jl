@@ -351,9 +351,9 @@ FUSE(shape::shape, ::shape...)
 Lights have a named constructor with signature
 
 ```julia
-Lights(.position position::point = {0,0,0},
-       .color color::color = <1,1,1>,
-       .linear_radius radius::number = 0)
+Light(.position position::point = {0,0,0},
+      .color color::color = <1,1,1>,
+      .linear_radius radius::number = 0)
 ```
 
 #### [PCGs](@id scenelang_syntax_structure_constructors_pcgs)
@@ -419,8 +419,8 @@ sin       | 1        | sine function (argument in radians)
 cos       | 1        | cos function (argument in radians)
 tan       | 1        | tan function (argument in radians)
 asin      | 1        | arcsine function
-acos      | 1        | arccos function 
-atan      | 1 or 2   | arctan function 
+acos      | 1        | arccos function
+atan      | 1 or 2   | arctan function
 Point     | 3        | Julia `Point` constructor
 RGB       | 3        | Julia `RGB` constructor
 
