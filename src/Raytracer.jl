@@ -17,7 +17,6 @@ module Raytracer
 # Imports
 
 
-using Intervals: minimum, isfinite
 import Base:
     (+), (-), (*), (≈),
     Matrix, OneTo,
@@ -34,6 +33,8 @@ import Base.Broadcast:
 using ColorTypes:
     RGB, Fractional
 
+using FileIO:
+    File, @format_str, query
 import FileIO:
     save, load
 
