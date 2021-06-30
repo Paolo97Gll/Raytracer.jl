@@ -128,7 +128,7 @@ function render_scene_from_script(input_script::String,
                            isnothing(scene.renderer)             => "No renderer is being used",
                            isnothing(scene.tracer)               => "No tracer is being used")
         if any(first.(are_not_defined))
-            throw(UndefinedSetting(SourceLocation(input_script = input_script), """
+            throw(UndefinedSetting(SourceLocation(file_name = input_script), """
             One or more necessary settings have not bene set by a USING or SPAWN command in the given SceneLang script.
             in particular:\n\t$(join(last.(filter(first, are_not_defined)), "\n\t"))
             """))

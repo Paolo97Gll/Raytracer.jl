@@ -65,8 +65,8 @@ function generate_kwargs(stream::InputStream, scene::Scene, kw::NamedTuple)
     is_positional_allowed = true
     for i ∈ SOneTo(length(kw))
         token = read_token(stream)
+        isa(token.value, LiteralSymbol) && token.value.value == Symbol(")") && break
         unread_token(stream, token)
-        isa(token.value, LiteralSymbol) && (expect_symbol(stream, Symbol(")")); break)
         key = if isa(token.value, Keyword)
             local key = expect_keyword(stream, keys(kw)).value.value
             haskey(kwargs, key) &&

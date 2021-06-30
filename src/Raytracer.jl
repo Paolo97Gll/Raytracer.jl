@@ -165,7 +165,9 @@ using .Interpreter:
     Scene,
     open_stream,
     InterpreterException,
-    parse_scene
+    parse_scene,
+    SourceLocation,
+    UndefinedSetting
 
 include("user_utils.jl")
 
