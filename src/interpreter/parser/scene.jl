@@ -128,7 +128,7 @@ A mutable struct containing all the significant elements of a renderable scene a
 - `camera::`[`CameraOrNot`](@ref): stores either the [`Camera`](@ref) or `nothing`
 - `renderer::`[`RendererOrNot`](@ref): stores either the [`RendererSettings`](@ref) for the [`Renderer`](@ref) or `nothing`
 - `tracer::`[`TracerOrNot`](@ref): strores either the [`TracerSettings`](@ref) for the [`ImageTracer`](@ref) or `nothing`
-- `time`: stores the animation time
+- `time::Float32`: stores the animation time
 """
 mutable struct Scene
     variables::IdTable
@@ -138,7 +138,7 @@ mutable struct Scene
 	camera::CameraOrNot
 	renderer::RendererOrNot
     tracer::TracerOrNot
-    time
+    time::Float32
 end
 
 """
@@ -149,7 +149,7 @@ end
             camera::CameraOrNot = nothing,
             renderer::RendererOrNot = nothing,
             tracer::TracerOrNot = nothing,
-            time = 0)
+            time::Float32 = 0f0)
 
 
 Constructor for a [`Scene`](@ref) instance.
@@ -161,7 +161,7 @@ function Scene(; variables::IdTable = IdTable(),
                  camera::CameraOrNot = nothing,
                  renderer::RendererOrNot = nothing,
                  tracer::TracerOrNot = nothing,
-                 time = 0)
+                 time = 0f0)
 	Scene(variables, world, lights, image, camera, renderer, tracer, time)
 end
 
@@ -173,7 +173,7 @@ end
           camera::CameraOrNot = nothing,
           renderer::RendererOrNot = nothing,
           tracer::TracerOrNot = nothing,
-          time = 0)
+          time = 0f0)
 
 
 Constructor for a [`Scene`](@ref) instance.
@@ -186,7 +186,7 @@ function Scene(variables::Vector{Pair{Type{<:TokenValue}, Vector{Pair{Symbol, To
                camera::CameraOrNot = nothing,
                renderer::RendererOrNot = nothing,
                tracer::TracerOrNot = nothing,
-               time = 0)
+               time = 0f0)
 
 	variables =  Dict(zip(first.(variables), (Dict(last(pair)) for pair ∈ variables)))
 	Scene(variables, world, lights, image, camera, renderer, tracer, time)
