@@ -134,5 +134,5 @@ function render_from_script(input_script::String,
     end
     image_tracer = ImageTracer(scene.image, scene.camera; scene.tracer.kwargs...)
     # render
-    render(image_tracer=image_tracer, renderer=renderer, output_file=output_file, use_threads=use_threads, disable_output=disable_output)
+    render(image_tracer, renderer, output_file=output_file, use_threads=use_threads, disable_output=disable_output)
 end
