@@ -295,6 +295,8 @@ and a command constructor with signature
 LOAD file_path::string # loads an image from a file at the given path if the format is valid
 ```
 
+Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
+
 #### [Pigments](@id scenelang_syntax_structure_constructors_pigments)
 
 Pigments have named constructors associated with each of their subtype specifiers. Their signatures are:
@@ -345,6 +347,7 @@ INTERSECT(shape::shape, ::shape...)
 DIFF(shape::shape, ::shape...)
 FUSE(shape::shape, ::shape...)
 ```
+Valid argument of [`SPAWN`](@ref scenelang_syntax_structure_instructions_SPAWN).
 
 #### [Lights](@id scenelang_syntax_structure_constructors_lights)
 
@@ -355,6 +358,7 @@ Light(.position position::point = {0,0,0},
       .color color::color = <1,1,1>,
       .linear_radius radius::number = 0)
 ```
+Valid argument of [`SPAWN`](@ref scenelang_syntax_structure_instructions_SPAWN).
 
 #### [PCGs](@id scenelang_syntax_structure_constructors_pcgs)
 
@@ -376,6 +380,9 @@ Camera.Perspective(.aspect_ratio ratio::number = 1.,
 Camera.Orthogonal(.aspect_ratio ratio::number = 1., 
                   .transformation transformation::transformation = SCALE 1.)
 ```
+
+Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
+
 #### [Renderers](@id scenelang_syntax_structure_constructors_renderers)
 
 Renderers have named constructors associated with each of their subtype specifiers. Their signatures are:
@@ -392,6 +399,7 @@ Renderer.PathTracer(.background_color color::color = <0,0,0>,
                     .max_depth        max::number.integer = 2,
                     .roulette_depth   roulette::number.integer = 3)
 ```
+Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
 
 #### [Tracers](@id scenelang_syntax_structure_constructors_tracers)
 
@@ -400,6 +408,7 @@ Tracers have a named constructor with signature
 ```julia
 Tracer(.samples_per_side samples::number = 1, .rng rng::pcg = Pcg())
 ```
+Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
 
 #### [MathExpressions](@id scenelang_syntax_structure_constructors_math_expressions)
 
@@ -435,7 +444,7 @@ atan      | 1 or 2   | arctan function
 Point     | 3        | Julia `Point` constructor
 RGB       | 3        | Julia `RGB` constructor
 
-After successful tokenization the expression is evaluated. Starting with the innermost expression all the identifiers are substituted with their value (if they are defined and contain a number, otherwise an exception will be thrown) an then the result of the expression is calculated. If the result is a finite number the second innermost expression is evaluated and so on until the outermost expression is evaluated. If the result is either infinite or `NaN` an exception will be thrown.
+After successful tokenization the expression is evaluated. Starting with the innermost expression all the identifiers are substituted with their value (if they are defined, otherwise an exception will be thrown) and then the result of the expression is calculated. If the result is a finite number the second innermost expression is evaluated and so on until the outermost expression is evaluated. If the result is either infinite or `NaN` an exception will be thrown.
 
 The tokenization and evaluation processes make use of the `Meta.parse` and `eval` functions provided by the Julia language. Therefore every valid Julia syntax for mathematical expressions is considered valid as long as it respects the restrictions discussed previously in this section.
 
@@ -463,7 +472,7 @@ Arguments can only be variables or constructors.
     - enclosing squared brackets `[]` to indicate optional arguments;
     - appended dots `...` to indicate that the previous element may be repeated an indefinite amount of times.
 
-#### `SET`
+#### [`SET`](@id scenelang_syntax_structure_instructions_SET)
 
 Assign to a variable a constructed variable.
 
@@ -493,7 +502,7 @@ SET
 !!! tip
     Since SceneLang is not sensitive to spaces and newlines chained commands can have any layout you prefer, we still suggest, for easier visual parsing, the style we use in our examples of separating every element by a newline and a tabulation.
 
-#### `UNSET`
+#### [`UNSET`](@id scenelang_syntax_structure_instructions_UNSET)
 
 Destroy a variable and the assigned value.
 
@@ -515,7 +524,7 @@ UNSET
 # not an identifier the UNSET statement is interrupted
 ```
 
-#### `SPAWN`
+#### [`SPAWN`](@id scenelang_syntax_structure_instructions_SPAWN)
 
 Spawns a shape or a light into the rendered world.
 
@@ -539,7 +548,7 @@ SPAWN
 # not an identifier the SPAWN statement is interrupted
 ```
 
-#### `USING`
+#### [`USING`](@id scenelang_syntax_structure_instructions_USING)
 
 Sets a rendering settings to a given value.
 
@@ -580,7 +589,7 @@ USING
 # not an identifier the USING statement is interrupted
 ```
 
-#### `DUMP`
+#### [`DUMP`](@id scenelang_syntax_structure_instructions_DUMP)
 
 Prints to `stdout` the specified content. Used mainy as a debug tool.
 
