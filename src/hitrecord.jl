@@ -65,5 +65,9 @@ function Base.isless(hr1::HitRecord, hr2::HitRecord)
 end
 
 function Base.isequal(hr1::HitRecord, hr2::HitRecord)
+    isequal(hr1.t/norm(hr1.ray.dir), hr2.t/norm(hr2.ray.dir))
+end
+
+function Base.:(==)(hr1::HitRecord, hr2::HitRecord)
     hr1.t/norm(hr1.ray.dir) == hr2.t/norm(hr2.ray.dir)
 end

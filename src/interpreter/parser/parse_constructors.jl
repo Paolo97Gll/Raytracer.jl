@@ -625,7 +625,6 @@ Return a [`Shape`](@ref) value from the `UNITE`, `INTERSECT`, `DIFF`, and `FUSE`
 See also: [`parse_shape`](@ref), [`parse_union`](@ref), [`parse_intersection`](@ref), [`parse_setdiff`](@ref), [`parse_fusion`](@ref)
 """
 function parse_shape_from_command(stream::InputStream, scene::Scene)
-    table = scene.variables
     command_token = expect_command(stream, (UNITE, INTERSECT, DIFF, FUSE))
     unread_token(stream, command_token)
     if command_token.value == UNITE
@@ -649,10 +648,9 @@ Return a [`UnionCSG`](@ref) value from the `UNITE` [`Command`](@ref).
 See also: [`parse_shape_from_command`](@ref)
 """
 function parse_union(stream::InputStream, scene::Scene)
-    table = scene.variables
     expect_command(stream, UNITE)
     expect_symbol(stream, Symbol("("))
-    shapes = Vector{Shapes}()
+    shapes = Vector{Shape}()
     while true
         push!(shapes, parse_shape(stream, scene))
         expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
@@ -668,7 +666,6 @@ Return a [`IntersectionCSG`](@ref) value from the `INTERSECT` [`Command`](@ref).
 See also: [`parse_shape_from_command`](@ref)
 """
 function parse_intersection(stream::InputStream, scene::Scene)
-    table = scene.variables
     expect_command(stream, INTERSECT)
     expect_symbol(stream, Symbol("("))
     shapes = Vector{Shapes}()
@@ -687,7 +684,6 @@ Return a [`DiffCSG`](@ref) value from the `DIFF` [`Command`](@ref).
 See also: [`parse_shape_from_command`](@ref)
 """
 function parse_setdiff(stream::InputStream, scene::Scene)
-    table = scene.variables
     expect_command(stream, DIFF)
     expect_symbol(stream, Symbol("("))
     shapes = Vector{Shape}()
@@ -706,7 +702,6 @@ Return a [`FusionCSG`](@ref) value from the `FUSE` [`Command`](@ref).
 See also: [`parse_shape_from_command`](@ref)
 """
 function parse_fusion(stream::InputStream, scene::Scene)
-    table = scene.variables
     expect_command(stream, FUSE)
     expect_symbol(stream, Symbol("("))
     shapes = Vector{Shapes}()

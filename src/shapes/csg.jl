@@ -12,7 +12,7 @@ For the function to work correctly `ts` must be of even length.
 function valid_intervals(ts::Vector)
     iseven(length(ts)) || throw(ArgumentError("given vector must have even length: got $ts"))
     sorted_ts = sort(ts)
-    [Interval(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
+    [Interval{Open, Open}(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
 end
 
 #######
@@ -114,87 +114,87 @@ See also: [`CSG`](@ref), [`Rule`](@ref).
 const FusionCSG = CSG{FuseRule}
 
 """
-    union(s1::Shape, s2::Shape)
+    union(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
 
 Construct a [`UnionCSG`](@ref) with the given shapes as `rbranch` and `lbranch` repectively.
 """
-function Base.union(s1::Shape, s2::Shape)
-    UnionCSG(s1, s2)
+function Base.union(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
+    UnionCSG(s1, s2, transformation = transformation)
 end
 
 """
-    union(s::Shape, ss::Shape...)
+    union(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
 
 Construct a [`UnionCSG`](@ref) binary tree, by recursively calling [`union`](@ref)`(::Shape, ::Shape)`.
 """
-function Base.union(s::Shape, ss::Shape...)
-    union(union(s, ss[begin:end ÷ 2]...), union(ss[end ÷ 2 + 1:end]...))
+function Base.union(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
+    union(union(s, ss[begin:end ÷ 2]...), union(ss[end ÷ 2 + 1:end]...); transformation = transformation)
 end
 
-function Base.union(s1::Shape, s2::Shape, s3::Shape)
-    union(union(s1, s2), s3)
+function Base.union(s1::Shape, s2::Shape, s3::Shape; transformation::Transformation = Transformation())
+    union(union(s1, s2), s3; transformation = transformation)
 end
 
 """
-    intersect(s1::Shape, s2::Shape)
+    intersect(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
 
 Construct a [`IntersectionCSG`](@ref) with the given shapes as `rbranch` and `lbranch` repectively.
 """
-function Base.intersect(s1::Shape, s2::Shape)
-    IntersectionCSG(s1, s2)
+function Base.intersect(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
+    IntersectionCSG(s1, s2; transformation = transformation)
 end
 
 """
-    intersect(s::Shape, ss::Shape...)
+    intersect(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
 
 Construct a [`IntersectionCSG`](@ref) binary tree, by recursively calling [`intersect`](@ref)`(::Shape, ::Shape)`.
 """
-function Base.intersect(s::Shape, ss::Shape...)
-    intersect(intersect(s, ss[begin:end ÷ 2]...), intersect(ss[(end ÷ 2 + 1):end]...))
+function Base.intersect(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
+    intersect(intersect(s, ss[begin:end ÷ 2]...), intersect(ss[(end ÷ 2 + 1):end]...); transformation = transformation)
 end
 
-function Base.intersect(s1::Shape, s2::Shape, s3::Shape)
-    intersect(intersect(s1, s2), s3)
+function Base.intersect(s1::Shape, s2::Shape, s3::Shape; transformation::Transformation = Transformation())
+    intersect(intersect(s1, s2), s3; transformation = transformation)
 end
 
 """
-    setdiff(s1::Shape, s2::Shape)
+    setdiff(s1::Shape, s2::Shape); transformation::Transformation = Transformation())
 
 Construct a [`DiffCSG`](@ref) with the given shapes as `rbranch` and `lbranch` repectively.
 """
-function Base.setdiff(s1::Shape, s2::Shape)
-    DiffCSG(s1, s2)
+function Base.setdiff(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
+    DiffCSG(s1, s2; transformation = transformation)
 end
 
 """
-    setdiff(s::Shape, ss::Shape...)
+    setdiff(s::Shape, ss::Shape...); transformation::Transformation = Transformation())
 
-Construct a [`DiffCSG`](@ref) between `s` and [`union`](@ref)`(ss...)`.
+Construct a [`DiffCSG`](@ref) between `s` and [`fuse`](@ref)`(ss...)`.
 """
-function Base.setdiff(s::Shape, ss::Shape...)
-    setdiff(s, union(ss...))
+function Base.setdiff(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
+    setdiff(s, fuse(ss...), transformation = transformation)
 end
 
 """
-    fuse(s1::Shape, s2::Shape)
+    fuse(s1::Shape, s2::Shape); transformation::Transformation = Transformation())
 
 Construct a [`FusionCSG`](@ref) with the given shapes as `rbranch` and `lbranch` repectively.
 """
-function fuse(s1::Shape, s2::Shape)
-    FusionCSG(s1, s2)
+function fuse(s1::Shape, s2::Shape; transformation::Transformation = Transformation())
+    FusionCSG(s1, s2; transformation = transformation)
 end
 
 """
-    fuse(s::Shape, ss::Shape...)
+    fuse(s::Shape, ss::Shape...); transformation::Transformation = Transformation())
 
 Construct a [`FusionCSG`](@ref) binary tree, by recursively calling [`intersect`](@ref)`(::Shape, ::Shape)`.
 """
-function fuse(s::Shape, ss::Shape...)
-    fuse(fuse(s, ss[begin:end ÷ 2]...), fuse(ss[end ÷ 2 + 1:end]...))
+function fuse(s::Shape, ss::Shape...; transformation::Transformation = Transformation())
+    fuse(fuse(s, ss[begin:end ÷ 2]...), fuse(ss[end ÷ 2 + 1:end]...); transformation = transformation)
 end
 
-function fuse(s1::Shape, s2::Shape, s3::Shape)
-    fuse(fuse(s1, s2), s3)
+function fuse(s1::Shape, s2::Shape, s3::Shape; transformation::Transformation = Transformation())
+    fuse(fuse(s1, s2), s3; transformation = transformation)
 end
 
 ###########
@@ -242,7 +242,7 @@ function all_ray_intersections(ray::Ray, csg::IntersectionCSG)
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
     r_filter = filter(hit -> any(Ref(hit) .∈ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals) && hit ∉ r_filter, l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -267,7 +267,7 @@ function get_all_ts(csg::IntersectionCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∈ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals) && t ∉ r_filter, l_ts)
     # @assert (length(r_filter) + length(l_filter) != 1) "Only one intersection for $(typeof(csg.rbranch)): $r_ts + $l_ts between $l_min and $l_max"
     append!(r_filter, l_filter)
 end
@@ -290,7 +290,7 @@ function all_ray_intersections(ray::Ray, csg::DiffCSG)
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
     r_filter = filter(hit -> all(Ref(hit) .∉ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals) && hit ∉ r_filter, l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -318,7 +318,7 @@ function get_all_ts(csg::DiffCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals) && t ∉ r_filter, l_ts)
     append!(r_filter, l_filter)
 end
 
@@ -339,8 +339,8 @@ function all_ray_intersections(ray::Ray, csg::FusionCSG)
     isempty(l_hits) && return r_hits
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
-    r_filter = filter(hit -> any(Ref(hit) .∉ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∉ r_intervals), l_hits)
+    r_filter = filter(hit -> all(Ref(hit) .∉ l_intervals), r_hits)
+    l_filter = filter(hit -> all(Ref(hit) .∉ r_intervals) && hit ∉ r_filter, l_hits)
     isempty(r_filter) && return l_filter
     isempty(l_filter) && return r_filter
     append!(r_filter, l_filter)
@@ -367,6 +367,6 @@ function get_all_ts(csg::FusionCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∉ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∉ r_intervals) && t ∉ r_filter, l_ts)
     append!(r_filter, l_filter)
 end
