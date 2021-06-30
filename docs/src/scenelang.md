@@ -365,6 +365,17 @@ Pcg(.state state::number.integer = 42,
     .inc   inc::number.integer = 54)
 ```
 
+#### [Camera](@id scenelang_syntax_structure_constructors_camera)
+
+Cameras have named constructors associated with each of their subtype specifiers. Their signatures are:
+
+```julia
+Camera.Perspective(.aspect_ratio ratio::number = 1., 
+                   .transformation transformation::transformation = SCALE 1., 
+                   .screen_distance distance::number = 1.)
+Camera.Orthogonal(.aspect_ratio ratio::number = 1., 
+                  .transformation transformation::transformation = SCALE 1.)
+```
 #### [Renderers](@id scenelang_syntax_structure_constructors_renderers)
 
 Renderers have named constructors associated with each of their subtype specifiers. Their signatures are:
