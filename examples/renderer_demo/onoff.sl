@@ -29,8 +29,10 @@ SPAWN
     Shape.Sphere(.transformation coord8)
     Shape.Sphere(.transformation coord9)
 
+SET camera_position ROTATE(.Z TIME) * TRANSLATE(.X -3)
+
 USING
-    Camera.Perspective(.transformation TRANSLATE(.X -3), .screen_distance 2)
+    Camera.Perspective(.transformation camera_position, .screen_distance 2)
     Renderer.OnOff()
     Image(500, 500)
     Tracer()
