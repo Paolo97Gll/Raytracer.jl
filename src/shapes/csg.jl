@@ -12,7 +12,7 @@ For the function to work correctly `ts` must be of even length.
 function valid_intervals(ts::Vector)
     iseven(length(ts)) || throw(ArgumentError("given vector must have even length: got $ts"))
     sorted_ts = sort(ts)
-    [Interval(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
+    [Interval{Open, Open}(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
 end
 
 #######
@@ -169,10 +169,10 @@ end
 """
     setdiff(s::Shape, ss::Shape...)
 
-Construct a [`DiffCSG`](@ref) between `s` and [`union`](@ref)`(ss...)`.
+Construct a [`DiffCSG`](@ref) between `s` and [`fuse`](@ref)`(ss...)`.
 """
 function Base.setdiff(s::Shape, ss::Shape...)
-    setdiff(s, union(ss...))
+    setdiff(s, fuse(ss...))
 end
 
 """
@@ -242,7 +242,7 @@ function all_ray_intersections(ray::Ray, csg::IntersectionCSG)
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
     r_filter = filter(hit -> any(Ref(hit) .∈ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals) && hit ∉ r_filter, l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -267,7 +267,7 @@ function get_all_ts(csg::IntersectionCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∈ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals) && t ∉ r_filter, l_ts)
     # @assert (length(r_filter) + length(l_filter) != 1) "Only one intersection for $(typeof(csg.rbranch)): $r_ts + $l_ts between $l_min and $l_max"
     append!(r_filter, l_filter)
 end
@@ -290,7 +290,7 @@ function all_ray_intersections(ray::Ray, csg::DiffCSG)
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
     r_filter = filter(hit -> all(Ref(hit) .∉ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals), l_hits)
+    l_filter = filter(hit -> any(Ref(hit) .∈ r_intervals) && hit ∉ r_filter, l_hits)
     append!(r_filter, l_filter)
 end
 
@@ -318,7 +318,7 @@ function get_all_ts(csg::DiffCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∈ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∈ r_intervals) && t ∉ r_filter, l_ts)
     append!(r_filter, l_filter)
 end
 
@@ -339,8 +339,8 @@ function all_ray_intersections(ray::Ray, csg::FusionCSG)
     isempty(l_hits) && return r_hits
     r_intervals = valid_intervals(r_hits)
     l_intervals = valid_intervals(l_hits)
-    r_filter = filter(hit -> any(Ref(hit) .∉ l_intervals), r_hits)
-    l_filter = filter(hit -> any(Ref(hit) .∉ r_intervals), l_hits)
+    r_filter = filter(hit -> all(Ref(hit) .∉ l_intervals), r_hits)
+    l_filter = filter(hit -> all(Ref(hit) .∉ r_intervals) && hit ∉ r_filter, l_hits)
     isempty(r_filter) && return l_filter
     isempty(l_filter) && return r_filter
     append!(r_filter, l_filter)
@@ -367,6 +367,6 @@ function get_all_ts(csg::FusionCSG, ray::Ray)
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     r_filter = filter(t -> any(t .∉ l_intervals), r_ts)
-    l_filter = filter(t -> any(t .∉ r_intervals), l_ts)
+    l_filter = filter(t -> any(t .∉ r_intervals) && t ∉ r_filter, l_ts)
     append!(r_filter, l_filter)
 end
