@@ -213,6 +213,7 @@ function parse_using_command(stream::InputStream, scene::Scene)
                 @assert false "@ $(next_token.loc): expect_type returned a non-spawnable type '$type'"
             end
         elseif isa(next_token.value, Command)
+            next_token.value ∈ (SET, UNSET, SPAWN, USING, DUMP) && break
             image = parse_image_from_command(stream, scene)
             isnothing(scene.image) || throw(already_defined_exception(type))
             scene.image = image
