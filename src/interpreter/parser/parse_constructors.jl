@@ -668,7 +668,7 @@ See also: [`parse_shape_from_command`](@ref)
 function parse_intersection(stream::InputStream, scene::Scene)
     expect_command(stream, INTERSECT)
     expect_symbol(stream, Symbol("("))
-    shapes = Vector{Shapes}()
+    shapes = Vector{Shape}()
     while true
         push!(shapes, parse_shape(stream, scene))
         expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
@@ -704,12 +704,12 @@ See also: [`parse_shape_from_command`](@ref)
 function parse_fusion(stream::InputStream, scene::Scene)
     expect_command(stream, FUSE)
     expect_symbol(stream, Symbol("("))
-    shapes = Vector{Shapes}()
+    shapes = Vector{Shape}()
     while true
         push!(shapes, parse_shape(stream, scene))
         expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
     end
-    fusion(shapes...)
+    fuse(shapes...)
 end
 
 """
