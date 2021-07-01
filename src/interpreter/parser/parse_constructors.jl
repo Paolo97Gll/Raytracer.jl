@@ -213,11 +213,11 @@ function parse_point(stream::InputStream, scene::Scene)
         z = get(kwargs, :Z, 0)
     elseif isa(next_token.value, LiteralSymbol)
         expect_symbol(stream, Symbol("{"))
-        x = expect_number(stream, scene).value.value
+        x = parse_float(stream, scene)
         expect_symbol(stream, Symbol(","))
-        y = expect_number(stream, scene).value.value
+        y = parse_float(stream, scene)
         expect_symbol(stream, Symbol(","))
-        z = expect_number(stream, scene).value.value
+        z = parse_float(stream, scene)
         expect_symbol(stream, Symbol("}"))
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
@@ -254,11 +254,11 @@ function parse_color(stream::InputStream, scene::Scene)
         blue  = get(kwargs, :B, 0)
     elseif isa(next_token.value, LiteralSymbol)
         expect_symbol(stream, Symbol("<"))
-        red = expect_number(stream, scene).value.value
+        red = parse_float(stream, scene)
         expect_symbol(stream, Symbol(","))
-        green = expect_number(stream, scene).value.value
+        green = parse_float(stream, scene)
         expect_symbol(stream, Symbol(","))
-        blue = expect_number(stream, scene).value.value
+        blue = parse_float(stream, scene)
         expect_symbol(stream, Symbol(">"))
     else
         throw(WrongTokenType(next_token.loc,"Expected either a 'LiteralType' or a 'LiteralSymbol', got '$(typeof(next_token.value))'",next_token.length))
