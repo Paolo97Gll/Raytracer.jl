@@ -20,7 +20,7 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
                 throw(UndefinedIdentifier(token.loc, "Undefined variable '$arg' in 'MathExpression'", token.length))
             return vars[type][arg].value
         elseif isa(arg, Expr)
-            return evaluate_math_expression(Token(token.loc, MathExpression(arg), token.length), vars)
+            return evaluate_math_expression(Token(token.loc, MathExpression(arg), token.length), scene)
         else
             hasmethod(isfinite, Tuple{typeof(arg)}) &&(
                 isfinite(arg) ||

@@ -239,6 +239,7 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
         isa(e, Base.Meta.ParseError) || rethrow(e)
         throw(InvalidExpression(token_location,"Mathemathical expression cannot be parsed:\n$(e.msg)", len + 1))
     end
+    isa(expr, Symbol) && (expr = :(+$expr))
     Raytracer.isvalid(expr, len, token_location)
     return Token(token_location, MathExpression(expr), len + 1)
 end
