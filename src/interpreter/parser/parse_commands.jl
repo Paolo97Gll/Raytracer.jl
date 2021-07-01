@@ -42,7 +42,8 @@ function parse_unset_command(stream::InputStream, scene::Scene)
         isa(id.value, Identifier) || (unread_token(stream, id); break)
         id_name = id.value.value
         type = findfirst(d -> haskey(d, id_name), table)
-        isnothing(type) && throw(UndefinedIdentifier(id.loc,"Undefined variable '$id_name'" ,id.length))
+        isnothing(type) && 
+            throw(UndefinedIdentifier(id.loc,"Undefined variable '$id_name'" ,id.length))
         pop!(table[type], id_name)
     end
     return
