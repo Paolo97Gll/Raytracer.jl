@@ -211,12 +211,13 @@ end
 
 function all_ray_intersections(ray::Ray, csg::UnionCSG)
     inv_ray = inv(csg.transformation) * ray
-    append!(all_ray_intersections(inv_ray, csg.rbranch), all_ray_intersections(inv_ray, csg.lbranch))
+    r_hits = all_ray_intersections(inv_ray, csg.rbranch)
+    append!(r_hits , filter(hit -> hit ∉ r_hits, all_ray_intersections(inv_ray, csg.lbranch)))
 end
 
 function quick_ray_intersection(ray::Ray, csg::UnionCSG)
     inv_ray = inv(csg.transformation) * ray
-    quick_ray_intersection(inv_ray, csg.rbranch) || quick_ray_intersection(inv_ray, csg.rbranch)
+    quick_ray_intersection(inv_ray, csg.rbranch) || quick_ray_intersection(inv_ray, csg.lbranch)
 end
 
 function get_all_ts(csg::UnionCSG, ray::Ray)
