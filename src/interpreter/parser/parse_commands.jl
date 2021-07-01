@@ -98,6 +98,8 @@ function parse_spawn_command(stream::InputStream, scene::Scene)
         if isa(next_val, Identifier)
             id_name = expect_identifier(stream).value.value
             type = findfirst(d -> haskey(d, id_name), table)
+            isnothing(type) &&
+                throw(UndefinedIdentifier(next_token.loc,"Undefined variable '$id_name'",next_token.length))
             if type == ShapeType
                 shape = table[type][id_name].value
                 push!(scene.world, shape)
@@ -163,6 +165,8 @@ function parse_using_command(stream::InputStream, scene::Scene)
         if isa(next_token.value, Identifier)
             id_name = expect_identifier(stream).value.value
             type = findfirst(d -> haskey(d, id_name), table)
+            isnothing(type) &&
+                throw(UndefinedIdentifier(next_token.loc,"Undefined variable '$id_name'",next_token.length))
             if type == CameraType
                 camera = table[type][id_name].value
                 isnothing(scene.camera) || throw(already_defined_exception(type))
