@@ -285,7 +285,7 @@ function renderimage(options::Dict{String, Any})
             output_ldr_file,
             α = options["alpha"],
             γ = options["gamma"],
-            luminosity = (options["luminosity"])
+            luminosity = options["luminosity"]
         )
     end
 end
