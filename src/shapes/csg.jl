@@ -355,8 +355,8 @@ function quick_ray_intersection(ray::Ray, csg::FusionCSG)
     isempty(l_ts) && return true
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
-    any(t -> any(t .∉ l_intervals && ray.tmin < t < ray.tmax), r_ts) ||
-    any(t -> any(t .∉ r_intervals && ray.tmin < t < ray.tmax), l_ts)
+    any(t -> any(t .∉ l_intervals) && ray.tmin < t < ray.tmax, r_ts) ||
+    any(t -> any(t .∉ r_intervals) && ray.tmin < t < ray.tmax, l_ts)
 end
 
 function get_all_ts(csg::FusionCSG, ray::Ray)
