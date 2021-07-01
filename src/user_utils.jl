@@ -40,6 +40,7 @@ function tonemapping(input_file::String,
     println(io, "\n-> TONE MAPPING PROCESS")
     print(io, "Loading input file '$(input_file)'...")
     image = load(input_file) |> HdrImage
+    replace!(image.pixel_matrix, RGB{Float32}(NaN, NaN, NaN) => BLACK)
     print(io, " done!\nApplying tone mapping... ")
     image = (isnothing(luminosity) ? normalize(image, α) : normalize(image, α, luminosity=luminosity)) |> clamp
     image = γ_correction(image, γ)

@@ -10,6 +10,14 @@
 
 
 """
+    ==(c1::RGB, c2::RGB)
+
+Elementwise comparison of two colors.
+"""
+(==)(c1::RGB, c2::RGB) = all(isequal.(c1, c2))
+
+
+"""
     +(c1::RGB, c2::RGB)
 
 Return the elementwise sum of two colors.
@@ -22,7 +30,7 @@ RGB color with eltype Float32
 R: 5.0, G: 7.0, B: 9.0
 ```
 """
-(+)(c1::RGB, c2::RGB) = RGB(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
+(+)(c1::RGB, c2::RGB) = RGB((+).(c1, c2))
 
 """
     -(c1::RGB, c2::RGB)
@@ -37,7 +45,7 @@ RGB color with eltype Float32
 R: -3.0, G: -3.0, B: -3.0
 ```
 """
-(-)(c1::RGB, c2::RGB) = RGB(c1.r - c2.r, c1.g - c2.g, c1.b - c2.b)
+(-)(c1::RGB, c2::RGB) = RGB((-).(c1, c2))
 
 """
     *(scalar::Number, c::RGB)
@@ -67,7 +75,7 @@ true
 
 Note that the eltype of RGB is mantained.
 """
-(*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}(scalar * c.r, scalar * c.g, scalar * c.b)
+(*)(scalar::Number, c::RGB{T}) where {T} = RGB{T}((*).(scalar, c))
 (*)(c::RGB, scalar::Number) = scalar * c
 
 """
@@ -83,7 +91,7 @@ RGB color with eltype Float32
 R: 4.0, G: 10.0, B: 18.0
 ```
 """
-(*)(c1::RGB, c2::RGB) = RGB(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)
+(*)(c1::RGB, c2::RGB) = RGB((*).(c1, c2))
 
 """
     ≈(c1::RGB, c2::RGB)
@@ -104,9 +112,7 @@ julia> c ≈ RGB(0f0, 0f0, 0f0)
 false
 ```
 """
-(≈)(c1::RGB, c2::RGB) = c1.r ≈ c2.r &&
-                        c1.g ≈ c2.g &&
-                        c1.b ≈ c2.b
+(≈)(c1::RGB, c2::RGB) = all((≈).(c1, c2))
 
 
 #############
