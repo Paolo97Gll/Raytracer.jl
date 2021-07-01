@@ -418,8 +418,8 @@ These expressions are first checked for validity at lexing time, where it is ens
 
 op symbol | # of args| action
 ----------|---------:|----------
-\+        |1+        | add
-\-        | 2        | subtract
+\+        | 1+       | add
+\-        | 1 or 2   | change sign or subtract
 \*        | 1+       | multiply
 /         | 2        | float divide
 div       | 2        | integer divide

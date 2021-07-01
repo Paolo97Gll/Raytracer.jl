@@ -54,7 +54,7 @@ while the pair `:floor => (n::Int) -> n == 1` indicates that the operation `floo
 See also: [`Raytracer.isvalid`](@ref)
 """
 const valid_operations = Dict(:+     => (; f = ( ::Int) -> true,        signature = "+(x...)"),
-                              :-     => (; f = (n::Int) -> n == 2,      signature = "-(x, y)"),
+                              :-     => (; f = (n::Int) -> 1 <= n <= 2, signature = "-(x, [y])"),
                               :*     => (; f = ( ::Int) -> true,        signature = "*(x...)"),
                               :/     => (; f = (n::Int) -> n == 2,      signature = "/(x, y)"),
                               :%     => (; f = (n::Int) -> n == 2,      signature = "%(x, y)"),
