@@ -123,10 +123,10 @@ function parse_commandline()
             default = 1f0
             range_tester = x -> x > 0
         "--luminosity", "-l"
-            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process"
-            arg_type = Union{Float32, Nothing}
-            default = nothing
-            range_tester = x -> isnothing(x) || x > 0
+            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process (-1 = auto)"
+            arg_type = Float32
+            default = -1f0
+            range_tester = x -> x == -1 || x > 0
     end
 
     # render animation
@@ -188,10 +188,10 @@ function parse_commandline()
             default = 1f0
             range_tester = x -> x > 0
         "--luminosity", "-l"
-            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process"
-            arg_type = Union{Float32, Nothing}
-            default = nothing
-            range_tester = x -> isnothing(x) || x > 0
+            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process (-1 = auto)"
+            arg_type = Float32
+            default = -1f0
+            range_tester = x -> x == -1 || x > 0
     end
 
     # tonemapping
@@ -224,10 +224,10 @@ function parse_commandline()
             default = 1f0
             range_tester = x -> x > 0
         "--luminosity", "-l"
-            help = "luminosity for the tone mapping process"
-            arg_type = Union{Float32, Nothing}
-            default = nothing
-            range_tester = x -> isnothing(x) || x > 0
+            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process (-1 = auto)"
+            arg_type = Float32
+            default = -1f0
+            range_tester = x -> x == -1 || x > 0
     end
 
     # docs
@@ -277,12 +277,15 @@ function renderimage(options::Dict{String, Any})
     )
 
     if options["with-tonemapping"]
+        if options["luminosity"] == -1
+            options["luminosity"] = nothing
+        end
         Raytracer.tonemapping(
             output_hdr_file,
             output_ldr_file,
             α = options["alpha"],
             γ = options["gamma"],
-            luminosity = options["luminosity"]
+            luminosity = (options["luminosity"])
         )
     end
 end
@@ -303,6 +306,9 @@ function renderanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, option
         disable_output = true
     )
     # apply tonemapping
+    if options["luminosity"] == -1
+        options["luminosity"] = nothing
+    end
     Raytracer.tonemapping(
         output_hdr_file,
         output_ldr_file,
@@ -390,6 +396,9 @@ function tonemapping(options::Dict{String, Any})
         end
     end
     # apply tonemapping
+    if options["luminosity"] == -1
+        options["luminosity"] = nothing
+    end
     Raytracer.tonemapping(
         options["input-file"],
         options["output-file"],
