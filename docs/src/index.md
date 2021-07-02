@@ -1,4 +1,4 @@
-# Raytracer.jl
+![logo](https://i.imgur.com/UxMU0YW.png)
 
 Raytracing package for the generation of photorealistic images in Julia.
 
