@@ -12,7 +12,11 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 # Pkg.activate(normpath(joinpath(@__DIR__, "..")))
 
-using Documenter, Raytracer
+using Documenter
+
+using Raytracer
+using Raytracer:
+    SimpleShape, CompositeShape
 
 
 makedocs(
