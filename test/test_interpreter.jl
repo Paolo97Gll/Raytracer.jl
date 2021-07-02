@@ -1,3 +1,11 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Unit test file for interpreter.jl (SceneLang interpreter)
+# TODO revise tests!
+
+
 @testset "TestLexer" begin
     expected = [Token(SourceLocation("test_interpreter_script.sl", 2, 2), SPAWN, ),
     Token(SourceLocation("test_interpreter_script.sl", 2, 8), Identifier(:number), ),

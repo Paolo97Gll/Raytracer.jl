@@ -26,30 +26,30 @@ See also:
 [`InvalidSize`](@ref),
 [`InvalidFilePath`](@ref),
 [`IdentifierRedefinition`](@ref)
-[`SettingRedefinition`](@ref)    
-[`UndefinedSetting`](@ref)       
+[`SettingRedefinition`](@ref)
+[`UndefinedSetting`](@ref)
 """
 abstract type InterpreterException <: Exception end
 
 macro make_exception(name::Symbol, descriptive_str::AbstractString)
-    struct_doc = 
+    struct_doc =
         """
             $name <: InterpreterException
-        
+
         $descriptive_str
-        
+
         See also: [`InterpreterException`](@ref)
-        
+
         # Fields
-        
+
         - `location::SourceLocation`: location of the error
         - `msg::AbstractString`: descriptive error message
         - `len::Int`: how many characters are involved in the error
         """
-    constructor_doc = 
+    constructor_doc =
         """
             $name(location::SourceLocation, msg::AbstractString)
-        
+
         Construct an instance of [`$name`](@ref) with `len = 1`.
         """
 
@@ -61,7 +61,7 @@ macro make_exception(name::Symbol, descriptive_str::AbstractString)
             msg::AbstractString
             len::Int
         end
-        
+
         @doc $constructor_doc $name(::SourceLocation, ::AbstractString)
 
         function $(esc(name))(location::SourceLocation, msg::AbstractString)
@@ -75,7 +75,7 @@ function Base.showerror(io::IO, e::InterpreterException)
     printstyled(io, " @ ", e.location, color=:light_black)
     println(io)
     printstyled(io, e.msg, color=:red)
-    iszero(e.location.line_num) && 
+    iszero(e.location.line_num) &&
         return
     println(io)
     printstyled(io, "source: ", color=:light_black)
@@ -91,7 +91,7 @@ function Base.showerror(io::IO, e::InterpreterException, bt; backtrace = false)
         nothing
     end
 end
- 
+
 @make_exception BadCharacter           "There is an invalid character in the SceneLang script."
 @make_exception UnfinishedExpression   "A special environment (e.g. a string, mathematical expression, list...) has been opened and not closed."
 @make_exception UndefinedIdentifier    "The given identifier has not been defined in the script."

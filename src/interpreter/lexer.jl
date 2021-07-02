@@ -124,7 +124,7 @@ function _parse_number_token(stream::InputStream, first_char::Char, token_locati
     value = try
         parse(Float32, str)
     catch e
-        isa(e, ArgumentError) && 
+        isa(e, ArgumentError) &&
             rethrow(InvalidNumber(token_location, "'$str' is an invalid number format\n"*
                     "Valid formats only include digits, '+' or '-', dots, and letters 'e' or 'E'\n"*
                     "Examples: +9e3, -300.5, 5e-7", length(str)))
@@ -169,24 +169,24 @@ function _parse_command_or_type_token(stream::InputStream, first_char::Char, tok
         str *= ch
     end
 
-    class, sym = all(ch -> isuppercase(ch) || ch == '_', str) ? 
-        (Command,     Symbol(str)) : 
+    class, sym = all(ch -> isuppercase(ch) || ch == '_', str) ?
+        (Command,     Symbol(str)) :
         (LiteralType, Symbol(str * "Type"))
 
     keywords = instances(class) .|> Symbol
-    if (index = findfirst(s -> s == sym, keywords)) |> isnothing 
+    if (index = findfirst(s -> s == sym, keywords)) |> isnothing
         valid_instances = replace.(
             last.(
                 split.(
                     repr.(
                         instances(class)
-                    ), 
+                    ),
                 ".")
             ),
             Ref(r"Type$" => "")
         )
-        throw((class <: Command ? InvalidCommand : InvalidType)(start_loc, 
-            "'$str' is not a valid '$class'.\nValid $(class)s are:\n\t" * join(valid_instances, "\n\t"), length(str))) 
+        throw((class <: Command ? InvalidCommand : InvalidType)(start_loc,
+            "'$str' is not a valid '$class'.\nValid $(class)s are:\n\t" * join(valid_instances, "\n\t"), length(str)))
     end
     Token(token_location, class(index - 1), length(str))
 end
@@ -226,7 +226,7 @@ function _parse_math_expression_token(stream::InputStream, token_location::Sourc
             break
         end
 
-        (isnothing(ch) || isnewline(ch)) && 
+        (isnothing(ch) || isnewline(ch)) &&
             throw(UnfinishedExpression(token_location, "Unterminated mathematical expression", stream.saved_location.col_num - token_location.col_num + 1))
 
         str *= ch
@@ -267,7 +267,7 @@ function read_token(stream::InputStream)
 
     # Check if we got some non ASCII character
     isascii(ch) || throw(BadCharacter(stream.saved_location, "Invalid character $ch: only ASCII charachters are supported"))
-    
+
     # At this point we must check what kind of token begins with the "ch" character
     # (which has been put back in the stream with stream.unread_char). First,
     # we save the position in the stream

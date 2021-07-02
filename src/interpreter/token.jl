@@ -1,4 +1,3 @@
-using Base: Symbol, Number
 # Raytracer.jl
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
@@ -14,7 +13,7 @@ Type wrapping a `Symbol` representing a command or type in a SceneLang script.
 # Fields
 
 - `value::Symbol`: the value of the token
-""" 
+"""
 struct Keyword
     value::Symbol
 end

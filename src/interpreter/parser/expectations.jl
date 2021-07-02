@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-##############
-# EXPECTATION
+# Expectations for the parser
+
 
 """
     expect_keyword(stream::InputStream, keyword::Symbol)

@@ -172,7 +172,7 @@ An abstract type representing a Bidirectional Reflectance Distribution Function.
 
 Each subtype of this type must include a field `pigment::`[`Pigment`](@ref) storing the pigment on which the BRDF operates.
 Each subtype of this type must implement an `at(::NewBRDF, ::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)` function, where `NewBRDF` should be swubstituted with your new type name. This function evaluates the BRDF of a point with given normal, input and output directions and uv coordinates (which are used to evaluate)
-        
+
 See also: [`DiffuseBRDF`](@ref), [`SpecularBRDF`](@ref),
 """
 abstract type BRDF end

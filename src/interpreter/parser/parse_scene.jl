@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-################
-# SCENE PARSING
+# Parse a scene
+
 
 """
     parse_scene(stream::InputStream, scene::Scene = Scene())

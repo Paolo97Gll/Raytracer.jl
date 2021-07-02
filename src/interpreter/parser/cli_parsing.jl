@@ -2,6 +2,9 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+# Parsers for CLI
+
+
 """
     parse_variables_from_string(str::AbstractString; table::IdTable = IdTable()) -> IdTable
 

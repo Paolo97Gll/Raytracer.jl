@@ -2,6 +2,9 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+# CSG
+
+
 """
     valid_intervals(ts::Vector)
 
@@ -15,8 +18,10 @@ function valid_intervals(ts::Vector)
     [Interval{Open, Open}(t1, t2) for (t1, t2) ∈ zip(sorted_ts[begin:2:end], sorted_ts[begin+1:2:end])]
 end
 
+
 #######
 # CSG
+
 
 """
     Rule
@@ -192,8 +197,10 @@ function fuse(s1::Shape, s2::Shape, s3::Shape; transformation::Transformation = 
     fuse(fuse(s1, s2), s3; transformation = transformation)
 end
 
+
 ###########
 # UnionCSG
+
 
 function ray_intersection(ray::Ray, csg::UnionCSG)
     inv_ray = inv(csg.transformation) * ray
@@ -220,8 +227,10 @@ function get_all_ts(csg::UnionCSG, ray::Ray)
     append!(get_all_ts(csg.rbranch, inv_ray), get_all_ts(csg.lbranch, inv_ray))
 end
 
+
 ##################
 # IntersectionCSG
+
 
 function ray_intersection(ray::Ray, csg::IntersectionCSG)
     hits = filter(hit -> ray.tmin < hit.t < ray.tmax, all_ray_intersections(ray, csg))
@@ -268,8 +277,10 @@ function get_all_ts(csg::IntersectionCSG, ray::Ray)
     append!(r_filter, l_filter)
 end
 
+
 ##########
 # DiffCSG
+
 
 function ray_intersection(ray::Ray, csg::DiffCSG)
     hits = filter(hit -> ray.tmin < hit.t < ray.tmax, all_ray_intersections(ray, csg))
@@ -296,7 +307,7 @@ function quick_ray_intersection(ray::Ray, csg::DiffCSG)
     isempty(r_ts) && return false
     l_ts = get_all_ts(csg.lbranch, inv_ray)
     isempty(l_ts) && return any(t -> ray.tmin < t < ray.tmax, r_ts)
-    
+
     r_intervals = valid_intervals(r_ts)
     l_intervals = valid_intervals(l_ts)
     any(t -> all(t .∉ l_intervals) && ray.tmin < t < ray.tmax, r_ts) ||
@@ -318,8 +329,10 @@ function get_all_ts(csg::DiffCSG, ray::Ray)
     append!(r_filter, l_filter)
 end
 
+
 ###########
 # FusionCSG
+
 
 function ray_intersection(ray::Ray, csg::FusionCSG)
     hits = filter(hit -> ray.tmin < hit.t < ray.tmax, all_ray_intersections(ray, csg))

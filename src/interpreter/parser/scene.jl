@@ -3,6 +3,8 @@
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
 # Parser of SceneLang
+
+
 """
     ValueLoc
 
@@ -263,5 +265,4 @@ function Base.show(io::IO, ::MIME"text/plain", scene::Scene)
     printstyled(io, "time", color = :green)
     println(io, " = ", scene.time)
     println(io)
-
 end

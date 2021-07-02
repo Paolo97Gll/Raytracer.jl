@@ -2,8 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-#######
-# AABB
+# Axis Aligned Bounding Box
 
 
 """

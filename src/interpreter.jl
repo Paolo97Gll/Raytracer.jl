@@ -4,6 +4,12 @@
 
 # Interpreter for input files
 
+
+"""
+    Raytracer.Interpreter
+
+SceneLang interpreter module.
+"""
 module Interpreter
 
 using Base:

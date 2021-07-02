@@ -2,8 +2,8 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-########
-# UTILS
+# Parser utilities
+
 
 """
     evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
@@ -16,7 +16,7 @@ function evaluate_math_expression(token::Token{MathExpression}, scene::Scene)
     args = map(expr.args[begin + 1: end]) do arg
         if isa(arg, Symbol)
             arg === :TIME && return scene.time
-            (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing && 
+            (type = findfirst(d -> haskey(d, arg), vars)) |> isnothing &&
                 throw(UndefinedIdentifier(token.loc, "Undefined variable '$arg' in 'MathExpression'", token.length))
             return vars[type][arg].value
         elseif isa(arg, Expr)
