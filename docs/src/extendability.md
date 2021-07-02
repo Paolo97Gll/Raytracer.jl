@@ -12,54 +12,54 @@ Raytracer is designed to be easily extensible in terms of renderers, pigments, B
 
 ## Renderers
 
-###### Needed fields
+##### Needed fields
 
 No fields are strictly needed, but it is suggested to have a [`World`](@ref) field, named `world` for code consistency, in which to store the shapes to be rendered. It is also common to store a background color that deals with rays which do not hit any shape.
 
-###### Needed methods
+##### Needed methods
 
 Each subtype of [`Renderer`](@ref) must be a callable like `(r::Renderer)(ray::Ray)` and must return a `RGB{Float32}`.
 
-###### Further notes
+##### Further notes
 
 See doc and source code for [`Renderer`](@ref).
 
 ## Pigments
 
-###### Needed fields
+##### Needed fields
 
 No fields are needed.
 
-###### Needed methods
+##### Needed methods
 
 Each subtype of [`Pigment`](@ref) must be a callable like `(p::Pigment)(uv::Vec2D)` and must return a `RGB{Float32}`.
 
-###### Further notes
+##### Further notes
 
 See doc and souce code for [`Pigment`](@ref).
 
 ## BRDFs
 
-###### Needed fields
+##### Needed fields
 
 - `pigment::Pigment`: a [`Pigment`](@ref) storing the pigment on which the BRDF operates. It is suggested that this field should have a default value (most BRDFs use the default [`UniformPigment`](@ref)).
 
-###### Needed methods
+##### Needed methods
 
 Each subtype of [`BRDF`](@ref) must implement an `at(::NewBRDF, ::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)` function, where `NewBRDF` should be swubstituted with your new type name. This function evaluates the BRDF of a point with given normal, input and output directions and uv coordinates (which are used to evaluate).
 
-###### Further notes
+##### Further notes
 
 See doc and souce code for [`BRDF`](@ref).
 
 ## Shapes
 
-###### Needed fields
+##### Needed fields
 
 - `material::Material`: a [`Material`](@ref) storing the informations on the material of the shape.
 - `transformation::Transformation`: a [`Transformation`](@ref) is the transformation that should be applied to every point of the unitary shape associated with the type (e.g., a sphere of radius one for the [`Sphere`](@ref) shape) to be transformed in the desired shape.
 
-###### Needed methods
+##### Needed methods
 
 - `ray_intersection(::Ray, ::NewShape)`: return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref).
 - `all_ray_intersections(::Ray, ::NewShape)`: return a `Vector` of [`HitRecord`](@ref)s of all the ray intersections with the given [`Shape`](@ref) for every finite value of `t`, even outside of the ray domain.
@@ -73,7 +73,7 @@ Furthermore, if you want to make your `NewShape` a subtype of [`SimpleShape`](@r
 - `get_normal(::Type{NewShape}, ::Point, ::Ray)`: return the [`Normal{true}`](@ref) of a shape given a point on its surface and the ray that hits it.
 - `get_uv(::Type{NewShape}, ::Point)`: return the uv coordinates of a shape associated with the given point on its surface.
 
-###### Further notes
+##### Further notes
 
 We suggest to implement any new composite shape as a subtype to [`CompositeShape`](@ref) instead of directly subtyping [`Shape`](@ref).
 
