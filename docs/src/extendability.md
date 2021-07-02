@@ -81,7 +81,7 @@ See documentation and source code of [`Shape`](@ref), [`SimpleShape`](@ref), and
 
 ## Examples of extendability
 
-Take a look to the examples folder in the repository to see an example, also reported below here.
+Take a look to the examples folder in the repository to see an example (see `examples\extendability\renderers`), also reported below here.
 
 ```julia
 using Raytracer
@@ -133,7 +133,7 @@ Render a `Ray` and return a `RBG{Float32}`.
 """
 function (fr::FoggyRenderer)(ray::Ray)
     hit = ray_intersection(ray, fr.world)
-    isnothing(hit) && return fr.fog_color 
+    isnothing(hit) && return fr.fog_color
     hit_color = hit.material.emitted_radiance(hit.surface_point) + hit.material.brdf.pigment(hit.surface_point)
     t = hit.t/fr.falloff
     fr.fog_color * (1 - exp(-t)) + hit_color * exp(-t)
