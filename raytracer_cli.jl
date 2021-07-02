@@ -111,7 +111,7 @@ function parse_commandline()
             help = "force overwrite"
             action = :store_true
     end
-    add_arg_group!(s["render"]["image"], "tonemapping");
+    add_arg_group!(s["render"]["image"], "tonemapping settings");
     @add_arg_table! s["render"]["image"] begin
         "--with-tonemapping"
             help = "apply the tone mapping process"
@@ -184,7 +184,7 @@ function parse_commandline()
             arg_type = Int
             range_tester = x -> x > 0
     end
-    add_arg_group!(s["render"]["animation"], "tonemapping");
+    add_arg_group!(s["render"]["animation"], "tonemapping settings");
     @add_arg_table! s["render"]["animation"] begin
         "--ldr-extension", "-e"
             help = "extension of the generated ldr image (e.g., \"jpg\" or \"png\")"

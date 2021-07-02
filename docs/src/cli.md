@@ -94,7 +94,7 @@ optional arguments:
   --version             show version information and exit
   -h, --help            show this help message and exit
 
-tonemapping:
+tonemapping settings:
   --with-tonemapping    apply the tone mapping process
   -e, --ldr-extension LDR-EXTENSION
                         only with "--with-tonemapping": extension of
@@ -156,7 +156,7 @@ delta animation (mutually exclusive):
   --n-frames N-FRAMES   number of frames between "t_start" and "t_end"
                         (type: Int64)
 
-tonemapping:
+tonemapping settings:
   -e, --ldr-extension LDR-EXTENSION
                         extension of the generated ldr image (e.g.,
                         "jpg" or "png") (default: "jpg")
