@@ -2,6 +2,11 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
+"""
+    parse_variables_from_string(str::AbstractString; table::IdTable = IdTable()) -> IdTable
+
+Parse a string containing comma separated identifier-constructor pairs and return the resulting [`IdTable`](@ref).
+"""
 function parse_variables_from_string(str::AbstractString; table::IdTable = IdTable()) :: IdTable
     scene = Scene(variables = table)
     str = replace(str, r"\s+" => " ")
