@@ -2,8 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-function parse_variables_from_string(str::AbstractString) :: IdTable
-    table = IdTable()
+function parse_variables_from_string(str::AbstractString; table::IdTable = IdTable()) :: IdTable
     str = replace(str, r"\s+" => " ")
     buff = IOBuffer(str)
     stream = InputStream(buff, "COMMANDLINE"; line_num = 0)
