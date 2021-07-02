@@ -2,7 +2,7 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-# Point-light renderer example script
+# Point-light renderer example script with streetlamps
 
 SET
 	white  <  1,  1,  1>
@@ -79,5 +79,3 @@ SPAWN
 	ground
 	streetlight
 	streetlamp
-
-

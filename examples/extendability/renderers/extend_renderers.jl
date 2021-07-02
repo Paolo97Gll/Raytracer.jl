@@ -1,3 +1,9 @@
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Custom scene example code
+
 using Pkg; Pkg.activate(joinpath("..", "..", ".."))
 
 using Raytracer
@@ -49,7 +55,7 @@ Render a `Ray` and return a `RBG{Float32}`.
 """
 function (fr::FoggyRenderer)(ray::Ray)
     hit = ray_intersection(ray, fr.world)
-    isnothing(hit) && return fr.fog_color 
+    isnothing(hit) && return fr.fog_color
 	hit_color = hit.material.emitted_radiance(hit.surface_point) + hit.material.brdf.pigment(hit.surface_point)
 	t = hit.t/fr.falloff
 	fr.fog_color * (1 - exp(-t)) + hit_color * exp(-t)

@@ -1,18 +1,23 @@
-# this script does not need to define a renderer to be used since it
+# Raytracer.jl
+# Raytracing for the generation of photorealistic images in Julia
+# Copyright (c) 2021 Samuele Colombo, Paolo Galli
+
+# Custom scene example script
+# This script does not need to define a renderer to be used since it
 # will be determined in the Julia scripts in this folder
 
-USING 
+USING
     Image(1000, 1000)
 	Camera.Perspective(.transformation TRANSLATE(.X -3))
 	Tracer()
 
-SET 
+SET
 	white  <1.000,1.000,1.000>
 	red    <0.800,0.235,0.204>
 	green  <0.212,0.592,0.145>
 	purple <0.580,0.345,0.694>
 
-SET 
+SET
 	white_material  Material(.brdf Brdf.Diffuse(.pigment Pigment.Uniform(white)))
 	red_material    Material(.brdf Brdf.Diffuse(.pigment Pigment.Uniform(red)))
 	green_material  Material(.brdf Brdf.Diffuse(.pigment Pigment.Uniform(green)))
