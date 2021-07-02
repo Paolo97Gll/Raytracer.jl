@@ -31,8 +31,12 @@ function parse_commandline_error_handler(settings::ArgParseSettings, err, err_co
     if "out of range input for" |> occursin(err.text)
         s = reduce(replace, ["out of range input for " => "", " " => ""], init=err.text)
         parameter, value = split(s, ":")
-        if parameter == "input_file"
-            print_error("the parameter \"$(parameter)\" (value: $(value)) must be a PFM file")
+        if parameter == "input-file"
+            print_error("the parameter \"$(parameter)\" (value: $(value)) must be an existing PFM file")
+        elseif parameter == "input-script"
+            print_error("the parameter \"$(parameter)\" (value: $(value)) must be an existing SceneLang script")
+        elseif parameter == "output-file"
+            print_error("the parameter \"$(parameter)\" (value: $(value)) must be a file name, not a path")
         elseif parameter ∈ ["--alpha", "-a", "--gamma", "-g", "--luminosity", "-l", "--delta-t", "--n-frames", "--fps", "-f"]
             print_error("the parameter \"$(parameter)\" (value: $(value)) must be > 0")
         elseif parameter == "time-limits"
@@ -89,7 +93,7 @@ function parse_commandline()
         "input-script"
             help = "path to the input SceneLang script"
             arg_type = String
-            range_tester = x -> x[end-2:end] == ".sl"
+            range_tester = x -> x[end-2:end] == ".sl" && isfile(x)
             required = true
         "--output-file", "-O"
             help = "output image name, without extension"
@@ -155,6 +159,7 @@ function parse_commandline()
             help = "name of saved frames and video, without extension"
             arg_type = String
             default = "out"
+            range_tester = x -> isempty(dirname(x))
         "--vars", "-v"
             help = "add variables using the SET SceneLang syntax; multiple variables separated with commas (e.g., \"a_variable 2, a_material Material()\")"
             arg_type = String
@@ -209,7 +214,7 @@ function parse_commandline()
         "input-file"
             help = "path to input file, it must be a PFM file"
             arg_type = String
-            range_tester = x -> typeof(query(x))<:File{format"PFM"}
+            range_tester = x -> typeof(query(x))<:File{format"PFM"} && isfile(x)
             required = true
         "output-file"
             help = "output file name"
@@ -277,6 +282,7 @@ function renderimage(options::Dict{String, Any})
             exit(1)
         end
     end
+    mkpath(dirname(options["input-script"]))
 
     Raytracer.render_from_script(
         options["input-script"],
@@ -357,7 +363,7 @@ function renderanimation(options::Dict{String, Any})
 
     print("Creating directory \"$(options["output-dir"])\"...")
     rm(demodir, force=true, recursive=true)
-    mkdir(demodir)
+    mkpath(demodir)
     println(" done!")
 
     println("\n-> RENDERING")
@@ -405,6 +411,7 @@ function tonemapping(options::Dict{String, Any})
             exit(1)
         end
     end
+    mkpath(dirname(options["output-file"]))
     # apply tonemapping
     if options["luminosity"] == -1
         options["luminosity"] = nothing
