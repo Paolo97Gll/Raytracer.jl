@@ -11,7 +11,7 @@
 Abstract type for functors that map [`Ray`](@ref) to `RGB{Float32}`.
 
 Each subtype of this type must be a callable like `(r::Renderer)(ray::Ray)` and must return a `RGB{Float32}`.
-Each subtype of this type sould have a member of type [`World`](@ref) to check for intersections of the given [`Ray`](@ref).
+Each subtype of this type should have a member of type [`World`](@ref) to check for intersections of the given [`Ray`](@ref).
 
 See also: [`OnOffRenderer`](@ref), [`FlatRenderer`](@ref), [`PathTracer`](@ref), [`PointLightRenderer`](@ref)
 """
