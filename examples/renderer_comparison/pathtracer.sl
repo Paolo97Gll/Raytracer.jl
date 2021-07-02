@@ -7,11 +7,9 @@
 SET
     # Shapes
     sp1_position TRANSLATE(0.5, 0.7, 0.1)
-    sp1_color <0.2, 0.7, 0.8>
-    sp1_material Material(.brdf Brdf.Diffuse(Pigment.Uniform(sp1_color)))
+    sp1_material Material(.brdf Brdf.Diffuse(Pigment.Uniform(<0.2, 0.7, 0.8>)))
     sp2_position TRANSLATE(-0.2, -0.8, -0.8) * SCALE 0.5
-    sp2_color <0.6, 0.2, 0.3>
-    sp2_material Material(.brdf Brdf.Specular(Pigment.Uniform(sp2_color)))
+    sp2_material Material(.brdf Brdf.Specular(Pigment.Uniform(<0.6, 0.2, 0.3>)))
 
     # Ground
     ground_position TRANSLATE(.Z -1)
@@ -20,10 +18,8 @@ SET
 
     # Sky
     sky_position SCALE 100
-    sky_color <0, 0, 0>
-    sky_emitted <1, 1, 1>
-    sky_material Material(.brdf Brdf.Diffuse(Pigment.Uniform(sky_color)),
-                          .emitted_radiance Pigment.Uniform(sky_emitted))
+    sky_material Material(.brdf Brdf.Diffuse(Pigment.Uniform(<0, 0, 0>)),
+                          .emitted_radiance Pigment.Uniform(<1, 1, 1>))
 
 SPAWN
     # Spheres
