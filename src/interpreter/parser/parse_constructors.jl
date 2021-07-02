@@ -13,7 +13,6 @@ Return a `Tuple{Any, IdTableKey}` containing the result of the construction and 
 If the expression from the `stream` is not a valid constructor an exception is thrown.
 """
 function parse_constructor(stream::InputStream, scene::Scene)
-    table =scene.variables
     next_token = read_token(stream)
     unread_token(stream, next_token)
     next_val = next_token.value
