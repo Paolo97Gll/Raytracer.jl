@@ -26,6 +26,8 @@ See also:
 [`InvalidSize`](@ref),
 [`InvalidFilePath`](@ref),
 [`IdentifierRedefinition`](@ref)
+[`SettingRedefinition`](@ref)    
+[`UndefinedSetting`](@ref)       
 """
 abstract type InterpreterException <: Exception end
 
