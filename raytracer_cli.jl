@@ -67,7 +67,7 @@ function parse_commandline()
             help = "apply tone mapping to a pfm image and save it to file"
         "docs"
             action = :command
-            help = "show the documentation link"
+            help = "show documentation links"
     end
 
     # render
@@ -240,7 +240,7 @@ function parse_commandline()
 
     # docs
 
-    s["docs"].description = "Show the documentation link."
+    s["docs"].description = "Show documentation links."
     @add_arg_table! s["docs"] begin
         "--dev"
             help = "documentation of the dev version"
