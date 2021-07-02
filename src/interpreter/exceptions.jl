@@ -73,6 +73,8 @@ function Base.showerror(io::IO, e::InterpreterException)
     printstyled(io, " @ ", e.location, color=:light_black)
     println(io)
     printstyled(io, e.msg, color=:red)
+    iszero(e.location.line_num) && 
+        return
     println(io)
     printstyled(io, "source: ", color=:light_black)
     println(io, read_at_line(e.location.file_name, e.location.line_num))
