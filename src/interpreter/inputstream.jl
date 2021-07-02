@@ -17,7 +17,7 @@ Type wrapping the `IO` from the source code of a SceneLang script.
 - `saved_char::Union{Char, Nothing}`: stores a character from [`unread_char!`](@ref) or nothing
 - `saved_location::SourceLocation`: a [`SourceLocation`](@ref) storing the previous reading position
 - `saved_token::Union{Token, Nothing}`: stores an unreaded [`Token`](@ref)
-- `tabulations::Int`: how many columns a `<tab>` charachter is worth
+- `tabulations::Int`: how many columns a `<tab>` character is worth
 """
 mutable struct InputStream
     stream::IO
@@ -28,13 +28,14 @@ mutable struct InputStream
     tabulations::Int
 
     """
-        InputStream(stream::IO, file_name::String; tabulations::Int = 8)
+        InputStream(stream::IO, file_name::String; tabulations::Int = 8, line_num::Int = 1, col_num::Int = 1)
 
     Construct an instance of [`InputStream`](@ref) with location at the beginning of the file and initialize
-    `saved_char` and `saved_token` to `nothing`.
+    `saved_char` and `saved_token` to `nothing`. The initial state of the location can be set using the `line_num` and `col_num`
+    keyword arguments, but remember this will not affect the starting position of the stored stream, only how it will be represented.
     """
-    function InputStream(stream::IO, file_name::String; tabulations::Int = 8)
-        loc = SourceLocation(file_name=file_name)
+    function InputStream(stream::IO, file_name::String; tabulations::Int = 8, line_num::Int = 1, col_num::Int = 1)
+        loc = SourceLocation(file_name=file_name, line_num = line_num, col_num = col_num)
         new(stream, loc, nothing, loc, nothing, tabulations)
     end
 end
