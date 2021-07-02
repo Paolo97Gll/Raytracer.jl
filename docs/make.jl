@@ -30,6 +30,7 @@ makedocs(
             "High-level API" => "api/high-level.md",
             "Low-level API" => "api/low-level.md"
         ],
+        "Extendability" => "extendability.md",
         "For devs" => [
             "Collaboration instructions" => "devs/collab.md",
             "Private API" => "devs/private-api.md",
