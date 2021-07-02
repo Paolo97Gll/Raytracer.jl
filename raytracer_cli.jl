@@ -99,6 +99,10 @@ function parse_commandline()
             help = "time for script"
             arg_type = Float32
             default = 0f0
+        "--vars", "-v"
+            help = "add variables using the SET SceneLang syntax; multiple variables separated with commas (e.g., \"a_variable 2, a_material Material()\")"
+            arg_type = String
+            default = ""
         "--force", "-f"
             help = "force overwrite"
             action = :store_true
@@ -151,6 +155,10 @@ function parse_commandline()
             help = "name of saved frames and video, without extension"
             arg_type = String
             default = "out"
+        "--vars", "-v"
+            help = "add variables using the SET SceneLang syntax; multiple variables separated with commas (e.g., \"a_variable 2, a_material Material()\")"
+            arg_type = String
+            default = ""
         "--force", "-f"
             help = "force overwrite"
             action = :store_true
@@ -174,21 +182,21 @@ function parse_commandline()
     add_arg_group!(s["render"]["animation"], "tonemapping");
     @add_arg_table! s["render"]["animation"] begin
         "--ldr-extension", "-e"
-            help = "only with \"--with-tonemapping\": extension of the generated ldr image (e.g., \"jpg\" or \"png\")"
+            help = "extension of the generated ldr image (e.g., \"jpg\" or \"png\")"
             arg_type = String
             default = "jpg"
         "--alpha", "-a"
-            help = "only with \"--with-tonemapping\": scaling factor for the normalization process"
+            help = "scaling factor for the normalization process"
             arg_type = Float32
             default = 0.75f0
             range_tester = x -> x > 0
         "--gamma", "-g"
-            help = "only with \"--with-tonemapping\": gamma value for the tone mapping process"
+            help = "gamma value for the tone mapping process"
             arg_type = Float32
             default = 1f0
             range_tester = x -> x > 0
         "--luminosity", "-l"
-            help = "only with \"--with-tonemapping\": luminosity for the tone mapping process (-1 = auto)"
+            help = "luminosity for the tone mapping process (-1 = auto)"
             arg_type = Float32
             default = -1f0
             range_tester = x -> x == -1 || x > 0
@@ -273,7 +281,8 @@ function renderimage(options::Dict{String, Any})
     Raytracer.render_from_script(
         options["input-script"],
         output_file = output_hdr_file,
-        time = options["time"]
+        time = options["time"],
+        vars = options["vars"]
     )
 
     if options["with-tonemapping"]
@@ -302,6 +311,7 @@ function renderanimation_loop(elem::Tuple{Int, Float32}, total_elem::Int, option
         options["input-script"],
         output_file = output_hdr_file,
         time = t,
+        vars = options["vars"],
         use_threads = false,
         disable_output = true
     )
