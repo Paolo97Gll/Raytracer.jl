@@ -9,7 +9,7 @@ Depth = 3
 
 ## Description
 
-The CLI tool is named `raytracer_cli.jl` and is placed in the root of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang.
+The CLI tool is named `raytracer_cli.jl` and is placed in the root of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. For this purpose, you can use the CLI tool with [SceneLang](@ref scenelang), a simple DSL with which to define the scenes to be rendered.
 
 This CLI tool recalls functions already present in the `Raytracer.jl` module, so is possible to run almost all these commands also from the REPL, by calling the same functions called by the tool.
 
@@ -221,13 +221,13 @@ To enable multithreading, e.g. use 8 threads, add `-t num_threads` after the `ju
 julia -t 8 raytracer_cli.jl render image input-script
 ```
 
-Here all examples use only one thread, but you can specify the number of threads you prefer.
+Here all the examples use only one thread, but you can specify the number of threads you prefer: Raytracer.jl is optimized to run with multiple threads.
 
 ## Examples
 
 ### Tone mapping
 
-You can use the [`tonemapping`](@ref raytracer_cli_tonemapping) ray command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
+You can use the [`tonemapping`](@ref raytracer_cli_tonemapping) command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image `test/memorial.pfm` into a jpg image:
 
 ```shell
 julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg
@@ -243,44 +243,48 @@ julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.png
 
 or any other format supported (see [here](@ref raytracer_cli_tonemapping)).
 
-You can also change the default values of `alpha`, `gamma` and `luminosity` to obtain a better tone mapping, according to your source image:
+You can also change the default values of `alpha`, `gamma` and `luminosity` to obtain a better tone mapping, according to your source image and the desired final effect:
 
 ```shell
-julia raytracer_cli.jl tonemapping --alpha 0.2 --gamma 1.8 test/memorial.pfm memorial.jpg
+julia raytracer_cli.jl tonemapping --alpha 0.2 --gamma 1.8 --luminosity 2 test/memorial.pfm memorial.jpg
 ```
 
-![](https://i.imgur.com/c6tKSRG.jpg)
+![](https://i.imgur.com/GeZiiQ1.jpg)
 
-### Generate a demo image
+### Render an image
 
-You can use the [`demo image`](@ref raytracer_cli_render_image) command to render a demo image:
+You can use the [`render image`](@ref raytracer_cli_render_image) command to render an image from a SceneLang script:
 
 ```shell
-julia raytracer_cli.jl demo image
+julia raytracer_cli.jl render image examples/logo.sl -O logo
 ```
 
-![](https://i.imgur.com/DiYwNyG.jpg)
+This will generate only the `logo.pfm` HDR image. Then you can use the `tonemapping` command to generate the LDR image.
 
-It creates two files: `demo.pfm` (the HDR image) and `demo.jpg` (the LDR image).
-
-You can change the output file name, the LDR extension and other rendering parameters using the command options. For example, you can enable antialiasing and see the difference it can make. Here an example with 36 rays/pixel:
-
-![](https://i.imgur.com/8JCWIJ2.jpg)
-
-### Generate a demo animation
-
-To create a demo animation, use the command [`demo animation`](@ref raytracer_cli_render_animation):
+Otherwise, you can apply the tone mapping immediately after the rendering using this command with the option `--with-tonemapping`. In this way you can see the generated image immediately. It creates two files: `logo.pfm` (the HDR image) and `logo.jpg` (the LDR image).
 
 ```shell
-julia raytracer_cli.jl demo animation
+julia raytracer_cli.jl render image examples/logo.sl -O logo --with-tonemapping
+```
+
+![](https://i.imgur.com/5tQ1cWn.jpg)
+
+You can change the output file name, the LDR extension, and other rendering parameters using the command line options.
+
+### Generate an animation
+
+To create an animation, use the command [`render animation`](@ref raytracer_cli_render_animation):
+
+```shell
+julia raytracer_cli.jl render animation examples/demo/animation.sl 0:360 --delta-t 1 --fps 60 --luminosity 0.08
 ```
 
 ```@raw html
 <video autoplay="" controls="" loop="" width="540" height="540">
-  <source src="https://i.imgur.com/2yEoRbA.mp4">
+  <source src="https://i.imgur.com/KOTcQ4E.mp4">
 </video>
 ```
 
-It creates a new folder `demo_animation` with the video `demo.mp4` and all the frames in jpeg format.
+It creates a new folder `animation` with the video `out.mp4` and all the frames in jpeg format.
 
-You can change the output folder and file name and other rendering and animation parameters using the command options.
+You can change the output folder and file name, the LDR frame extension, and other rendering and animation parameters using the command line options.
