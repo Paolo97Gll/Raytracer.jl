@@ -86,18 +86,21 @@ end
 
 
 """
-    function render_from_script(input_script::String,
-                                ; output_file::String = "out.pfm",
-                                  use_threads::Bool = true,
-                                  disable_output::Bool = false)
+    render_from_script(input_script::String
+                       ; output_file::String = "out.pfm",
+                         time::Float32 = 0f0,
+                         vars::String = "",
+                         use_threads::Bool = true,
+                         disable_output::Bool = false)
 
 Render an image given an `input_script` written in SceneLang and save the generated hdr image in `output_file`.
 
 If `use_threads` is `true`, use macro `Threads.@threads`. If `disable_output` is `true`, no message is printed.
 """
-function render_from_script(input_script::String,
+function render_from_script(input_script::String
                             ; output_file::String = "out.pfm",
                               time::Float32 = 0f0,
+                              vars::String = "",
                               use_threads::Bool = true,
                               disable_output::Bool = false)
     # check if valid output_file
@@ -105,7 +108,7 @@ function render_from_script(input_script::String,
         error("'$output_file' is not a pfm file!")
     end
     # parse scene
-    scene = Scene(time=time)
+    scene = Scene(time=time, variables=parse_variables_from_string(vars))
     scene = open_stream(input_script) do stream
         try
             parse_scene(stream, scene)
