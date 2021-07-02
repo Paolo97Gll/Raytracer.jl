@@ -44,7 +44,7 @@ Raytracing for the generation of photorealistic images in Julia.
 commands:
   render       render an image from a SceneLang script
   tonemapping  apply tone mapping to a pfm image and save it to file
-  docs         show the documentation link
+  docs         show documentation links
 
 optional arguments:
   --version    show version information and exit
@@ -205,7 +205,7 @@ tonemapping settings:
 ```text
 usage: raytracer_cli.jl docs [--dev] [--version] [-h]
 
-Show the documentation link.
+Show documentation links.
 
 optional arguments:
   --dev       documentation of the dev version
