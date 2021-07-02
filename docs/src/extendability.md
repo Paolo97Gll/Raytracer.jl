@@ -1,17 +1,16 @@
 # [Extendability](@id extendability)
 
-Raytracer is designed to be easily extensible in terms of:
+## Contents
 
-- [Renderers](@ref extendability_Renderers)
-- [Pigments](@ref extendability_Pigments)
-- [BRDFs](@ref extendability_BRDFs)
-- [Shapes](@ref extendability_Shapes)
+```@contents
+Pages = ["extendability.md"]
+```
 
-At [the end of this section](@ref extendability_example) we will present an example of code extendability.
+## Description
 
-To implement new renderers, BRDFs, and shapes one must follow certain guidelines:
+Raytracer is designed to be easily extensible in terms of renderers, pigments, BRDFs, and shapes. To extend the package, one must follow the following guidelines.
 
-## [Renderers](@id extendability_Renderers)
+## Renderers
 
 ###### Needed fields
 
@@ -25,7 +24,7 @@ Each subtype of [`Renderer`](@ref) must be a callable like `(r::Renderer)(ray::R
 
 See doc and source code for [`Renderer`](@ref).
 
-## [Pigments](@id extendability_Pigments)
+## Pigments
 
 ###### Needed fields
 
@@ -39,7 +38,7 @@ Each subtype of [`Pigment`](@ref) must be a callable like `(p::Pigment)(uv::Vec2
 
 See doc and souce code for [`Pigment`](@ref).
 
-## [BRDFs](@id extendability_BRDFs)
+## BRDFs
 
 ###### Needed fields
 
@@ -53,7 +52,7 @@ Each subtype of [`BRDF`](@ref) must implement an `at(::NewBRDF, ::Normal, in_dir
 
 See doc and souce code for [`BRDF`](@ref).
 
-## [Shapes](@id extendability_Shapes)
+## Shapes
 
 ###### Needed fields
 
@@ -80,7 +79,7 @@ We suggest to implement any new composite shape as a subtype to [`CompositeShape
 
 See documentation and source code of [`Shape`](@ref), [`SimpleShape`](@ref), and [`CompositeShape`](@ref).
 
-## [Examples of extendability](@id extendability_example)
+## Examples of extendability
 
 Take a look to the examples folder in the repository to see an example, also reported below here.
 
