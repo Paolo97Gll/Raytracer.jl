@@ -6,12 +6,12 @@ function parse_variables_from_string(str::AbstractString; table::IdTable = IdTab
     scene = Scene(variables = table)
     str = replace(str, r"\s+" => " ")
     buff = IOBuffer(str)
-    stream = InputStream(buff, "COMMANDLINE"; line_num = 0)
+    stream = InputStream(buff, "/COMMANDLINE"; line_num = 0)
     while !eof(stream)
         id = expect_identifier(stream)
         id_name = id.value.value
         findfirst(d -> haskey(d, id_name), table) |> isnothing ||
-            error("Identifier '$(id_name)' has alredy been set.")
+            throw(IdentifierRedefinition(id.loc, "Identifier '$(id_name)' has alredy been set.", id.length))
         value, id_type = parse_constructor(stream, scene)
         haskey(table, id_type) ?
             push!(table[id_type], id_name => ValueLoc(value, copy(id.loc))) :
