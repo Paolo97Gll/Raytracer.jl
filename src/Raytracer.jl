@@ -164,6 +164,7 @@ using .Interpreter:
     print_subsequent_lexer_exceptions,
     Scene,
     open_stream,
+    cli_parsing,
     InterpreterException,
     parse_scene,
     SourceLocation,

@@ -9,4 +9,5 @@ let parser_dir = "parser"
     include(joinpath(parser_dir, "parse_constructors.jl"))
     include(joinpath(parser_dir, "parse_commands.jl"))
     include(joinpath(parser_dir, "parse_scene.jl"))
+    include(joinpath(parser_dir, "cli_parsing.jl"))
 end
