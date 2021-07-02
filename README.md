@@ -1,4 +1,4 @@
-![logo](https://i.imgur.com/BKwIgBO.png)
+![logo](https://i.imgur.com/UxMU0YW.png)
 
 [![julia-version](https://img.shields.io/badge/julia_version-v1.6-9558B2?style=flat&logo=julia)](https://julialang.org/)
 [![package-version](https://img.shields.io/badge/package_version-v0.2.1-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
