@@ -38,7 +38,7 @@ makedocs(
         "For devs" => [
             "Collaboration instructions" => "devs/collab.md",
             "Private API" => "devs/private-api.md",
-            "SceneLang API" => "devs/scenelang-api.md"
+            "SceneLang interpreter API" => "devs/scenelang-api.md"
         ]
     ]
 )

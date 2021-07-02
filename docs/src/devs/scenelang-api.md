@@ -1,4 +1,4 @@
-# SceneLang API
+# SceneLang interpreter API
 
 Documentation of SceneLang interpreter.
 
