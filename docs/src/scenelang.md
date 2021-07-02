@@ -29,11 +29,11 @@ Let's start by looking at what tokens are in a SceneLang script.
 
 In a SceneLang script there are mainly five classes of tokens:
 
-1. [Commands](@ref scenelang_token_commands)
-2. [Types](@ref scenelang_token_types)
-3. [Keywords](@ref scenelang_token_keywords)
-4. [Identifiers](@ref scenelang_token_identifiers)
-5. [Literals](@ref scenelang_token_literals)
+- [Commands](@ref scenelang_token_commands)
+- [Types](@ref scenelang_token_types)
+- [Keywords](@ref scenelang_token_keywords)
+- [Identifiers](@ref scenelang_token_identifiers)
+- [Literals](@ref scenelang_token_literals)
 
 ### [Commands](@id scenelang_token_commands)
 
@@ -112,9 +112,9 @@ $ 1 + 2id ^ 4 - 1e-2 $ # this is a MathExpression token
 
 The syntax of SceneLang is composed of only three entities:
 
-1. [Variables](@ref scenelang_syntax_structure_variables)
-2. [Constructors](@ref scenelang_syntax_structure_constructors)
-3. [Instructions](@ref scenelang_syntax_structure_instructions)
+- [Variables](@ref scenelang_syntax_structure_variables)
+- [Constructors](@ref scenelang_syntax_structure_constructors)
+- [Instructions](@ref scenelang_syntax_structure_instructions)
 
 ### [Variables](@id scenelang_syntax_structure_variables)
 

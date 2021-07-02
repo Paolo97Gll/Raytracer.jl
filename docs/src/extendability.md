@@ -1,10 +1,11 @@
 # [Extendability](@id extendability)
 
 Raytracer is designed to be easily extensible in terms of:
-- [Renderers](@ref extendability_Renderers), 
+
+- [Renderers](@ref extendability_Renderers)
 - [Pigments](@ref extendability_Pigments)
-- [BRDFs](@ref extendability_BRDFs), 
-- [Shapes](@ref extendability_Shapes). 
+- [BRDFs](@ref extendability_BRDFs)
+- [Shapes](@ref extendability_Shapes)
 
 At [the end of this section](@ref extendability_example) we will present an example of code extendability.
 
@@ -12,57 +13,56 @@ To implement new renderers, BRDFs, and shapes one must follow certain guidelines
 
 ## [Renderers](@id extendability_Renderers)
 
-**Needed Fields**
+###### Needed fields
 
-No fields are strictly needed, but it is suggested to have a `World` field, named `world` for code consistency, in which to store the shapes to be rendered. It is also common to store a background color that deals with rays which do not hit any shape.
+No fields are strictly needed, but it is suggested to have a [`World`](@ref) field, named `world` for code consistency, in which to store the shapes to be rendered. It is also common to store a background color that deals with rays which do not hit any shape.
 
-**Needed Methods**
+###### Needed methods
 
 Each subtype of [`Renderer`](@ref) must be a callable like `(r::Renderer)(ray::Ray)` and must return a `RGB{Float32}`.
 
-**Further Notes**
+###### Further notes
 
-See doc and source code for [`Renderer`](@ref)
+See doc and source code for [`Renderer`](@ref).
 
 ## [Pigments](@id extendability_Pigments)
 
-**Needed Fields**
+###### Needed fields
 
 No fields are needed.
 
-**Needed Methods**
+###### Needed methods
 
 Each subtype of [`Pigment`](@ref) must be a callable like `(p::Pigment)(uv::Vec2D)` and must return a `RGB{Float32}`.
 
-**Further Notes**
+###### Further notes
 
-See doc and souce code for [`Pigment`](@ref)
+See doc and souce code for [`Pigment`](@ref).
 
 ## [BRDFs](@id extendability_BRDFs)
 
-**Needed Fields**
+###### Needed fields
 
-`pigment::Pigment` storing the pigment on which the BRDF operates. It is suggested that this field should have a default value (most BRDFs use the default [`UniformPigment`](@ref))
+- `pigment::Pigment`: a [`Pigment`](@ref) storing the pigment on which the BRDF operates. It is suggested that this field should have a default value (most BRDFs use the default [`UniformPigment`](@ref)).
 
-**Needed Methods**
+###### Needed methods
 
-Each subtype of [`BRDF`](@ref) must implement an `at(::NewBRDF, ::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)` function, where `NewBRDF` should be swubstituted with your new type name. This function evaluates the BRDF of a point with given normal, input and output directions and uv coordinates (which are used to evaluate)
+Each subtype of [`BRDF`](@ref) must implement an `at(::NewBRDF, ::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)` function, where `NewBRDF` should be swubstituted with your new type name. This function evaluates the BRDF of a point with given normal, input and output directions and uv coordinates (which are used to evaluate).
 
-**Further Notes**
+###### Further notes
 
-See doc and souce code for [`BRDF`](@ref)
+See doc and souce code for [`BRDF`](@ref).
 
 ## [Shapes](@id extendability_Shapes)
 
-**Needed Fields**
+###### Needed fields
 
-- `material::`[`Material`](@ref) storing the informations on the material of the shape.
-- `transformation::`[`Transformation`](@ref) is the transformation that should be applied to every point of the unitary shape associated with the type (e.g. a sphere of radius one for the [`Sphere`](@ref) shape) to be transformed in the desired shape.
+- `material::Material`: a [`Material`](@ref) storing the informations on the material of the shape.
+- `transformation::Transformation`: a [`Transformation`](@ref) is the transformation that should be applied to every point of the unitary shape associated with the type (e.g., a sphere of radius one for the [`Sphere`](@ref) shape) to be transformed in the desired shape.
 
-**Needed Methods**
+###### Needed methods
 
- A list of the necessary methods for a `NewShape` to qualify as a `Shape` includes:
-- `ray_intersection(::Ray, ::NewShape)`: return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref),
+- `ray_intersection(::Ray, ::NewShape)`: return an [`HitRecord`](@ref) of the nearest ray intersection with the given [`Shape`](@ref).
 - `all_ray_intersections(::Ray, ::NewShape)`: return a `Vector` of [`HitRecord`](@ref)s of all the ray intersections with the given [`Shape`](@ref) for every finite value of `t`, even outside of the ray domain.
 - `quick_ray_intersection(::Ray, ::NewShape)`: return whether the ray intersects the given [`Shape`](@ref).
 - `get_all_ts(::NewShape, ::Ray)`: return a `Vector` of the hit parameter `t` against the given [`Shape`](@ref), even outside of the ray domain.
@@ -71,14 +71,14 @@ Furthermore, if you want to make your `NewShape` a subtype of [`SimpleShape`](@r
 
 - `get_t(::Type{NewShape}, ::Ray)`: return the parameter `t` at which [`Ray`](@ref) first hits the unitary [`SimpleShape`](@ref). If no hit exists, return `Inf32`.
 - `get_all_ts(::Type{NewShape}, ::Ray)`: return a `Vector` of the hit parameter `t` against the unitary shape of the given [`SimpleShape`](@ref) type, even outside of the ray domain.
-- `get_normal(::Type{NewShape}, ::Point, ::Ray)`: return the [`Normal`](@ref)`{true}` of a shape given a point on its surface and the ray that hits it.
+- `get_normal(::Type{NewShape}, ::Point, ::Ray)`: return the [`Normal{true}`](@ref) of a shape given a point on its surface and the ray that hits it.
 - `get_uv(::Type{NewShape}, ::Point)`: return the uv coordinates of a shape associated with the given point on its surface.
 
-**Further Notes**
+###### Further notes
 
 We suggest to implement any new composite shape as a subtype to [`CompositeShape`](@ref) instead of directly subtyping [`Shape`](@ref).
 
-See documentation and source code of [`Shape`](@ref), [`SimpleShape`](@ref), and [`CompositeShape`](@ref)
+See documentation and source code of [`Shape`](@ref), [`SimpleShape`](@ref), and [`CompositeShape`](@ref).
 
 ## [Examples of extendability](@id extendability_example)
 
@@ -107,9 +107,9 @@ If there are no hits this renderer returns the value of its field `fog_color`.
 - `falloff::Float32`: color falloff
 """
 struct FoggyRenderer <: Renderer
-	world::World
-	fog_color::RGB{Float32}
-	falloff::Float32
+    world::World
+    fog_color::RGB{Float32}
+    falloff::Float32
 end
 
 @doc """
@@ -135,9 +135,9 @@ Render a `Ray` and return a `RBG{Float32}`.
 function (fr::FoggyRenderer)(ray::Ray)
     hit = ray_intersection(ray, fr.world)
     isnothing(hit) && return fr.fog_color 
-	hit_color = hit.material.emitted_radiance(hit.surface_point) + hit.material.brdf.pigment(hit.surface_point)
-	t = hit.t/fr.falloff
-	fr.fog_color * (1 - exp(-t)) + hit_color * exp(-t)
+    hit_color = hit.material.emitted_radiance(hit.surface_point) + hit.material.brdf.pigment(hit.surface_point)
+    t = hit.t/fr.falloff
+    fr.fog_color * (1 - exp(-t)) + hit_color * exp(-t)
 end
 
 scene = open_stream(parse_scene, "test_scene.sl")
@@ -148,7 +148,7 @@ render(image_tracer, renderer, output_file="foggy_renderer_out.pfm")
 tonemapping("foggy_renderer_out.pfm", "foggy_renderer_out.jpg", luminosity = 0.5f0)
 ```
 
-Which outputs the following image
+Which outputs the following image:
 
 ![](https://i.imgur.com/T3UmNOO.jpg)
 
