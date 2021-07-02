@@ -27,7 +27,7 @@ export # Interpreter
         open_stream,
     Scene,
         parse_scene,
-        cli_parsing,
+        parse_variables_from_string,
     InterpreterException
 
 let interpreter_dir = "interpreter"
