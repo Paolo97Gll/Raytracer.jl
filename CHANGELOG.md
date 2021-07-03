@@ -1,6 +1,6 @@
 # Changelog Raytracer.jl
 
-## HEAD
+## v0.3.0
 
 ### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
 

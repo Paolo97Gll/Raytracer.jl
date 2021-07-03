@@ -1,7 +1,7 @@
 name = "Raytracer"
 uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
 authors = ["Samuele Colombo <79973069+Samuele-Colombo@users.noreply.github.com>", "Paolo Galli <49845775+Paolo97Gll@users.noreply.github.com>"]
-version = "0.2.1"
+version = "0.3.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"

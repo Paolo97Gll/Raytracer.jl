@@ -1,7 +1,7 @@
 ![logo](https://i.imgur.com/UxMU0YW.png)
 
 [![julia-version](https://img.shields.io/badge/julia_version-v1.6-9558B2?style=flat&logo=julia)](https://julialang.org/)
-[![package-version](https://img.shields.io/badge/package_version-v0.2.1-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
+[![package-version](https://img.shields.io/badge/package_version-v0.3.0-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
 [![status](https://img.shields.io/badge/project_status-beta-ba8a11?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl)
 [![doc-stable](https://img.shields.io/badge/docs-stable-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/stable)
 [![doc-dev](https://img.shields.io/badge/docs-dev-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/dev)
