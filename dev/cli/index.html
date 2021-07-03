@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>CLI tool · Raytracer.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Raytracer.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><span class="tocitem">Quickstart</span><ul><li><a class="tocitem" href="../quickstart/scenelang/">Basic SceneLang usage</a></li><li><a class="tocitem" href="../quickstart/cli/">Basic CLI usage</a></li><li><a class="tocitem" href="../quickstart/api/">Basic API usage</a></li></ul></li><li><a class="tocitem" href="../scenelang/">SceneLang</a></li><li class="is-active"><a class="tocitem" href>CLI tool</a><ul class="internal"><li><a class="tocitem" href="#Contents"><span>Contents</span></a></li><li><a class="tocitem" href="#Description"><span>Description</span></a></li><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li><li><a class="tocitem" href="#Multithreading"><span>Multithreading</span></a></li><li><a class="tocitem" href="#Examples"><span>Examples</span></a></li></ul></li><li><span class="tocitem">API</span><ul><li><a class="tocitem" href="../api/high-level/">High-level API</a></li><li><a class="tocitem" href="../api/low-level/">Low-level API</a></li></ul></li><li><span class="tocitem">For devs</span><ul><li><a class="tocitem" href="../devs/collab/">Collaboration instructions</a></li><li><a class="tocitem" href="../devs/private-docs/">Private documentation</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>CLI tool</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>CLI tool</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Paolo97Gll/Raytracer.jl/blob/master/docs/src/cli.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="cli_tool"><a class="docs-heading-anchor" href="#cli_tool">CLI tool</a><a id="cli_tool-1"></a><a class="docs-heading-anchor-permalink" href="#cli_tool" title="Permalink"></a></h1><h2 id="Contents"><a class="docs-heading-anchor" href="#Contents">Contents</a><a id="Contents-1"></a><a class="docs-heading-anchor-permalink" href="#Contents" title="Permalink"></a></h2><ul><li><a href="#cli_tool">CLI tool</a></li><ul><li><a href="#Contents">Contents</a></li><li><a href="#Description">Description</a></li><li><a href="#Installation">Installation</a></li><li><a href="#Usage">Usage</a></li><ul><li><a href="#raytracer_cli"><code>raytracer_cli.jl</code></a></li><li><a href="#raytracer_cli_tonemapping"><code>raytracer_cli.jl tonemapping</code></a></li><li><a href="#raytracer_cli_demo"><code>raytracer_cli.jl demo</code></a></li><li><a href="#raytracer_cli_demo_image"><code>raytracer_cli.jl demo image</code></a></li><li><a href="#raytracer_cli_demo_animation"><code>raytracer_cli.jl demo animation</code></a></li><li><a href="#raytracer_cli_docs"><code>raytracer_cli.jl docs</code></a></li></ul><li><a href="#Multithreading">Multithreading</a></li><li><a href="#Examples">Examples</a></li><ul><li><a href="#Tone-mapping">Tone mapping</a></li><li><a href="#Generate-a-demo-image">Generate a demo image</a></li><li><a href="#Generate-a-demo-animation">Generate a demo animation</a></li></ul></ul></ul><h2 id="Description"><a class="docs-heading-anchor" href="#Description">Description</a><a id="Description-1"></a><a class="docs-heading-anchor-permalink" href="#Description" title="Permalink"></a></h2><p>The CLI tool is named <code>raytracer_cli.jl</code> and is placed in the root of the repository. Thanks to the simple usage and the extended help messages, it makes possible the use of this package&#39;s high-level features to those who do not know Julia lang.</p><p>This CLI tool recalls functions already present in the <code>Raytracer.jl</code> module, so is possible to run almost all these commands also from the REPL, by calling the same functions called by the tool.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>For now, the command <a href="#raytracer_cli_demo_animation"><code>demo animation</code></a> is available only with the CLI tool.</p></div></div><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>See <a href="../#cli_tool_installation">CLI tool installation</a>.</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>You <em>must</em> call this tool from the repo main folder! It will not work if called by another folder.</p></div></div><p>The CLI tool is based on a series of commands, in a similar way to the <code>git</code> and <code>docker</code> CLI tools. The menu tree is:</p><ul><li><a href="#raytracer_cli"><code>raytracer_cli.jl</code></a><ul><li><a href="#raytracer_cli_tonemapping"><code>tonemapping</code></a></li><li><a href="#raytracer_cli_demo"><code>demo</code></a><ul><li><a href="#raytracer_cli_demo_image"><code>image</code></a></li><li><a href="#raytracer_cli_demo_animation"><code>animation</code></a></li></ul></li><li><a href="#raytracer_cli_docs"><code>docs</code></a></li></ul></li></ul><h3 id="raytracer_cli"><a class="docs-heading-anchor" href="#raytracer_cli"><code>raytracer_cli.jl</code></a><a id="raytracer_cli-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli" title="Permalink"></a></h3><pre><code class="language-text">usage: raytracer_cli.jl [--version] [-h] {tonemapping|demo|docs}
+
+Raytracing for the generation of photorealistic images in Julia.
+
+commands:
+  tonemapping  apply tone mapping to a pfm image and save it to file
+  demo         show a demo of Raytracer.jl
+  docs         show the documentation link
+
+optional arguments:
+  --version    show version information and exit
+  -h, --help   show this help message and exit</code></pre><h3 id="raytracer_cli_tonemapping"><a class="docs-heading-anchor" href="#raytracer_cli_tonemapping"><code>raytracer_cli.jl tonemapping</code></a><a id="raytracer_cli_tonemapping-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli_tonemapping" title="Permalink"></a></h3><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>We support as output image type all the formats supported by the packages <a href="https://github.com/JuliaIO/ImageIO.jl">ImageIO</a>, <a href="https://github.com/JuliaIO/ImageMagick.jl">ImageMagick</a> and <a href="https://github.com/JuliaIO/QuartzImageIO.jl">QuartzImageIO</a>, including: jpg, png, tiff, ppm, bmp, gif, ...</p></div></div><pre><code class="language-text">usage: raytracer_cli.jl tonemapping [-a ALPHA] [-g GAMMA] [--version]
+                        [-h] input_file output_file
+
+Apply tone mapping to a pfm image and save it to file.
+
+optional arguments:
+  --version          show version information and exit
+  -h, --help         show this help message and exit
+
+tonemapping settings:
+  -a, --alpha ALPHA  scaling factor for the normalization process
+                     (type: Float32, default: 0.5)
+  -g, --gamma GAMMA  gamma value for the tone mapping process (type:
+                     Float32, default: 1.0)
+
+files:
+  input_file         path to input file, it must be a PFM file
+  output_file        output file name</code></pre><h3 id="raytracer_cli_demo"><a class="docs-heading-anchor" href="#raytracer_cli_demo"><code>raytracer_cli.jl demo</code></a><a id="raytracer_cli_demo-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli_demo" title="Permalink"></a></h3><pre><code class="language-text">usage: raytracer_cli.jl demo [--version] [-h] {image|animation}
+
+Show a demo of Raytracer.jl.
+
+commands:
+  image       render a demo image of Raytracer.jl
+  animation   create a demo animation of Raytracer.jl (require ffmpeg)
+
+optional arguments:
+  --version   show version information and exit
+  -h, --help  show this help message and exit</code></pre><h3 id="raytracer_cli_demo_image"><a class="docs-heading-anchor" href="#raytracer_cli_demo_image"><code>raytracer_cli.jl demo image</code></a><a id="raytracer_cli_demo_image-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli_demo_image" title="Permalink"></a></h3><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The options <code>camera_position</code> and <code>camera_orientation</code> represent the camera transformations. The application order is: first the translation, then the rotation.</p></div></div><pre><code class="language-text">usage: raytracer_cli.jl demo image [--force] [-t CAMERA_TYPE]
+                        [-p CAMERA_POSITION] [-o CAMERA_ORIENTATION]
+                        [-d SCREEN_DISTANCE] [-r IMAGE_RESOLUTION]
+                        [-R RENDERER] [-A ANTIALIASING] [--pt_n PT_N]
+                        [--pt_max_depth PT_MAX_DEPTH]
+                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
+                        [-a ALPHA] [-g GAMMA] [-O OUTPUT_FILE]
+                        [--version] [-h]
+
+Render a demo image of Raytracer.jl.
+
+optional arguments:
+  --force               force overwrite
+  --version             show version information and exit
+  -h, --help            show this help message and exit
+
+camera:
+  -t, --camera_type CAMERA_TYPE
+                        choose camera type (&quot;perspective&quot; or
+                        &quot;orthogonal&quot;) (default: &quot;perspective&quot;)
+  -p, --camera_position CAMERA_POSITION
+                        camera position in the scene as &quot;X,Y,Z&quot;
+                        (default: &quot;-3,0,0&quot;)
+  -o, --camera_orientation CAMERA_ORIENTATION
+                        camera orientation as &quot;angX,angY,angZ&quot;
+                        (default: &quot;0,0,0&quot;)
+  -d, --screen_distance SCREEN_DISTANCE
+                        only for &quot;perspective&quot; camera: distance
+                        between camera and screen (type: Float32,
+                        default: 2.0)
+
+rendering:
+  -r, --image_resolution IMAGE_RESOLUTION
+                        resolution of the rendered image (default:
+                        &quot;540:540&quot;)
+  -R, --renderer RENDERER
+                        type of renderer to use (&quot;onoff&quot;, &quot;flat&quot;,
+                        &quot;path&quot; or &quot;pointlight&quot;) (default: &quot;path&quot;)
+  -A, --antialiasing ANTIALIASING
+                        number of samples per pixel (must be a perfect
+                        square) (type: Int64, default: 0)
+
+path-tracer options (only for &quot;path&quot; renderer):
+  --pt_n PT_N           number of rays fired for mc integration (type:
+                        Int64, default: 10)
+  --pt_max_depth PT_MAX_DEPTH
+                        maximum number of reflections for each ray
+                        (type: Int64, default: 2)
+  --pt_roulette_depth PT_ROULETTE_DEPTH
+                        depth of the russian-roulette algorithm (type:
+                        Int64, default: 3)
+
+tonemapping:
+  -a, --alpha ALPHA     scaling factor for the normalization process
+                        (type: Float32, default: 0.75)
+  -g, --gamma GAMMA     gamma value for the tone mapping process
+                        (type: Float32, default: 1.0)
+
+files:
+  -O, --output_file OUTPUT_FILE
+                        output LDR file name (the HDR file will have
+                        the same name, but with &quot;pfm&quot; extension)
+                        (default: &quot;demo.jpg&quot;)</code></pre><h3 id="raytracer_cli_demo_animation"><a class="docs-heading-anchor" href="#raytracer_cli_demo_animation"><code>raytracer_cli.jl demo animation</code></a><a id="raytracer_cli_demo_animation-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli_demo_animation" title="Permalink"></a></h3><p>This is an advanced function that requires <a href="https://www.ffmpeg.org/">ffmpeg</a> to be installed on the local machine and to be in the PATH. It generates an H.264 mp4 video containing the animation.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>For now, the generation of animations is available only with the CLI tool.</p></div></div><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The parameter <code>camera_orientation</code> is not present since the animation is done by rotating the camera around the Z axis and therefore there isn&#39;t a fixed camera orientation.</p></div></div><pre><code class="language-text">usage: raytracer_cli.jl demo animation [--force] [-t CAMERA_TYPE]
+                        [-p CAMERA_POSITION] [-d SCREEN_DISTANCE]
+                        [-r IMAGE_RESOLUTION] [-R RENDERER]
+                        [-A ANTIALIASING] [--pt_n PT_N]
+                        [--pt_max_depth PT_MAX_DEPTH]
+                        [--pt_roulette_depth PT_ROULETTE_DEPTH]
+                        [-a ALPHA] [-g GAMMA] [-D DELTA_THETA]
+                        [-f FPS] [-F OUTPUT_DIR] [-O OUTPUT_FILE]
+                        [--version] [-h]
+
+Create a demo animation of Raytracer.jl, by generating n images with
+different camera orientation and merging them into an mp4 video.
+Require ffmpeg installed on local machine.
+
+optional arguments:
+  --force               force overwrite
+  --version             show version information and exit
+  -h, --help            show this help message and exit
+
+frame camera:
+  -t, --camera_type CAMERA_TYPE
+                        choose camera type (&quot;perspective&quot; or
+                        &quot;orthogonal&quot;) (default: &quot;perspective&quot;)
+  -p, --camera_position CAMERA_POSITION
+                        camera position in the scene as &quot;X,Y,Z&quot;
+                        (default: &quot;-3,0,0&quot;)
+  -d, --screen_distance SCREEN_DISTANCE
+                        only for &quot;perspective&quot; camera: distance
+                        between camera and screen (type: Float32,
+                        default: 2.0)
+
+frame rendering:
+  -r, --image_resolution IMAGE_RESOLUTION
+                        resolution of the rendered image (default:
+                        &quot;540:540&quot;)
+  -R, --renderer RENDERER
+                        type of renderer to use (&quot;onoff&quot;, &quot;flat&quot;,
+                        &quot;path&quot; or &quot;pointlight&quot;) (default: &quot;path&quot;)
+  -A, --antialiasing ANTIALIASING
+                        number of samples per pixel (must be a perfect
+                        square) (type: Int64, default: 0)
+
+path-tracer options (only for &quot;path&quot; renderer):
+  --pt_n PT_N           number of rays fired for mc integration (type:
+                        Int64, default: 10)
+  --pt_max_depth PT_MAX_DEPTH
+                        maximum number of reflections for each ray
+                        (type: Int64, default: 2)
+  --pt_roulette_depth PT_ROULETTE_DEPTH
+                        depth of the russian-roulette algorithm (type:
+                        Int64, default: 3)
+
+frame tonemapping:
+  -a, --alpha ALPHA     scaling factor for the normalization process
+                        (type: Float32, default: 0.75)
+  -g, --gamma GAMMA     gamma value for the tone mapping process
+                        (type: Float32, default: 1.0)
+
+animation parameter:
+  -D, --delta_theta DELTA_THETA
+                        Δθ in camera orientation (around z axis)
+                        between each frame; the number of frames
+                        generated is [360/Δθ] (type: Float32, default:
+                        10.0)
+  -f, --fps FPS         FPS (frame-per-second) of the output video
+                        (type: Int64, default: 15)
+
+files:
+  -F, --output_dir OUTPUT_DIR
+                        output directory (default: &quot;demo_animation&quot;)
+  -O, --output_file OUTPUT_FILE
+                        name of output frames and animation without
+                        extension (default: &quot;demo&quot;)</code></pre><h3 id="raytracer_cli_docs"><a class="docs-heading-anchor" href="#raytracer_cli_docs"><code>raytracer_cli.jl docs</code></a><a id="raytracer_cli_docs-1"></a><a class="docs-heading-anchor-permalink" href="#raytracer_cli_docs" title="Permalink"></a></h3><pre><code class="language-text">usage: raytracer_cli.jl docs [--version] [-h]
+
+Show the documentation link.
+
+optional arguments:
+  --version   show version information and exit
+  -h, --help  show this help message and exit</code></pre><h2 id="Multithreading"><a class="docs-heading-anchor" href="#Multithreading">Multithreading</a><a id="Multithreading-1"></a><a class="docs-heading-anchor-permalink" href="#Multithreading" title="Permalink"></a></h2><p>To enable multithreading, e.g. use 8 threads, add <code>-t num_threads</code> after the <code>julia</code> command:</p><pre><code class="language-shell">julia -t 8 raytracer_cli.jl demo image</code></pre><p>Here all examples use only one thread, but you can specify the number of threads you prefer.</p><h2 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h2><h3 id="Tone-mapping"><a class="docs-heading-anchor" href="#Tone-mapping">Tone mapping</a><a id="Tone-mapping-1"></a><a class="docs-heading-anchor-permalink" href="#Tone-mapping" title="Permalink"></a></h3><p>You can use the <a href="#raytracer_cli_tonemapping"><code>tonemapping</code></a> ray command to apply the tone mapping process to a pfm image. For example, you can use the following command to convert the image <code>test/memorial.pfm</code> into a jpg image:</p><pre><code class="language-shell">julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.jpg</code></pre><p><img src="https://i.imgur.com/YX9eSkk.jpg" alt/></p><p>You can also convert to a png image:</p><pre><code class="language-shell">julia raytracer_cli.jl tonemapping test/memorial.pfm memorial.png</code></pre><p>or any other format supported (see <a href="#raytracer_cli_tonemapping">here</a>).</p><p>You can also change the default values of <code>alpha</code> and/or <code>gamma</code> to obtain a better tone mapping, according to your source image:</p><pre><code class="language-shell">julia raytracer_cli.jl tonemapping --alpha 0.2 --gamma 1.8 test/memorial.pfm memorial.jpg</code></pre><p><img src="https://i.imgur.com/c6tKSRG.jpg" alt/></p><h3 id="Generate-a-demo-image"><a class="docs-heading-anchor" href="#Generate-a-demo-image">Generate a demo image</a><a id="Generate-a-demo-image-1"></a><a class="docs-heading-anchor-permalink" href="#Generate-a-demo-image" title="Permalink"></a></h3><p>You can use the <a href="#raytracer_cli_demo_image"><code>demo image</code></a> command to render a demo image:</p><pre><code class="language-shell">julia raytracer_cli.jl demo image</code></pre><p><img src="https://i.imgur.com/DiYwNyG.jpg" alt/></p><p>It creates two files: <code>demo.pfm</code> (the HDR image) and <code>demo.jpg</code> (the LDR image).</p><p>You can change the output file name, the LDR extension and other rendering parameters using the command options. For example, you can enable antialiasing and see the difference it can make. Here an example with 36 rays/pixel:</p><p><img src="https://i.imgur.com/8JCWIJ2.jpg" alt/></p><h3 id="Generate-a-demo-animation"><a class="docs-heading-anchor" href="#Generate-a-demo-animation">Generate a demo animation</a><a id="Generate-a-demo-animation-1"></a><a class="docs-heading-anchor-permalink" href="#Generate-a-demo-animation" title="Permalink"></a></h3><p>To create a demo animation, use the command <a href="#raytracer_cli_demo_animation"><code>demo animation</code></a>:</p><pre><code class="language-shell">julia raytracer_cli.jl demo animation</code></pre><video autoplay="" controls="" loop="" width="540" height="540">
+  <source src="https://i.imgur.com/2yEoRbA.mp4">
+</video><p>It creates a new folder <code>demo_animation</code> with the video <code>demo.mp4</code> and all the frames in jpeg format.</p><p>You can change the output folder and file name and other rendering and animation parameters using the command options.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../scenelang/">« SceneLang</a><a class="docs-footer-nextpage" href="../api/high-level/">High-level API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 16 June 2021 08:17">Wednesday 16 June 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
