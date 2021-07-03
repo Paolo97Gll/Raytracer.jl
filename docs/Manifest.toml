@@ -148,9 +148,9 @@ version = "0.8.5"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "3ebb967819b284dc1e3c0422229b58a40a255649"
+git-tree-sha1 = "47f13b6305ab195edb73c86815962d84e31b0f48"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.26.3"
+version = "0.27.3"
 
 [[DocumenterTools]]
 deps = ["AbstractTrees", "Base64", "DocStringExtensions", "Documenter", "FileWatching", "Gumbo", "LibGit2", "Sass"]
@@ -233,10 +233,10 @@ uuid = "528830af-5a63-567c-a44a-034ed33b8444"
 version = "0.10.1+1"
 
 [[IOCapture]]
-deps = ["Logging"]
-git-tree-sha1 = "377252859f740c217b936cebcd918a44f9b53b59"
+deps = ["Logging", "Random"]
+git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.1.1"
+version = "0.2.2"
 
 [[IdentityRanges]]
 deps = ["OffsetArrays"]
@@ -606,11 +606,11 @@ version = "0.4.0"
 
 [[Raytracer]]
 deps = ["ArgParse", "ColorTypes", "Colors", "Documenter", "FileIO", "ImageIO", "ImageMagick", "ImagePFM", "Images", "Intervals", "LinearAlgebra", "Netpbm", "ProgressMeter", "QuartzImageIO", "Random", "StaticArrays", "Test"]
-git-tree-sha1 = "c0b1af6a82bfef0bdda84bc1ec011ac620e86bba"
+git-tree-sha1 = "90b7fe9fd4781ee95a60197714074a9c59af0895"
 repo-rev = "master"
 repo-url = "https://github.com/Paolo97Gll/Raytracer.jl"
 uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
-version = "0.2.1"
+version = "0.3.0"
 
 [[RecipesBase]]
 git-tree-sha1 = "b3fb709f3c97bfc6e948be68beeecb55a0b340ae"

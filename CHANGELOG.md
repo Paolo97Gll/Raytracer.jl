@@ -1,6 +1,8 @@
 # Changelog Raytracer.jl
 
-## v0.3.0
+## v1.0.0
+
+First stable version.
 
 ### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
 
