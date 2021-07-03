@@ -606,11 +606,11 @@ version = "0.4.0"
 
 [[Raytracer]]
 deps = ["ArgParse", "ColorTypes", "Colors", "Documenter", "FileIO", "ImageIO", "ImageMagick", "ImagePFM", "Images", "Intervals", "LinearAlgebra", "Netpbm", "ProgressMeter", "QuartzImageIO", "Random", "StaticArrays", "Test"]
-git-tree-sha1 = "90b7fe9fd4781ee95a60197714074a9c59af0895"
+git-tree-sha1 = "58d72df0f5f7981163255bc2e85ab936ad3767be"
 repo-rev = "master"
 repo-url = "https://github.com/Paolo97Gll/Raytracer.jl"
 uuid = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
-version = "0.3.0"
+version = "1.0.0"
 
 [[RecipesBase]]
 git-tree-sha1 = "b3fb709f3c97bfc6e948be68beeecb55a0b340ae"
