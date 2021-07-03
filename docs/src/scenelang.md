@@ -351,6 +351,7 @@ INTERSECT(shape::shape, ::shape...)
 DIFF(shape::shape, ::shape...)
 FUSE(shape::shape, ::shape...)
 ```
+
 Valid argument of [`SPAWN`](@ref scenelang_syntax_structure_instructions_SPAWN).
 
 #### [Lights](@id scenelang_syntax_structure_constructors_lights)
@@ -362,6 +363,7 @@ Light(.position position::point = {0,0,0},
       .color color::color = <1,1,1>,
       .linear_radius radius::number = 0)
 ```
+
 Valid argument of [`SPAWN`](@ref scenelang_syntax_structure_instructions_SPAWN).
 
 #### [PCGs](@id scenelang_syntax_structure_constructors_pcgs)
@@ -403,6 +405,7 @@ Renderer.PathTracer(.background_color color::color = <0,0,0>,
                     .max_depth        max::number.integer = 2,
                     .roulette_depth   roulette::number.integer = 3)
 ```
+
 Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
 
 #### [Tracers](@id scenelang_syntax_structure_constructors_tracers)
@@ -412,6 +415,7 @@ Tracers have a named constructor with signature
 ```julia
 Tracer(.samples_per_side samples::number = 1, .rng rng::pcg = Pcg())
 ```
+
 Valid argument of [`USING`](@ref scenelang_syntax_structure_instructions_USING).
 
 #### [MathExpressions](@id scenelang_syntax_structure_constructors_math_expressions)

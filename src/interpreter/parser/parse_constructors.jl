@@ -672,7 +672,7 @@ function parse_intersection(stream::InputStream, scene::Scene)
         push!(shapes, parse_shape(stream, scene))
         expect_symbol(stream, (Symbol(","), Symbol(")"))).value.value == Symbol(")") && break
     end
-    intersection(shapes...)
+    intersect(shapes...)
 end
 
 """
