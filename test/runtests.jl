@@ -58,12 +58,6 @@ end
 end
 
 
-# TODO fix interpreter tests
-# @testset "Interpreter" begin
-#     include("test_interpreter.jl")
-# end
-
-
 ################
 # Documentation
 
