@@ -22,7 +22,7 @@ function parse_set_command(stream::InputStream, scene::Scene)
             iszero(preexisting.loc.line_num) ||
                 throw(IdentifierRedefinition(id.loc, "Identifier '$(id_name)' has alredy been set at\n$(preexisting.loc)\nIf you want to redefine it first UNSET it.", id.length))
             parse_constructor(stream, scene)
-            return # if identifier was defined at the command line level throw no error and return nothing
+            continue # if identifier was defined at the command line level throw no error and ignore the set instruction
         end
         value, id_type = parse_constructor(stream, scene)
         haskey(table, id_type) ?
