@@ -6,4 +6,4 @@ ImagePFM = "de255290-5529-4d77-9c46-251ebffccf2e"
 Raytracer = "44409bb9-c390-49b7-a20d-58ebfe3ef213"
 
 [compat]
-Documenter = "0.26"
+Documenter = "0.27"
