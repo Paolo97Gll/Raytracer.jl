@@ -12,7 +12,11 @@ using Pkg
 Pkg.activate(normpath(@__DIR__))
 # Pkg.activate(normpath(joinpath(@__DIR__, "..")))
 
-using Documenter, Raytracer
+using Documenter
+
+using Raytracer
+using Raytracer:
+    SimpleShape, CompositeShape
 
 
 makedocs(
@@ -20,8 +24,8 @@ makedocs(
     pages = [
         "Introduction" => "index.md",
         "Quickstart" => [
-            "Basic SceneLang usage" => "quickstart/scenelang.md",
             "Basic CLI usage" => "quickstart/cli.md",
+            "Basic SceneLang usage" => "quickstart/scenelang.md",
             "Basic API usage" => "quickstart/api.md"
         ],
         "SceneLang" => "scenelang.md",
@@ -30,9 +34,11 @@ makedocs(
             "High-level API" => "api/high-level.md",
             "Low-level API" => "api/low-level.md"
         ],
+        "Extendability" => "extendability.md",
         "For devs" => [
             "Collaboration instructions" => "devs/collab.md",
-            "Private documentation" => "devs/private-docs.md"
+            "Private API" => "devs/private-api.md",
+            "SceneLang interpreter API" => "devs/scenelang-api.md"
         ]
     ]
 )

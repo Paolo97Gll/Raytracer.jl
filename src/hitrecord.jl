@@ -10,7 +10,7 @@
 
 A struct representing the result of an intersection between a [`Ray`](@ref) and a [`Shape`](@ref).
 
-# Members
+# Fields
 
 - `world_point::Point`: a [`Point`](@ref) representing the world coordinates of the hit point.
 - `normal::Normal`: a [`Normal`](@ref) representing the orientation of the normal to the surface where the hit happened.
@@ -65,5 +65,9 @@ function Base.isless(hr1::HitRecord, hr2::HitRecord)
 end
 
 function Base.isequal(hr1::HitRecord, hr2::HitRecord)
+    isequal(hr1.t/norm(hr1.ray.dir), hr2.t/norm(hr2.ray.dir))
+end
+
+function Base.:(==)(hr1::HitRecord, hr2::HitRecord)
     hr1.t/norm(hr1.ray.dir) == hr2.t/norm(hr2.ray.dir)
 end

@@ -17,9 +17,8 @@ module Raytracer
 # Imports
 
 
-using Intervals: minimum, isfinite
 import Base:
-    (+), (-), (*), (≈),
+    (+), (-), (*), (≈), (==),
     Matrix, OneTo,
     axes, clamp, convert, eltype, fill!, firstindex, getindex, iterate,
     lastindex, length, one, print_matrix, rand, read, readline, setindex!, show,
@@ -34,6 +33,8 @@ import Base.Broadcast:
 using ColorTypes:
     RGB, Fractional
 
+using FileIO:
+    File, @format_str, query
 import FileIO:
     save, load
 
@@ -55,7 +56,6 @@ import Random:
     Random.CloseOpen01, Sampler, SamplerTrivial
 
 using Intervals, ProgressMeter
-
 
 ##########
 # Exports
@@ -93,7 +93,7 @@ export # Scene
         create_onb_from_z,
         NORMAL_X, NORMAL_Y, NORMAL_Z,
         VEC_X, VEC_Y, VEC_Z,
-        NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false, 
+        NORMAL_X_false, NORMAL_Y_false, NORMAL_Z_false,
     Point,
         convert,
         ORIGIN,
@@ -104,9 +104,9 @@ export # Scene
         scaling, translation,
     Shape,
         Sphere, Plane, Cube, Cylinder, Cone,
-        CSG, 
-            UnionCSG, 
-            IntersectionCSG, 
+        CSG,
+            UnionCSG,
+            IntersectionCSG,
             DiffCSG,
             FusionCSG,
         fuse,
@@ -126,7 +126,7 @@ export # Random number generation
     PCG
 
 export # High level API
-    demo, tonemapping
+    tonemapping, render, render_from_script
 
 export # image tools
     clamp_image, normalize_image, γ_correction, load, save
@@ -157,6 +157,18 @@ include("shapes.jl")
 include("world.jl")
 include("renderers.jl")
 include("imagetracer.jl")
+
+include("interpreter.jl")
+
+using .Interpreter:
+    print_subsequent_lexer_exceptions,
+    Scene,
+    open_stream,
+    parse_variables_from_string,
+    InterpreterException,
+    parse_scene,
+    SourceLocation,
+    UndefinedSetting
 
 include("user_utils.jl")
 

@@ -101,12 +101,13 @@ function CheckeredPigment{N}(; color_on::RGB{Float32} = WHITE, color_off::RGB{Fl
 end
 
 """
-    CheckeredPigment(color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
+    CheckeredPigment(; N::Int = 2, color_on::RGB{Float32} = WHITE,
+                      color_off::RGB{Float32} = BLACK) where {N}
 
-Constructor for a [`CheckeredPigment{2}`](@ref) instance.
+Constructor for a [`CheckeredPigment`](@ref) instance.
 """
-function CheckeredPigment(color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
-    CheckeredPigment{2}(color_on, color_off)
+function CheckeredPigment(; N::Int = 2, color_on::RGB{Float32} = WHITE, color_off::RGB{Float32} = BLACK)
+    CheckeredPigment{N}(color_on, color_off)
 end
 
 """
@@ -139,6 +140,15 @@ Constructor for a [`ImagePigment`](@ref) instance.
 """ ImagePigment(::HdrImage)
 
 """
+    ImagePigment(; image::HdrImage = HdrImage(1, 1))
+
+Constructor for a [`ImagePigment`](@ref) instance.
+"""
+function ImagePigment(; image::HdrImage = HdrImage(1, 1))
+    ImagePigment(image)
+end
+
+"""
     (ip::ImagePigment)(u::Float32, v::Float32)
 
 Return the color of the surface in the given point ``(u,v)``.
@@ -160,6 +170,9 @@ end
 
 An abstract type representing a Bidirectional Reflectance Distribution Function.
 
+Each subtype of this type must include a field `pigment::`[`Pigment`](@ref) storing the pigment on which the BRDF operates.
+Each subtype of this type must implement an `at(::NewBRDF, ::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)` function, where `NewBRDF` should be swubstituted with your new type name. This function evaluates the BRDF of a point with given normal, input and output directions and uv coordinates (which are used to evaluate)
+
 See also: [`DiffuseBRDF`](@ref), [`SpecularBRDF`](@ref),
 """
 abstract type BRDF end
@@ -176,7 +189,6 @@ A class representing an ideal diffuse [`BRDF`](@ref) (also called "Lambertian").
 """
 Base.@kwdef struct DiffuseBRDF <: BRDF
     pigment::Pigment = UniformPigment()
-    reflectance::Float32 = 1f0
 end
 
 @doc """
@@ -198,8 +210,8 @@ Constructor for a [`DiffuseBRDF`](@ref) instance.
 Get the radiance, given a point `uv` ([`Vec2D`](@ref)) on the surface with a [`DiffuseBRDF`](@ref)., an incoming
 direction `in_dir` and outcoming direction ([`Vec`](@ref)), a `normal` of the surface point ([`Normal`](@ref)).
 """
-function at(brdf::DiffuseBRDF, normal::Normal, in_dir::Vec, out_dir::Vec, uv::Vec2D)
-    brdf.pigment(uv) * (brdf.reflectance / π)
+function at(brdf::DiffuseBRDF, #=normal=#::Normal, #=in_dir=#::Vec, #=out_dir=#::Vec, uv::Vec2D)
+    brdf.pigment(uv) * (1f0 / π)
 end
 
 """

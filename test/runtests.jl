@@ -9,7 +9,7 @@ using Test
 
 using Documenter, LinearAlgebra, StaticArrays
 
-using Raytracer
+using Raytracer, Raytracer.Interpreter
 
 
 ##############

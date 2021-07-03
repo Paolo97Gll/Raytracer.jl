@@ -1,4 +1,4 @@
-# Raytracer.jl
+![logo](https://i.imgur.com/UxMU0YW.png)
 
 Raytracing package for the generation of photorealistic images in Julia.
 
@@ -29,57 +29,29 @@ We provide:
 
 - A [CLI tool](@ref cli_tool). Thanks to the simple usage and the extended help messages, it makes possible the use of this package's high-level features to those who do not know Julia lang. See [Basic CLI tool usage](@ref).
 
-For example, to generate a demo image, you can use the julia REPL:
+- [SceneLang](@ref scenelang) is a Domain-Specific Language (DSL) used to describe a 3D scene that can be rendered by Raytracer. Being a DSL, SceneLang lacks some of the basic features of general purpose languages: there are no functions or custom types or even flexible arithmetic operations. SceneLang is made only to construct scenes to be rendered. See [Basic SceneLang usage](@ref).
+
+For example, to generate an image from a SceneLang script, you can use the julia REPL:
 
 ```julia-repl
 julia> using Raytracer
 
-julia> demo()
-
--> RENDERING
-Loading scene... done!
-Loading tracing informations... done!
-Rendering image...
-Progress: 100%|█████████████████████████████████████████████████████| Time: 0:00:44
-Saving pfm image... done!
-
--> TONE MAPPING PROCESS
-Loading input file 'demo.pfm'... done!
-Applying tone mapping...  done!
-Saving final image to 'demo.jpg'... done!
+julia> render_from_script("path/to/script.sl")
 ```
 
 or equivalently the CLI tool:
 
 ```text
-~/Raytracer.jl❯ julia raytracer_cli.jl demo image
-  Activating environment at `C:\Users\paolo\source\repos\Raytracer.jl\Project.toml`
-
-raytracer_cli.jl : Raytracer.jl demo image
-
-Renderer: PathTracer
-Number of threads: 1
-
--> RENDERING
-Loading scene... done!
-Loading tracing informations... done!
-Rendering image...
-Progress: 100%|█████████████████████████████████████████████████████| Time: 0:00:42
-Saving pfm image... done!
-
--> TONE MAPPING PROCESS
-Loading input file 'demo.pfm'... done!
-Applying tone mapping...  done!
-Saving final image to 'demo.jpg'... done!
+~/Raytracer.jl❯ julia raytracer_cli.jl render image path/to/script.sl
 ```
 
-The CLI tool has more advanced features, like the generation of animations. But using the package from the REPL gives more flexibility.
+The CLI tool has more advanced features, like the generation of animations, but using the package from the REPL gives more flexibility.
 
 ## Installation
 
 ### Package
 
-The package is still under development and is not available in the official registry.
+The package is not available in the official registry.
 
 To add this package to your main environment (_not recommended_), open the julia REPL and type the following commands:
 
@@ -104,14 +76,13 @@ Pkg.add(url="https://github.com/Paolo97Gll/Raytracer.jl")
 
 ### [CLI tool](@id cli_tool_installation)
 
-To use it, clone this repository:
+To use the CLI tool, you don't need to install the package or create a new environment: you just need to clone the repository:
 
 ```shell
 git clone https://github.com/Paolo97Gll/Raytracer.jl.git
-cd Raytracer.jl
 ```
 
-Then, open the julia REPL and type the following commands to instantiate the environment:
+Then `cd` into the cloned folder, open the julia REPL, and type the following commands to instantiate the environment:
 
 ```julia
 import Pkg

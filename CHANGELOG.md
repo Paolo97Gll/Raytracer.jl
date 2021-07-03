@@ -1,10 +1,32 @@
 # Changelog Raytracer.jl
 
-## HEAD
+## v0.3.0
 
-- Add cubes, cylinders, and CSG ([#25](https://github.com/Paolo97Gll/Raytracer.jl/pull/25))
+### ⚠⚠⚠ BREAKING CHANGES ⚠⚠⚠
+
+- CLI `demo` command is removed in favor of the command `render`: this command takes a SceneLang script (see below) as input and generates an hdr image (and optionally the corrispective ldr image).
+
+### New package features
+
+- Add SceneLang support ([#27](https://github.com/Paolo97Gll/Raytracer.jl/pull/27)).
+
+### New CLI tool features
+
+- Add `docs` command to show documentation informations.
+
+- Add `--luminosity` option in `tonemapping` command ([#30](https://github.com/Paolo97Gll/Raytracer.jl/issues/30)).
+
+### Improvements
+
+- Improve documentation.
 
 ## v0.2.1
+
+### New package features
+
+- Add cubes, cylinders, and CSG ([#25](https://github.com/Paolo97Gll/Raytracer.jl/pull/25)).
+
+### Improvements
 
 - Improve documentation.
 

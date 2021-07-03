@@ -3,8 +3,9 @@
 # Raytracing for the generation of photorealistic images in Julia
 # Copyright (c) 2021 Samuele Colombo, Paolo Galli
 
-#######
 # Cone
+# FIXME bugged, so not included!
+
 
 """
     Cone{radius_ratio} <: SimpleShape
