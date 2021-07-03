@@ -24,8 +24,8 @@ makedocs(
     pages = [
         "Introduction" => "index.md",
         "Quickstart" => [
-            "Basic SceneLang usage" => "quickstart/scenelang.md",
             "Basic CLI usage" => "quickstart/cli.md",
+            "Basic SceneLang usage" => "quickstart/scenelang.md",
             "Basic API usage" => "quickstart/api.md"
         ],
         "SceneLang" => "scenelang.md",
