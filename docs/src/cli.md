@@ -288,3 +288,5 @@ julia raytracer_cli.jl render animation examples/demo/animation.sl 0:360 --delta
 It creates a new folder `animation` with the video `out.mp4` and all the frames in jpeg format.
 
 You can change the output folder and file name, the LDR frame extension, and other rendering and animation parameters using the command line options.
+
+An important argument of the `render animation` command is `time_limits`, as it sets the `time` setting for the rendered scene, which can used in a SceneLang script as described [here](@ref scenelang_syntax_structure_constructors_numbers_time).

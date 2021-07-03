@@ -189,6 +189,10 @@ This constructor supports integer notation `1`, dotted notations `1.0` and `1.`,
 !!! warning
     The notation `.1` is not supported, the parser would interpret it as a keyword, use `+.1`, `-.1`, or `0.1` instead.
 
+###### [`TIME` command](@id scenelang_syntax_structure_constructors_numbers_time)
+
+A special constructor command can also be used: `TIME`. This constructor returns the value of the `time` setting, which is set at the cli level (see [render image](@ref raytracer_cli_render_image) and [render animation](@ref raytracer_cli_render_animation)). This is needed in animations to change values between a frame and the other.
+
 #### [Strings](@id scenelang_syntax_structure_constructors_strings)
 
 Being a primitive type, strings only have a symbolic constructor.
@@ -249,7 +253,7 @@ Transformation(matrix::list.lenght16)
 
 Transformations can be concatenated using the symbol `*` which behaves like a matrix multiplication operation.
 
-and four command constructors.
+Transformations also have the following four command constructors.
 
 ##### `SCALE` command
 
