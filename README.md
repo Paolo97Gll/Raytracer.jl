@@ -1,14 +1,14 @@
 ![logo](https://i.imgur.com/UxMU0YW.png)
 
-[![julia-version](https://img.shields.io/badge/julia_version-v1.6-9558B2?style=flat&logo=julia)](https://julialang.org/)
-[![package-version](https://img.shields.io/badge/package_version-v1.0.0-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
+[![julia-version](https://img.shields.io/badge/julia_version-v1.6,_v1.7-9558B2?style=flat&logo=julia)](https://julialang.org/)
+[![package-version](https://img.shields.io/badge/package_version-v1.0.1-9558B2?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl/releases)
 [![status](https://img.shields.io/badge/project_status-stable-green?style=flat)](https://github.com/Paolo97Gll/Raytracer.jl)
 [![doc-stable](https://img.shields.io/badge/docs-stable-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/stable)
 [![doc-dev](https://img.shields.io/badge/docs-dev-blue?style=flat)](https://paolo97gll.github.io/Raytracer.jl/dev)
 
 Raytracing package for the generation of photorealistic images in Julia.
 
-Julia version required: ≥1.6
+Julia version required: ≥ v1.6 (tested on julia 1.6 and julia 1.7)
 
 _Note: we refer to **stable** documentation for the latest tag, and **dev** documentation for the current code in the master branch._
 
@@ -45,6 +45,8 @@ We provide:
 [SceneLang](https://paolo97gll.github.io/Raytracer.jl/stable/scenelang) is a Domain-Specific Language (DSL) used to describe a 3D scene that can be rendered by Raytracer. See [quickstart](https://paolo97gll.github.io/Raytracer.jl/stable/quickstart/scenelang).
 
 Being a DSL, SceneLang lacks some of the basic features of general purpose languages: there are no functions or custom types or even flexible arithmetic operations. SceneLang is made only to construct scenes to be rendered.
+
+There is also a syntax highlighting [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=samuele-colombo.scenelang-highlighter).
 
 ## Contributing
 

@@ -1,5 +1,11 @@
 # Changelog Raytracer.jl
 
+## v1.0.1
+
+- Package dependencies updated.
+
+- Add support for Julia 1.7.
+
 ## v1.0.0
 
 First stable version.
