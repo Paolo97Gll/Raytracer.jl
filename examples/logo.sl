@@ -34,7 +34,7 @@ SET
 SET
 	offset 1.5
 
-# These svariables are constructed by referring 
+# These svariables are constructed by referring
 # to previously declared variables and through
 # mathematical expressions surrounded by `$`
 SET
