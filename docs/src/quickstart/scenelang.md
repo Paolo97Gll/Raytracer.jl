@@ -2,7 +2,11 @@
 
 As it has been seen in the [Basic CLI tool usage](@ref) section, scenes can be rendered by the `render` command starting from a SceneLang script.
 
-SceneLang is a custum Domain-Specific Language (DSL) conceived to allow an easy description of scenes that can be rendered by Raytracer. A SceneLang script must be stored in a file with the `.sl` extension and must contain a series of instructions aimed at constructing an image. 
+SceneLang is a custom Domain-Specific Language (DSL) conceived to allow an easy description of scenes that can be rendered by Raytracer. A SceneLang script must be stored in a file with the `.sl` extension and must contain a series of instructions aimed at constructing an image.
+
+!!! tip
+    If you use Visual Studio Code, you can install the [SceneLang Highlighter]((https://marketplace.visualstudio.com/items?itemName=samuele-colombo.scenelang-highlighter)) extension, which add support for syntax highlighting.
+
 We refer to the [SceneLang documentation](@ref scenelang) for an in-depth explanation on how the language works, but a simple example of how the scripting language works is the script that generates the Raytracer.jl logo. This script can be found in `examples/logo.sl`.
 
 ```julia
@@ -42,7 +46,7 @@ SET
 SET
 	offset 1.5
 
-# These svariables are constructed by referring 
+# These svariables are constructed by referring
 # to previously declared variables and through
 # mathematical expressions surrounded by `$`
 SET
